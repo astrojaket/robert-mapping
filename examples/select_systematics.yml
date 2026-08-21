@@ -1,0 +1,45 @@
+schema_version: 1
+
+project:
+  name: select-raw-systematics
+  seed: 20260821
+  description: Fast nuisance-model comparison before a joint eclipse-map fit
+
+data:
+  kind: files
+  time: ../wasp43b_simulation/w43b_time.npy
+  flux: ../wasp43b_simulation/w43b_flux.npy
+  flux_err: ../wasp43b_simulation/w43b_error.npy
+  time_unit: day
+  exposure_seconds: 10.04
+  normalize: none
+
+# The selector compares only nuisance designs. It does not fit a map.
+systematics_selection:
+  enabled: true
+  metric: bic                 # use held_out_elpd for a chronological check
+  validation_fraction: 0.20   # final 20 percent of the time series is held out
+  min_training_points: 20
+  candidates:
+    - name: corrected
+      mode: corrected
+    - name: additive_ramp
+      mode: additive
+      exponential_ramp: true
+      ramp_timescale_hours: 88.8
+    - name: multiplicative_ramp
+      mode: multiplicative
+      exponential_ramp: true
+      ramp_timescale_hours: 88.8
+
+compute:
+  profile: local
+  jax_platform: cpu
+  max_cpus: 1
+  threads: 1
+
+output:
+  directory: ../results/systematics-selection
+  overwrite: true
+  save_resolved_config: true
+  best_fit_color: mediumpurple

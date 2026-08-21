@@ -1,0 +1,15 @@
+{
+  "cases": [
+    "circular_degree0",
+    "circular_degree1",
+    "circular_degree2",
+    "circular_degree2_exposure240s",
+    "circular_degree2_inclination83",
+    "circular_degree2_light_delay",
+    "circular_degree4",
+    "eccentric_degree2_e018_w125"
+  ],
+  "generator": "tools/generate_starry_v1_reference.py",
+  "runtime_note": "These files are frozen. robert-mapping does not import starry.",
+  "starry_version": "1.0.0"
+}

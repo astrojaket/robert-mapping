@@ -1,0 +1,68 @@
+schema_version: 1
+
+project:
+  name: hatp32-production-recovery
+  seed: 20260812
+  description: Increased-sampling fit to the first new 60 ppm recovery data set
+
+data:
+  kind: files
+  file: ../results/recovery_hatp32/synthetic_observation.csv
+  format: csv
+  time_column: time_bjd_tdb
+  flux_column: relative_flux
+  flux_err_column: relative_flux_err
+  time_unit: day
+  exposure_seconds: 88.44
+  normalize: none
+
+system:
+  period_days: 2.150009
+  transit_time: 2457740.0443955003
+  a_over_rstar: 6.05
+  radius_ratio: 0.1508
+  inclination_degrees: 88.9
+  planet_flux_ratio: 0.000445
+  eccentricity: 0.0
+
+map:
+  representation: pixels
+  harmonic_degree: 2
+  n_pixels: 16
+  # The legacy HAT-P-32b recovery used a broad harmonic prior.
+  pixel_log_sigma: 3.1622776601683795
+  positive: true
+  regularization: entropy
+  entropy_penalty: 0.0
+
+model:
+  null_model: uniform_disk
+  mapped_model: spherical_harmonic
+  likelihood: gaussian
+  fit_baseline: false
+  fit_ramp: false
+  integrate_exposure: false
+
+inference:
+  sampler: nuts
+  chains: 2
+  warmup: 2000
+  draws: 2000
+  target_accept: 0.999
+  init_strategy: jitter+adapt_diag
+  dense_mass: true
+  progress_bar: true
+
+compute:
+  profile: local
+  jax_platform: cpu
+  max_cpus: 3
+  threads: 2
+  quadrature_radial: 32
+  quadrature_azimuth: 128
+
+output:
+  directory: ../results/production_hatp32_v2_nuts
+  overwrite: true
+  save_report: true
+  best_fit_color: mediumpurple

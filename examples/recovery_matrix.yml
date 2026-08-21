@@ -1,0 +1,71 @@
+schema_version: 1
+
+project:
+  name: synthetic-recovery-matrix
+  seed: 20260821
+  description: Bounded latitude/longitude recovery at two noise levels and one or three eclipses
+
+data:
+  kind: synthetic
+  time_unit: day
+  exposure_seconds: 88.44
+
+system:
+  period_days: 2.150009
+  transit_time: 2457740.0443955003
+  a_over_rstar: 6.05
+  radius_ratio: 0.1508
+  inclination_degrees: 88.9
+  planet_flux_ratio: 0.000445
+  eccentricity: 0.0
+
+map:
+  representation: harmonics
+  harmonic_degree: 2
+  positive: true
+
+model:
+  null_model: uniform_disk
+  mapped_model: eclipse_map
+  fit_baseline: true
+  fit_ramp: false
+
+inference:
+  # The recovery matrix is profile-grid only. These values are not used.
+  chains: 1
+  warmup: 1
+  draws: 1
+
+compute:
+  profile: local
+  jax_platform: cpu
+  max_cpus: 1
+  threads: 1
+
+recovery:
+  enabled: true
+  case: synthetic_matrix
+  injected_longitudes_degrees: [-30.0, 0.0, 30.0]
+  injected_latitudes_degrees: [-30.0, 0.0, 30.0]
+  hotspot_width_degrees: 40.0
+  hotspot_fraction: 0.8
+  noise_ppm: 60.0
+  noise_levels_ppm: [60.0, 120.0]
+  eclipse_counts: [1, 3]
+  points_per_eclipse: 121
+  trials_per_case: 1
+  longitude_grid_min_degrees: -90.0
+  longitude_grid_max_degrees: 90.0
+  longitude_grid_step_degrees: 15.0
+  latitude_grid_degrees: [-60.0, -30.0, 0.0, 30.0, 60.0]
+  width_grid_degrees: [40.0]
+  timing_grid_seconds: [0.0]
+  detection_delta_bic: -6.0
+  baseline_order: 0
+  correlated_noise: false
+
+output:
+  directory: ../results/recovery_matrix
+  overwrite: true
+  save_report: true
+  best_fit_color: mediumpurple

@@ -1,0 +1,71 @@
+schema_version: 1
+
+project:
+  name: hammond-2024-wasp43b-production
+  seed: 20260820
+  description: Increased-sampling full-phase fit to the frozen starry WASP-43b simulation
+
+data:
+  kind: files
+  file: ../results/production_wasp43b_input/wasp43b_full_phase_curve.csv
+  format: csv
+  time_column: time
+  flux_column: flux
+  flux_err_column: flux_err
+  time_unit: day
+  exposure_seconds: 10.04
+  normalize: none
+
+system:
+  period_days: 0.8134740621723353
+  transit_time: 55934.292283
+  a_over_rstar: 4.859
+  radius_ratio: 0.15839
+  inclination_degrees: 82.106
+  planet_flux_ratio: 0.005
+  limb_darkening_u1: 0.0182
+  limb_darkening_u2: 0.595
+  eccentricity: 0.0
+
+map:
+  # Nine full-rank positive anchors span the nine degree-2 harmonics without
+  # the seven exact null directions in the legacy 16-pixel parameterization.
+  representation: harmonics
+  harmonic_degree: 2
+  n_pixels: 16
+  # A smooth anchor prior still contains the injected Hammond map.
+  pixel_log_sigma: 0.75
+  positive: true
+  regularization: entropy
+  entropy_penalty: 0.0
+
+model:
+  null_model: fourier
+  mapped_model: spherical_harmonic
+  likelihood: gaussian
+  fit_baseline: false
+  fit_ramp: false
+  integrate_exposure: false
+
+inference:
+  sampler: nuts
+  chains: 3
+  warmup: 1500
+  draws: 2000
+  target_accept: 0.99
+  dense_mass: true
+  progress_bar: true
+
+compute:
+  profile: local
+  jax_platform: cpu
+  max_cpus: 3
+  threads: 3
+  quadrature_radial: 32
+  quadrature_azimuth: 128
+
+output:
+  directory: ../results/production_wasp43b_anchor_v2_nuts
+  overwrite: true
+  save_report: true
+  best_fit_color: mediumpurple

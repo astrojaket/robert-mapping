@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robert-mapping"
+version = "0.1.0"
+description = "Standalone eclipse mapping with a ROBERT-style configuration interface"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Robert Mapping contributors"}]
+dependencies = [
+  "arviz>=0.20",
+  "h5netcdf>=1.3",
+  "jax>=0.4.35",
+  "matplotlib>=3.9",
+  "numpy>=2.0",
+  "numpyro>=0.15",
+  "pandas>=2.2",
+  "pydantic>=2.7",
+  "PyYAML>=6.0",
+  "scipy>=1.13",
+  "xarray>=2024.6",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+]
+
+[project.scripts]
+robert-mapping = "robert_mapping.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+

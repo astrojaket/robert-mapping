@@ -1,0 +1,19 @@
+{
+  "a_over_rstar": 7.0,
+  "argument_of_periastron_degrees": 125.0,
+  "eccentricity": 0.18,
+  "inclination_degrees": 87.0,
+  "light_delay": false,
+  "period_days": 1.7,
+  "planet_amplitude": 0.003,
+  "radius_ratio": 0.12,
+  "rotation_period_days": 1.7,
+  "scope": "eccentric-orbit future implementation reference",
+  "starry_version": "1.0.0",
+  "status": "reference_only_until_robert_mapping_supports_eccentric_orbits",
+  "theta0_degrees": 180.0,
+  "transit_time": 0.0,
+  "u1": 0.18,
+  "u2": 0.12,
+  "ydeg": 2
+}

@@ -1,0 +1,88 @@
+schema_version: 1
+
+project:
+  name: wasp178b-legacy-pixels-whitened-benchmark
+  seed: 20260821
+  description: One-to-one Hammond positive-pixel benchmark with posterior-whitened sampling
+
+data:
+  kind: files
+  file: ../results/production_wasp178b_input/fixed_detrending_white_light.csv
+  format: csv
+  time_column: time_mjd_tdb
+  flux_column: relative_flux
+  flux_err_column: relative_flux_err
+  time_unit: day
+  exposure_seconds: 18.04
+  normalize: none
+
+system:
+  period_days: 3.3448333
+  transit_time: 61268.16804221503
+  a_over_rstar: 7.19
+  radius_ratio: 0.1125
+  inclination_degrees: 85.8
+  planet_flux_ratio: 0.00239374
+  eccentricity: 0.0
+  argument_of_periastron_degrees: 90.0
+  limb_darkening_u1: 0.0182
+  limb_darkening_u2: 0.595
+  stellar_radius_rsun: 1.0
+
+map:
+  # This intentionally retains the old 16-pixel starry/PyMC3 parameterization
+  # for a strict benchmark. Posterior whitening includes the prior curvature
+  # and is expected to control the seven likelihood-null directions.
+  representation: pixels
+  harmonic_degree: 2
+  n_pixels: 16
+  pixel_log_sigma: 3.1622776601683795
+  positive: true
+  regularization: entropy
+  entropy_penalty: 0.0
+
+model:
+  null_model: fourier
+  mapped_model: spherical_harmonic
+  likelihood: gaussian
+  fit_baseline: false
+  fit_ramp: false
+  integrate_exposure: false
+  include_light_delay: true
+
+systematics:
+  mode: corrected
+  fit_offset: false
+  polynomial_order: 0
+  exponential_ramp: false
+  regressor_columns: []
+  segment_column: null
+  standardize_regressors: true
+  coefficient_prior_sigma: 0.01
+
+inference:
+  sampler: nuts
+  chains: 3
+  warmup: 2000
+  draws: 4000
+  target_accept: 0.99
+  init_strategy: median
+  dense_mass: false
+  progress_bar: true
+
+compute:
+  profile: local
+  jax_platform: cpu
+  x64: true
+  max_cpus: 3
+  threads: 3
+  jit: true
+  quadrature_radial: 32
+  quadrature_azimuth: 128
+
+output:
+  directory: ../results/production_wasp178b_legacy_whitened_nuts
+  save_resolved_config: true
+  save_report: true
+  overwrite: false
+  best_fit_color: mediumpurple

@@ -1,0 +1,36 @@
+schema_version: 1
+
+project:
+  name: my-eclipse-map
+  seed: 42
+
+data:
+  time: data/time.npy
+  flux: data/flux.npy
+  flux_err: data/flux_err.npy
+
+system:
+  period_days: 0.813474
+  transit_time: 55934.292283
+  a_over_rstar: 4.859
+  radius_ratio: 0.15839
+  inclination_degrees: 82.106
+
+map:
+  representation: pixels
+  harmonic_degree: 2
+  positive: true
+  regularization: cross_validate
+
+inference:
+  sampler: nuts
+  chains: 2
+  warmup: 150
+  draws: 150
+
+compute:
+  max_cpus: 3
+  threads: 2
+
+output:
+  directory: results/my-eclipse-map

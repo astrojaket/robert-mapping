@@ -1,0 +1,71 @@
+schema_version: 1
+
+project:
+  name: hammond-wasp43b
+  seed: 42
+  description: Hammond et al. (2024) WASP-43b benchmark configuration
+
+data:
+  time: ../w43b_time.npy
+  flux: ../w43b_flux.npy
+  flux_err: ../w43b_error.npy
+  time_unit: day
+  exposure_seconds: 10.04
+  normalize: none
+
+system:
+  period_days: 0.813474
+  transit_time: 55934.292283
+  a_over_rstar: 4.859
+  radius_ratio: 0.15839
+  inclination_degrees: 82.106
+  planet_flux_ratio: 0.005
+  limb_darkening_u1: 0.0182
+  limb_darkening_u2: 0.595
+
+map:
+  representation: pixels
+  harmonic_degree: 2
+  positive: true
+  regularization: cross_validate
+  entropy_penalty: 0.0
+  n_pixels: 16
+
+model:
+  null_model: fourier
+  mapped_model: spherical_harmonic
+  fourier_degree: 2
+  likelihood: gaussian
+  integrate_exposure: true
+
+systematics:
+  mode: multiplicative
+  polynomial_order: 0
+  exponential_ramp: true
+  ramp_timescale_hours: 88.8
+  regressor_columns: []
+  segment_column: null
+  standardize_regressors: true
+  coefficient_prior_sigma: 0.01
+
+inference:
+  sampler: nuts
+  chains: 2
+  warmup: 150
+  draws: 150
+  target_accept: 0.9
+
+compute:
+  profile: local
+  jax_platform: cpu
+  x64: true
+  max_cpus: 3
+  threads: 2
+  jit: true
+
+output:
+  directory: ../results/hammond-wasp43b
+  save_resolved_config: true
+  save_report: true
+  overwrite: false
+  best_fit_color: mediumpurple

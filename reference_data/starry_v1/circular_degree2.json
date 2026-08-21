@@ -1,0 +1,17 @@
+{
+  "a_over_rstar": 7.0,
+  "eccentricity": 0.0,
+  "inclination_degrees": 87.0,
+  "light_delay": false,
+  "period_days": 1.7,
+  "planet_amplitude": 0.003,
+  "radius_ratio": 0.12,
+  "rotation_period_days": 1.7,
+  "scope": "3.4 orbital periods with three transits and three eclipses",
+  "starry_version": "1.0.0",
+  "theta0_degrees": 180.0,
+  "transit_time": 0.0,
+  "u1": 0.18,
+  "u2": 0.12,
+  "ydeg": 2
+}

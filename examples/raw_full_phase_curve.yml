@@ -1,0 +1,87 @@
+schema_version: 1
+
+project:
+  name: raw-full-phase-systematics-example
+  seed: 20260820
+  description: Raw WASP-43b phase curve with a joint multiplicative ramp
+
+data:
+  kind: files
+  time: ../wasp43b_simulation/w43b_time.npy
+  flux: ../wasp43b_simulation/w43b_flux.npy
+  flux_err: ../wasp43b_simulation/w43b_error.npy
+  time_unit: day
+  exposure_seconds: 10.04
+  normalize: none
+
+system:
+  period_days: 0.8134740621723353
+  transit_time: 55934.292283
+  a_over_rstar: 4.859
+  radius_ratio: 0.15839
+  inclination_degrees: 82.106
+  planet_flux_ratio: 0.005
+  limb_darkening_u1: 0.0182
+  limb_darkening_u2: 0.595
+  eccentricity: 0.0
+
+map:
+  # Direct harmonics avoid the curved positive-anchor posterior when the ramp
+  # is fitted jointly. Positivity is checked on a dense rendered grid.
+  representation: direct_harmonics
+  harmonic_degree: 2
+  n_pixels: 16
+  pixel_log_sigma: 0.30
+  positive: false
+  regularization: entropy
+  entropy_penalty: 0.0
+
+model:
+  null_model: fourier
+  mapped_model: spherical_harmonic
+  likelihood: gaussian
+  # Optional O(n) correlated-noise model for irregular-cadence raw data.
+  noise_model: ou
+  ou_amplitude_prior_scale_ppm: 100.0
+  ou_timescale_prior_median_seconds: 900.0
+  ou_timescale_prior_sigma_ln: 1.0
+  jitter_prior_scale_ppm: 100.0
+  integrate_exposure: false
+
+# Use corrected for a light curve that has already been detrended.
+# Use additive or multiplicative to fit raw systematics jointly with the map.
+systematics:
+  mode: multiplicative
+  # The relative flux is already normalized. Do not add a scale term that can
+  # overlap the planet amplitude and the long ramp.
+  fit_offset: false
+  polynomial_order: 0
+  exponential_ramp: true
+  ramp_timescale_hours: 88.8
+  regressor_columns: []
+  segment_column: null
+  standardize_regressors: true
+  coefficient_prior_sigma: 0.01
+
+inference:
+  sampler: nuts
+  chains: 3
+  warmup: 1500
+  draws: 2000
+  target_accept: 0.99
+  dense_mass: true
+  progress_bar: true
+
+compute:
+  profile: local
+  jax_platform: cpu
+  max_cpus: 3
+  threads: 3
+  quadrature_radial: 32
+  quadrature_azimuth: 128
+
+output:
+  directory: ../results/validation_wasp43b_raw_ou_v2
+  overwrite: true
+  save_report: true
+  best_fit_color: mediumpurple

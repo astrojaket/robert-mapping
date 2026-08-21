@@ -1,0 +1,100 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Data files
+*.npy
+*.pickle
+*.h5
+*.csv
+
+# Small frozen fixtures required by tests and examples
+!w43b_time.npy
+!w43b_flux.npy
+!w43b_error.npy
+!wasp43b_simulation/w43b_time.npy
+!wasp43b_simulation/w43b_flux.npy
+!wasp43b_simulation/w43b_error.npy
+!wasp43b_simulation/sim_flux_clean.npy
+!wasp43b_simulation/sim_flux_total.npy
+!wasp43b_simulation/sim_ylm_coeffs.npy
+
+# Output files and folders
+outputs/
+results/
+plots/
+# *.png
+*.pdf
+*.txt
+
+# Docker
+.dockerignore
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+old/
+
+# Local legacy analyses. These are not part of the standalone package.
+LTT9779b/
+WASP-121b/
+WASP-76b/
+wasp43b_results/
+wasp43b_simulation_results/
+wasp43b_simulation/*.png
+eclipse_pixel_sampling.py
+fit_simulation.py
+fit_wasp43b.py
+paper_eclipse_suite.py
+simulate_wasp43b.py
+Dockerfile
+launch_docker.sh

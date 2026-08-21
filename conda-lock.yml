@@ -1,0 +1,32 @@
+# Input specification for conda-lock.
+#
+# Generate platform lock files after creating or updating the environment:
+#
+#   conda-lock lock --file environment.yml --platform osx-arm64 --platform linux-64
+#
+# The generated lock files are intentionally not committed until dependency
+# solving is run in the target environment.  This file keeps the two supported
+# CPU platforms and the package contract in one reviewable place.
+name: eclipse-mapping
+channels:
+  - conda-forge
+platforms:
+  - osx-arm64
+  - linux-64
+specs:
+  - python=3.12
+  - setuptools>=68
+  - wheel
+  - numpy>=2.0
+  - scipy>=1.13
+  - pandas>=2.2
+  - xarray>=2024.6
+  - h5netcdf>=1.3
+  - pyyaml>=6.0
+  - pydantic>=2.7
+  - matplotlib>=3.9
+  - arviz>=0.20
+  - jax>=0.4.35
+  - numpyro>=0.15
+  - pytest>=8.0
+  - pip

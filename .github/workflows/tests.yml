@@ -1,0 +1,28 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: "3"
+      OPENBLAS_NUM_THREADS: "3"
+      MKL_NUM_THREADS: "3"
+      NUMEXPR_NUM_THREADS: "3"
+      XLA_FLAGS: --xla_force_host_platform_device_count=3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: eclipse-mapping
+          environment-file: environment-linux-64-cpu.yml
+          auto-activate-base: false
+      - name: Install package
+        shell: bash -el {0}
+        run: python -m pip install --no-deps -e .
+      - name: Run tests
+        shell: bash -el {0}
+        run: pytest -q
