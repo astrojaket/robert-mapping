@@ -335,9 +335,11 @@ def _secondary_design(config: MappingConfig, curve: LightCurve) -> _DesignBundle
             segment_ids=curve.segments,
             include_offsets=bool(config.systematics.fit_offset),
             polynomial_order=int(config.systematics.polynomial_order),
+            standardize_time=bool(config.systematics.standardize_time),
             ramp_timescale=(
                 float(config.systematics.ramp_timescale_hours) / 24.0
                 if config.systematics.exponential_ramp
+                and not config.systematics.fit_ramp_rate
                 else None
             ),
             auxiliary_regressors=auxiliary,
@@ -532,6 +534,11 @@ def _harmonic_nuts_fit(
         raise ValueError("Direct harmonic flux samples have an invalid shape")
     mean_flux = np.mean(flux_samples, axis=0)
     residual = np.asarray(curve.flux, dtype=float) - mean_flux
+    error_scale_mean = (
+        float(np.mean(np.asarray(run.samples["error_scale"], dtype=float)))
+        if "error_scale" in run.samples
+        else 1.0
+    )
     divergences = np.asarray(
         run.extra_fields.get(
             "diverging", np.zeros(harmonic_samples.shape[0], dtype=bool)
@@ -592,7 +599,9 @@ def _harmonic_nuts_fit(
         "coefficient_prior_mean": prior_mean.tolist(),
         "coefficient_prior_sigma": prior_sigma.tolist(),
         "residual_rms": float(np.sqrt(np.mean(residual**2))),
-        "chi_squared": float(np.sum((residual / curve.flux_err) ** 2)),
+        "chi_squared": float(
+            np.sum((residual / (curve.flux_err * error_scale_mean)) ** 2)
+        ),
         "n_parameters": int(ncoefficients),
         "n_samples": int(harmonic_samples.shape[0]),
         "chains": effective_chains,
@@ -687,13 +696,46 @@ def _pixel_fit(
         raise ValueError("At least one CPU is required for NumPyro sampling.")
     if int(config.inference.warmup) < 1:
         raise ValueError("inference.warmup must be at least one when sampler is nuts.")
+    if config.map.pixel_prior_mean_ppm is not None:
+        arithmetic_mean = float(config.map.pixel_prior_mean_ppm) * 1.0e-6 / np.pi
+        arithmetic_sd = float(config.map.pixel_prior_sd_ppm) * 1.0e-6 / np.pi
+        pixel_log_sigma = float(
+            np.sqrt(np.log1p((arithmetic_sd / arithmetic_mean) ** 2))
+        )
+        pixel_prior_median = float(
+            arithmetic_mean / np.sqrt(1.0 + (arithmetic_sd / arithmetic_mean) ** 2)
+        )
+    else:
+        arithmetic_mean = None
+        arithmetic_sd = None
+        pixel_prior_median = max(
+            float(config.system.planet_flux_ratio) / np.pi, 1.0e-8
+        )
+        pixel_log_sigma = float(config.map.pixel_log_sigma)
+
+    systematics_prior_sigma: float | np.ndarray
+    if config.systematics.coefficient_prior_sigmas:
+        systematics_prior_sigma = np.asarray(
+            config.systematics.coefficient_prior_sigmas, dtype=float
+        )
+        if systematics_prior_sigma.shape != (bundle.systematics_design.shape[1],):
+            raise ValueError(
+                "systematics.coefficient_prior_sigmas must contain one value "
+                "for each fitted nuisance coefficient: "
+                + ", ".join(bundle.systematics_names)
+            )
+    else:
+        systematics_prior_sigma = float(
+            config.systematics.coefficient_prior_sigma
+        )
+
     run = sample_positive_map(
         pixel_design,
         curve.flux,
         curve.flux_err,
         stellar_flux=bundle.stellar_flux,
-        pixel_prior_mean=max(float(config.system.planet_flux_ratio) / np.pi, 1.0e-8),
-        pixel_log_sigma=float(config.map.pixel_log_sigma),
+        pixel_prior_mean=pixel_prior_median,
+        pixel_log_sigma=pixel_log_sigma,
         alpha=float(config.map.entropy_penalty),
         warmup=int(config.inference.warmup),
         draws=int(config.inference.draws),
@@ -713,7 +755,7 @@ def _pixel_fit(
             if bundle.systematics_mode != "corrected"
             else "additive"
         ),
-        systematics_prior_sigma=float(config.systematics.coefficient_prior_sigma),
+        systematics_prior_sigma=systematics_prior_sigma,
         likelihood=str(config.model.likelihood),
         student_t_nu=float(config.model.student_t_nu),
         time_seconds=(
@@ -730,12 +772,33 @@ def _pixel_fit(
         ),
         ou_timescale_prior_sigma_ln=float(config.model.ou_timescale_prior_sigma_ln),
         jitter_prior_scale=float(config.model.jitter_prior_scale_ppm) * 1.0e-6,
+        sample_ramp_rate=bool(config.systematics.fit_ramp_rate),
+        ramp_rate_prior_mean_per_day=float(
+            config.systematics.ramp_rate_prior_mean_per_day
+        ),
+        ramp_rate_prior_sigma_per_day=float(
+            config.systematics.ramp_rate_prior_sigma_per_day
+        ),
+        ramp_amplitude_prior_sigma=float(
+            config.systematics.ramp_amplitude_prior_sigma
+        ),
+        fit_error_scale=bool(config.model.fit_error_scale),
+        error_scale_log_sigma=float(config.model.error_scale_log_sigma),
+        multiplicative_composition=str(
+            config.systematics.multiplicative_composition
+        ),
+        systematics_names=bundle.systematics_names,
     )
     pixel_samples = np.asarray(run.samples["pixels"], dtype=float)
     harmonic_samples = pixel_samples @ transform.T
     flux_samples = np.asarray(run.samples.get("flux", 1.0 + pixel_samples @ pixel_design.T), dtype=float)
     mean_flux = np.mean(flux_samples, axis=0)
     residual = np.asarray(curve.flux, dtype=float) - mean_flux
+    error_scale_mean = (
+        float(np.mean(np.asarray(run.samples["error_scale"], dtype=float)))
+        if "error_scale" in run.samples
+        else 1.0
+    )
     entropy_samples = np.asarray(run.samples.get("entropy", np.full(pixel_samples.shape[0], np.nan)), dtype=float)
     divergences = np.asarray(run.extra_fields.get("diverging", np.zeros(pixel_samples.shape[0], dtype=bool)))
     max_rhat = None
@@ -788,7 +851,9 @@ def _pixel_fit(
         "harmonic_coefficient_mean": np.mean(harmonic_samples, axis=0).tolist(),
         "harmonic_coefficient_standard_deviation": np.std(harmonic_samples, axis=0).tolist(),
         "residual_rms": float(np.sqrt(np.mean(residual**2))),
-        "chi_squared": float(np.sum((residual / curve.flux_err) ** 2)),
+        "chi_squared": float(
+            np.sum((residual / (curve.flux_err * error_scale_mean)) ** 2)
+        ),
         "n_pixels": npixels,
         "n_samples": int(pixel_samples.shape[0]),
         "chains": effective_chains,
@@ -809,6 +874,14 @@ def _pixel_fit(
         "pixel_grid": pixel_grid,
         "parameterization": (
             "harmonic_anchors" if anchor_transform is not None else "pixels"
+        ),
+        "pixel_prior_median_internal": float(pixel_prior_median),
+        "pixel_prior_log_sigma": float(pixel_log_sigma),
+        "pixel_prior_mean_ppm": (
+            None if arithmetic_mean is None else float(config.map.pixel_prior_mean_ppm)
+        ),
+        "pixel_prior_sd_ppm": (
+            None if arithmetic_sd is None else float(config.map.pixel_prior_sd_ppm)
         ),
         "anchor_indices": (
             anchor_transform.anchor_indices.tolist()
@@ -858,6 +931,21 @@ def _pixel_fit(
             ).tolist()
             if "systematics_coefficients" in run.samples
             else []
+        ),
+        "ramp_amplitude_mean": (
+            float(np.mean(np.asarray(run.samples["ramp_amplitude"], dtype=float)))
+            if "ramp_amplitude" in run.samples
+            else None
+        ),
+        "ramp_rate_mean_per_day": (
+            float(np.mean(np.asarray(run.samples["ramp_rate_per_day"], dtype=float)))
+            if "ramp_rate_per_day" in run.samples
+            else None
+        ),
+        "error_scale_mean": (
+            error_scale_mean
+            if "error_scale" in run.samples
+            else None
         ),
         **_noise_diagnostics(run, config),
         "pixel_samples": pixel_samples,
@@ -1111,6 +1199,16 @@ def run_fit(config: MappingConfig) -> FitResult:
     samples_path = output / "samples.npz"
     noise_payload: dict[str, Any] = {}
     _add_noise_samples(noise_payload, run)
+    nonlinear_payload = {
+        key: np.asarray(run.samples[key])
+        for key in ("ramp_amplitude", "ramp_rate_per_day", "error_scale")
+        if key in run.samples
+    }
+    grouped_nonlinear_payload = {
+        f"{key}_by_chain": np.asarray(run.grouped_samples[key])
+        for key in ("ramp_amplitude", "ramp_rate_per_day", "error_scale")
+        if run.grouped_samples is not None and key in run.grouped_samples
+    }
     np.savez_compressed(
         samples_path,
         pixels=pixel_samples,
@@ -1150,6 +1248,8 @@ def run_fit(config: MappingConfig) -> FitResult:
             else {}
         ),
         **noise_payload,
+        **nonlinear_payload,
+        **grouped_nonlinear_payload,
         **{key: np.asarray(value) for key, value in run.extra_fields.items()},
     )
     return FitResult(

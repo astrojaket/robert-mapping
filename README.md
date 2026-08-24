@@ -38,6 +38,13 @@ robert-mapping fit examples/hammond_wasp43b.yml --dry-run
 robert-mapping benchmark hammond examples/hammond_wasp43b.yml --dry-run
 ```
 
+`examples/hammond_wasp43b.yml` is the strict small-sampling paper profile. It
+uses the 8,424 valid points from the released full phase curve, correct Kipping limb darkening,
+the 16-pixel LogNormal prior, light delay, exposure integration, a fitted
+error scale, exact detector regressors, and the Hammond systematics product. See
+[`docs/hammond2024_audit.md`](docs/hammond2024_audit.md) for the exact audit
+and the two remaining limits.
+
 The default quick profile uses two chains, 150 warmup steps, and 150 draws.
 Use these settings for checks, not for a final scientific result.
 
@@ -90,6 +97,8 @@ systematics:
   regressor_columns: [airmass, trace_x]
   segment_column: visit
   standardize_regressors: true
+  standardize_time: true     # false keeps days from the midpoint
+  multiplicative_composition: linearized  # product for L*R*Y*S_Y
   coefficient_prior_sigma: 0.01
 ```
 

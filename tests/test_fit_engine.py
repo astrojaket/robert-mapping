@@ -193,3 +193,67 @@ def test_nuts_fit_passes_offset_setting_to_systematics_design(tmp_path: Path, mo
     nuisance = np.asarray(captured["nuisance"])
     assert nuisance.shape == (24, 1)
     assert np.allclose(nuisance[:, 0], (np.arange(24) - 11.5) / 11.5)
+
+
+def test_nuts_fit_passes_hammond_prior_ramp_and_error_scale(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import importlib
+
+    engine = importlib.import_module("robert_mapping.inference.run")
+    config = _config(tmp_path, sampler="nuts", n_pixels=16)
+    config = replace(
+        config,
+        map=replace(
+            config.map,
+            pixel_prior_mean_ppm=6000.0,
+            pixel_prior_sd_ppm=3000.0,
+        ),
+        model=replace(config.model, fit_error_scale=True, error_scale_log_sigma=0.25),
+        systematics=SystematicsConfig(
+            mode="multiplicative",
+            polynomial_order=1,
+            exponential_ramp=True,
+            fit_ramp_rate=True,
+            standardize_time=False,
+            multiplicative_composition="product",
+        ),
+    )
+    captured: dict[str, object] = {}
+
+    def fake_sampler(design, observed, sigma, **kwargs):
+        captured.update(kwargs)
+        nsamples = 2
+        ntime = design.shape[0]
+        nuisance = np.asarray(kwargs["systematics_design"])
+        return NumpyroRun(
+            samples={
+                "pixels": np.full((nsamples, design.shape[1]), 1.0e-3),
+                "flux": np.ones((nsamples, ntime)),
+                "entropy": np.zeros(nsamples),
+                "systematics_coefficients": np.zeros((nsamples, nuisance.shape[1])),
+                "systematics_model": np.zeros((nsamples, ntime)),
+                "ramp_amplitude": np.full(nsamples, 0.001),
+                "ramp_rate_per_day": np.full(nsamples, 3.7),
+                "error_scale": np.full(nsamples, 1.2),
+            },
+            extra_fields={"diverging": np.zeros(nsamples, dtype=bool)},
+            sampler=None,
+        )
+
+    monkeypatch.setattr(engine, "sample_positive_map", fake_sampler)
+    result = run_fit(config)
+
+    expected_sigma = np.sqrt(np.log1p(0.5**2))
+    expected_median = (6000.0e-6 / np.pi) / np.sqrt(1.0 + 0.5**2)
+    assert np.isclose(captured["pixel_log_sigma"], expected_sigma)
+    assert np.isclose(captured["pixel_prior_mean"], expected_median)
+    assert captured["sample_ramp_rate"] is True
+    assert captured["fit_error_scale"] is True
+    assert captured["multiplicative_composition"] == "product"
+    nuisance = np.asarray(captured["systematics_design"])
+    elapsed_days = np.linspace(55934.45, 55935.05, 24)
+    assert np.allclose(nuisance[:, 1], elapsed_days - np.mean(elapsed_days))
+    saved = np.load(result.samples_path)
+    assert "ramp_rate_per_day" in saved
+    assert "error_scale" in saved

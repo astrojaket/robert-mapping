@@ -78,6 +78,19 @@ def test_offsets_can_be_disabled_without_dropping_other_terms() -> None:
     assert np.allclose(result.matrix[:, 2], time)
 
 
+def test_time_polynomial_can_use_days_from_midpoint() -> None:
+    time = np.array([10.0, 10.5, 11.0])
+    result = build_systematics_design(
+        time,
+        polynomial_order=2,
+        standardize_time=False,
+    )
+
+    centred = time - np.mean(time)
+    assert np.allclose(result.matrix[:, 1], centred)
+    assert np.allclose(result.matrix[:, 2], centred**2)
+
+
 def test_disabling_offsets_requires_another_nuisance_term() -> None:
     with pytest.raises(ValueError, match="at least one nuisance column"):
         build_systematics_design(np.arange(3.0), include_offsets=False)
@@ -95,6 +108,7 @@ def test_include_offsets_must_be_boolean() -> None:
         ({"ramp_timescale": 0.0}, "ramp_timescale"),
         ({"segment_ids": [0, 1]}, "segment_ids"),
         ({"auxiliary_regressors": [[1.0], [2.0], [np.nan]]}, "finite"),
+        ({"standardize_time": 1}, "standardize_time"),
     ],
 )
 def test_systematics_design_validates_inputs(kwargs, message: str) -> None:

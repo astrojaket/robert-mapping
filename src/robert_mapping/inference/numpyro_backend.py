@@ -196,7 +196,7 @@ def sample_positive_map(
     init_strategy: str = "median",
     systematics_design: ArrayLike | None = None,
     systematics_mode: str = "additive",
-    systematics_prior_sigma: float = 0.01,
+    systematics_prior_sigma: ArrayLike | float = 0.01,
     likelihood: str = "gaussian",
     student_t_nu: float = 4.0,
     time_seconds: ArrayLike | None = None,
@@ -205,6 +205,14 @@ def sample_positive_map(
     ou_timescale_prior_median: float = 900.0,
     ou_timescale_prior_sigma_ln: float = 1.0,
     jitter_prior_scale: float = 100.0e-6,
+    sample_ramp_rate: bool = False,
+    ramp_rate_prior_mean_per_day: float = 3.7,
+    ramp_rate_prior_sigma_per_day: float = 1.0,
+    ramp_amplitude_prior_sigma: float = 0.1,
+    fit_error_scale: bool = False,
+    error_scale_log_sigma: float = 0.1,
+    multiplicative_composition: str = "linearized",
+    systematics_names: tuple[str, ...] | list[str] | None = None,
 ) -> NumpyroRun:
     """Sample positive map pixels for a precomputed light-curve operator.
 
@@ -227,8 +235,10 @@ def sample_positive_map(
             raise ValueError("systematics_design contains non-finite values")
     if systematics_mode not in {"additive", "multiplicative"}:
         raise ValueError("systematics_mode must be additive or multiplicative")
-    if systematics_prior_sigma <= 0.0:
-        raise ValueError("systematics_prior_sigma must be positive")
+    if multiplicative_composition not in {"linearized", "product"}:
+        raise ValueError(
+            "multiplicative_composition must be linearized or product"
+        )
     if likelihood not in {"gaussian", "student_t"}:
         raise ValueError("likelihood must be gaussian or student_t")
     if student_t_nu < 2.0:
@@ -237,6 +247,12 @@ def sample_positive_map(
         raise ValueError("pixel prior values must be positive")
     if alpha < 0.0:
         raise ValueError("alpha must be greater than or equal to zero")
+    if ramp_rate_prior_mean_per_day <= 0.0 or ramp_rate_prior_sigma_per_day <= 0.0:
+        raise ValueError("ramp-rate prior values must be positive")
+    if ramp_amplitude_prior_sigma <= 0.0:
+        raise ValueError("ramp_amplitude_prior_sigma must be positive")
+    if error_scale_log_sigma <= 0.0:
+        raise ValueError("error_scale_log_sigma must be positive")
     if min(warmup, draws, chains) < 1 or chains > 3:
         raise ValueError("warmup and draws must be positive; chains must be from 1 to 3")
     times = _validated_noise_inputs(
@@ -249,6 +265,44 @@ def sample_positive_map(
         jitter_prior_scale=float(jitter_prior_scale),
     )
     noise_model = "white" if str(noise_model).lower() == "independent" else str(noise_model).lower()
+    if sample_ramp_rate and times is None:
+        raise ValueError("time_seconds is required when sample_ramp_rate is true")
+    if (
+        multiplicative_composition == "product"
+        and nuisance.shape[1]
+        and systematics_names is None
+    ):
+        raise ValueError(
+            "systematics_names is required for product-composed systematics"
+        )
+    if systematics_names is None:
+        nuisance_names = tuple(f"term_{index}" for index in range(nuisance.shape[1]))
+    else:
+        nuisance_names = tuple(str(name) for name in systematics_names)
+        if len(nuisance_names) != nuisance.shape[1]:
+            raise ValueError("systematics_names must match systematics_design columns")
+    systematics_prior_scales = _coefficient_prior_vector(
+        systematics_prior_sigma,
+        "systematics_prior_sigma",
+        nuisance.shape[1],
+        strictly_positive=True,
+    )
+    ramp_cv = float(ramp_rate_prior_sigma_per_day / ramp_rate_prior_mean_per_day)
+    ramp_sigma_ln = float(np.sqrt(np.log1p(ramp_cv**2)))
+    ramp_mu_ln = float(
+        np.log(ramp_rate_prior_mean_per_day) - 0.5 * ramp_sigma_ln**2
+    )
+
+    # The first factor is the linear baseline. Each detector regressor and
+    # fixed ramp is a separate multiplicative factor, as in Hammond et al.
+    product_group_ids: list[int] = []
+    next_group = 1
+    for name in nuisance_names:
+        if name.startswith("offset") or name.startswith("time"):
+            product_group_ids.append(0)
+        else:
+            product_group_ids.append(next_group)
+            next_group += 1
 
     # Match the legacy workflow: optimize in unconstrained log-pixel space,
     # then initialize all chains at the posterior mode. This avoids sending
@@ -277,7 +331,7 @@ def sample_positive_map(
         else:
             data_density = 0.5 * np.sum(residual**2)
         prior = (log_pixels - log_prior_mean) / pixel_log_sigma
-        nuisance_prior = beta / systematics_prior_sigma
+        nuisance_prior = beta / systematics_prior_scales
         mean_pixel = float(np.mean(pixels))
         entropy = -float(np.sum(pixels * np.log(pixels / mean_pixel)))
         return float(
@@ -328,7 +382,7 @@ def sample_positive_map(
             float(pixel_log_sigma),
             nuisance,
             systematics_mode,
-            float(systematics_prior_sigma),
+            systematics_prior_scales,
             likelihood,
             float(student_t_nu),
         )
@@ -341,6 +395,7 @@ def sample_positive_map(
     error_jax = jnp.asarray(error)
     star_jax = jnp.asarray(star)
     nuisance_jax = jnp.asarray(nuisance)
+    systematics_prior_scales_jax = jnp.asarray(systematics_prior_scales)
     times_jax = None if times is None else jnp.asarray(times)
     map_parameters_jax = jnp.asarray(map_parameters)
     whitening_jax = jnp.asarray(whitening)
@@ -384,7 +439,7 @@ def sample_positive_map(
         physical_prior_log_prob = pixel_prior.log_prob(log_pixels)
         if nuisance.shape[1]:
             physical_prior_log_prob += dist.Normal(
-                0.0, systematics_prior_sigma
+                0.0, systematics_prior_scales_jax
             ).expand((nuisance.shape[1],)).to_event(1).log_prob(
                 systematics_coefficients
             )
@@ -400,13 +455,43 @@ def sample_positive_map(
         numpyro.deterministic("entropy", entropy)
         numpyro.factor("entropy_regularization", 2.0 * alpha * entropy)
         astrophysical_flux = star_jax + design_jax @ pixels
-        if nuisance.shape[1]:
+        has_systematics = bool(nuisance.shape[1]) or bool(sample_ramp_rate)
+        if has_systematics:
             nuisance_model = nuisance_jax @ systematics_coefficients
-            flux = (
-                astrophysical_flux + nuisance_model
-                if systematics_mode == "additive"
-                else astrophysical_flux * (1.0 + nuisance_model)
-            )
+            if sample_ramp_rate:
+                ramp_amplitude = numpyro.sample(
+                    "ramp_amplitude",
+                    dist.Normal(0.0, float(ramp_amplitude_prior_sigma)),
+                )
+                ramp_rate_per_day = numpyro.sample(
+                    "ramp_rate_per_day",
+                    dist.LogNormal(ramp_mu_ln, ramp_sigma_ln),
+                )
+                elapsed_days = (times_jax - times_jax[0]) / 86_400.0
+                ramp_model = ramp_amplitude * jnp.exp(
+                    -ramp_rate_per_day * elapsed_days
+                )
+                nuisance_model = nuisance_model + ramp_model
+            if systematics_mode == "additive":
+                flux = astrophysical_flux + nuisance_model
+            elif multiplicative_composition == "linearized":
+                flux = astrophysical_flux * (1.0 + nuisance_model)
+            else:
+                systematics_factor = jnp.ones_like(astrophysical_flux)
+                for group_id in sorted(set(product_group_ids)):
+                    indices = [
+                        index
+                        for index, value in enumerate(product_group_ids)
+                        if value == group_id
+                    ]
+                    group_model = nuisance_jax[:, indices] @ systematics_coefficients[
+                        jnp.asarray(indices)
+                    ]
+                    systematics_factor = systematics_factor * (1.0 + group_model)
+                if sample_ramp_rate:
+                    systematics_factor = systematics_factor * (1.0 + ramp_model)
+                flux = astrophysical_flux * systematics_factor
+                nuisance_model = systematics_factor - 1.0
             numpyro.deterministic("systematics_model", nuisance_model)
         else:
             flux = astrophysical_flux
@@ -416,6 +501,14 @@ def sample_positive_map(
                 "systematics_coefficients", systematics_coefficients
             )
         numpyro.deterministic("flux", flux)
+        if fit_error_scale:
+            error_scale = numpyro.sample(
+                "error_scale",
+                dist.LogNormal(0.0, float(error_scale_log_sigma)),
+            )
+        else:
+            error_scale = jnp.asarray(1.0, dtype=error_jax.dtype)
+        scaled_error = error_jax * error_scale
         if noise_model == "ou":
             ou_amplitude = numpyro.sample(
                 "ou_amplitude",
@@ -436,7 +529,7 @@ def sample_positive_map(
                 "ou_log_likelihood",
                 _ou_kalman_log_likelihood(
                     y_jax - flux,
-                    error_jax,
+                    scaled_error,
                     times_jax,
                     ou_amplitude,
                     ou_timescale,
@@ -450,9 +543,9 @@ def sample_positive_map(
             )
         else:
             observation_distribution = (
-                dist.StudentT(student_t_nu, flux, error_jax)
+                dist.StudentT(student_t_nu, flux, scaled_error)
                 if likelihood == "student_t"
-                else dist.Normal(flux, error_jax)
+                else dist.Normal(flux, scaled_error)
             )
             numpyro.sample("obs", observation_distribution, obs=y_jax)
 
@@ -513,7 +606,7 @@ def _local_posterior_whitener(
     coefficient_prior_sigma: NDArray[np.float64],
     nuisance: NDArray[np.float64],
     systematics_mode: str,
-    systematics_prior_sigma: float,
+    systematics_prior_sigma: ArrayLike | float,
     likelihood: str,
     student_t_nu: float,
 ) -> tuple[NDArray[np.float64], float, NDArray[np.float64]]:
@@ -626,8 +719,12 @@ def _positive_map_posterior_whitener(
         raise ValueError("map_parameters has an invalid shape")
     if not np.isfinite(pixel_log_sigma) or pixel_log_sigma <= 0.0:
         raise ValueError("pixel_log_sigma must be positive")
-    if not np.isfinite(systematics_prior_sigma) or systematics_prior_sigma <= 0.0:
-        raise ValueError("systematics_prior_sigma must be positive")
+    systematics_prior_scales = _coefficient_prior_vector(
+        systematics_prior_sigma,
+        "systematics_prior_sigma",
+        nuisance.shape[1],
+        strictly_positive=True,
+    )
 
     log_pixels = np.asarray(map_parameters[:n_pixels], dtype=float)
     beta = np.asarray(map_parameters[n_pixels:], dtype=float)
@@ -657,7 +754,7 @@ def _positive_map_posterior_whitener(
     prior_scales = np.concatenate(
         (
             np.full(n_pixels, pixel_log_sigma, dtype=float),
-            np.full(nuisance.shape[1], systematics_prior_sigma, dtype=float),
+            systematics_prior_scales,
         )
     )
     scaled_jacobian = jacobian * prior_scales[None, :]

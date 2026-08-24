@@ -161,6 +161,7 @@ def build_systematics_design(
     segment_ids: ArrayLike | None = None,
     include_offsets: bool = True,
     polynomial_order: int = 0,
+    standardize_time: bool = True,
     ramp_timescale: float | None = None,
     auxiliary_regressors: ArrayLike | Mapping[str, ArrayLike] | None = None,
     auxiliary_names: Sequence[str] | None = None,
@@ -168,10 +169,12 @@ def build_systematics_design(
     """Build standard nuisance regressors for an arbitrary time array.
 
     Columns are returned in this order: optional per-segment offsets,
-    standardized global time polynomials, per-segment exponential ramps, and
+    global time polynomials, per-segment exponential ramps, and
     auxiliary regressors.  Set ``include_offsets=False`` to omit the global or
     per-segment offset columns while retaining every other requested term.
-    Polynomial ``time`` is centred and scaled to approximately ``[-1, 1]``.
+    Polynomial ``time`` is centred and scaled to approximately ``[-1, 1]`` by
+    default. Set ``standardize_time=False`` to keep time in the caller's units
+    relative to the observation midpoint.
     Each ramp uses the same fixed ``ramp_timescale`` in the time units supplied
     by the caller and resets at the first time in its segment.
 
@@ -185,6 +188,8 @@ def build_systematics_design(
     values = _validate_time(time)
     if not isinstance(include_offsets, (bool, np.bool_)):
         raise ValueError("include_offsets must be true or false")
+    if not isinstance(standardize_time, (bool, np.bool_)):
+        raise ValueError("standardize_time must be true or false")
     order = _validate_polynomial_order(polynomial_order)
     segments, labels, has_explicit_segments = _validate_segments(
         segment_ids, values.size
@@ -214,10 +219,14 @@ def build_systematics_design(
                 columns.append(np.ones(values.size, dtype=float))
 
     if order:
-        standardized = _standardized_time(values)
+        time_basis = (
+            _standardized_time(values)
+            if standardize_time
+            else values - float(np.mean(values))
+        )
         for degree in range(1, order + 1):
             names.append("time" if degree == 1 else f"time^{degree}")
-            columns.append(standardized**degree)
+            columns.append(time_basis**degree)
 
     if timescale is not None:
         for label in labels:

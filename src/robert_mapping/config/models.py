@@ -207,6 +207,10 @@ class MapConfig:
     # default NUTS run small. Use 62 pixels with harmonic_degree: 4.
     n_pixels: int = 16
     pixel_log_sigma: float = 0.75
+    # Optional arithmetic-space LogNormal prior used by Hammond et al. (2024).
+    # Values describe the rendered pixel intensity before starry's division by pi.
+    pixel_prior_mean_ppm: float | None = None
+    pixel_prior_sd_ppm: float | None = None
 
 
 @dataclass(frozen=True)
@@ -231,6 +235,8 @@ class ModelConfig:
     integrate_exposure: bool = True
     fit_orbit: bool = False
     fit_limb_darkening: bool = False
+    fit_error_scale: bool = False
+    error_scale_log_sigma: float = 0.1
 
 
 @dataclass(frozen=True)
@@ -242,10 +248,26 @@ class SystematicsConfig:
     polynomial_order: int = 0
     exponential_ramp: bool = False
     ramp_timescale_hours: float = 0.75
+    # Hammond uses r0 * exp(-r1 * t), with r1 in inverse days.
+    fit_ramp_rate: bool = False
+    ramp_rate_prior_mean_per_day: float = 3.7
+    ramp_rate_prior_sigma_per_day: float = 1.0
     regressor_columns: tuple[str, ...] = ()
     segment_column: str | None = None
     standardize_regressors: bool = True
+    # Keep time in days from the observation midpoint for published
+    # coefficients such as Hammond et al. (2024). The default preserves the
+    # well-conditioned [-1, 1] basis used by existing configurations.
+    standardize_time: bool = True
+    # ``product`` evaluates each physical nuisance factor separately. This
+    # reproduces L(t) R(t) Y(y) S_Y(s_y); ``linearized`` preserves the older
+    # 1 + sum(terms) approximation.
+    multiplicative_composition: str = "linearized"
     coefficient_prior_sigma: float = 0.01
+    # Optional values in the exact order shown in fit_summary.json. This lets
+    # a published model use different priors for baseline and detector terms.
+    coefficient_prior_sigmas: tuple[float, ...] = ()
+    ramp_amplitude_prior_sigma: float = 0.1
 
 
 @dataclass(frozen=True)
@@ -600,6 +622,7 @@ def mapping_config_from_dict(
     _check_keys(map_section, {
         "representation", "harmonic_degree", "positive", "regularization",
         "entropy_penalty", "n_pixels", "pixel_log_sigma",
+        "pixel_prior_mean_ppm", "pixel_prior_sd_ppm",
     }, "map")
     map_obj = MapConfig(
         representation=_choice(
@@ -617,7 +640,32 @@ def mapping_config_from_dict(
             "map.pixel_log_sigma",
             minimum=1.0e-6,
         ),
+        pixel_prior_mean_ppm=(
+            None
+            if map_section.get("pixel_prior_mean_ppm") is None
+            else _number(
+                map_section["pixel_prior_mean_ppm"],
+                "map.pixel_prior_mean_ppm",
+                minimum=1.0e-12,
+            )
+        ),
+        pixel_prior_sd_ppm=(
+            None
+            if map_section.get("pixel_prior_sd_ppm") is None
+            else _number(
+                map_section["pixel_prior_sd_ppm"],
+                "map.pixel_prior_sd_ppm",
+                minimum=1.0e-12,
+            )
+        ),
     )
+    if (map_obj.pixel_prior_mean_ppm is None) != (
+        map_obj.pixel_prior_sd_ppm is None
+    ):
+        raise _error(
+            "map",
+            "pixel_prior_mean_ppm and pixel_prior_sd_ppm must be supplied together.",
+        )
     if map_obj.representation == "spherical_harmonics":
         map_obj = replace(map_obj, representation="harmonics")
 
@@ -628,6 +676,7 @@ def mapping_config_from_dict(
         "ou_timescale_prior_median_seconds", "ou_timescale_prior_sigma_ln",
         "jitter_prior_scale_ppm", "fit_baseline",
         "fit_ramp", "include_light_delay", "integrate_exposure", "fit_orbit", "fit_limb_darkening",
+        "fit_error_scale", "error_scale_log_sigma",
     }, "model")
     noise_model = _choice(
         model.get("noise_model", ModelConfig.noise_model),
@@ -681,6 +730,15 @@ def mapping_config_from_dict(
         integrate_exposure=_bool(model.get("integrate_exposure", ModelConfig.integrate_exposure), "model.integrate_exposure"),
         fit_orbit=_bool(model.get("fit_orbit", ModelConfig.fit_orbit), "model.fit_orbit"),
         fit_limb_darkening=_bool(model.get("fit_limb_darkening", ModelConfig.fit_limb_darkening), "model.fit_limb_darkening"),
+        fit_error_scale=_bool(
+            model.get("fit_error_scale", ModelConfig.fit_error_scale),
+            "model.fit_error_scale",
+        ),
+        error_scale_log_sigma=_number(
+            model.get("error_scale_log_sigma", ModelConfig.error_scale_log_sigma),
+            "model.error_scale_log_sigma",
+            minimum=1.0e-6,
+        ),
     )
 
     systematics = _section(root, "systematics")
@@ -692,14 +750,22 @@ def mapping_config_from_dict(
             "polynomial_order",
             "exponential_ramp",
             "ramp_timescale_hours",
+            "fit_ramp_rate",
+            "ramp_rate_prior_mean_per_day",
+            "ramp_rate_prior_sigma_per_day",
             "regressor_columns",
             "segment_column",
             "standardize_regressors",
+            "standardize_time",
+            "multiplicative_composition",
             "coefficient_prior_sigma",
+            "coefficient_prior_sigmas",
+            "ramp_amplitude_prior_sigma",
         },
         "systematics",
     )
     segment_value = systematics.get("segment_column", SystematicsConfig.segment_column)
+    coefficient_prior_sigmas_value = systematics.get("coefficient_prior_sigmas", ())
     systematics_obj = SystematicsConfig(
         mode=_choice(
             systematics.get("mode", SystematicsConfig.mode),
@@ -725,6 +791,26 @@ def mapping_config_from_dict(
             "systematics.ramp_timescale_hours",
             minimum=1.0e-6,
         ),
+        fit_ramp_rate=_bool(
+            systematics.get("fit_ramp_rate", SystematicsConfig.fit_ramp_rate),
+            "systematics.fit_ramp_rate",
+        ),
+        ramp_rate_prior_mean_per_day=_number(
+            systematics.get(
+                "ramp_rate_prior_mean_per_day",
+                SystematicsConfig.ramp_rate_prior_mean_per_day,
+            ),
+            "systematics.ramp_rate_prior_mean_per_day",
+            minimum=1.0e-6,
+        ),
+        ramp_rate_prior_sigma_per_day=_number(
+            systematics.get(
+                "ramp_rate_prior_sigma_per_day",
+                SystematicsConfig.ramp_rate_prior_sigma_per_day,
+            ),
+            "systematics.ramp_rate_prior_sigma_per_day",
+            minimum=1.0e-6,
+        ),
         regressor_columns=_string_tuple(
             systematics.get("regressor_columns", SystematicsConfig.regressor_columns),
             "systematics.regressor_columns",
@@ -740,6 +826,18 @@ def mapping_config_from_dict(
             ),
             "systematics.standardize_regressors",
         ),
+        standardize_time=_bool(
+            systematics.get("standardize_time", SystematicsConfig.standardize_time),
+            "systematics.standardize_time",
+        ),
+        multiplicative_composition=_choice(
+            systematics.get(
+                "multiplicative_composition",
+                SystematicsConfig.multiplicative_composition,
+            ),
+            "systematics.multiplicative_composition",
+            {"linearized", "product"},
+        ),
         coefficient_prior_sigma=_number(
             systematics.get(
                 "coefficient_prior_sigma", SystematicsConfig.coefficient_prior_sigma
@@ -747,7 +845,29 @@ def mapping_config_from_dict(
             "systematics.coefficient_prior_sigma",
             minimum=1.0e-12,
         ),
+        coefficient_prior_sigmas=(
+            ()
+            if isinstance(coefficient_prior_sigmas_value, (list, tuple))
+            and len(coefficient_prior_sigmas_value) == 0
+            else _number_tuple(
+                coefficient_prior_sigmas_value,
+                "systematics.coefficient_prior_sigmas",
+            )
+        ),
+        ramp_amplitude_prior_sigma=_number(
+            systematics.get(
+                "ramp_amplitude_prior_sigma",
+                SystematicsConfig.ramp_amplitude_prior_sigma,
+            ),
+            "systematics.ramp_amplitude_prior_sigma",
+            minimum=1.0e-12,
+        ),
     )
+    if any(value <= 0.0 for value in systematics_obj.coefficient_prior_sigmas):
+        raise _error(
+            "systematics.coefficient_prior_sigmas",
+            "all values must be positive.",
+        )
     if systematics_obj.mode == "corrected" and (
         systematics_obj.polynomial_order > 0
         or systematics_obj.exponential_ramp
@@ -757,6 +877,22 @@ def mapping_config_from_dict(
         raise _error(
             "systematics.mode",
             "use additive or multiplicative when nuisance terms are configured.",
+        )
+    if systematics_obj.fit_ramp_rate and not systematics_obj.exponential_ramp:
+        raise _error(
+            "systematics.fit_ramp_rate",
+            "requires systematics.exponential_ramp: true.",
+        )
+    if map_obj.representation == "direct_harmonics" and (
+        model_obj.fit_error_scale
+        or systematics_obj.fit_ramp_rate
+        or systematics_obj.multiplicative_composition == "product"
+    ):
+        raise _error(
+            "map.representation",
+            "direct_harmonics does not yet support fitted error scaling, "
+            "a fitted ramp rate, or product-composed systematics. Use pixels "
+            "or harmonics for these settings.",
         )
 
     selection = _section(root, "systematics_selection")

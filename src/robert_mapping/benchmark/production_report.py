@@ -81,9 +81,11 @@ def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureCo
             ),
             "assumed 1.1-1.7 micron WFC3-like band; 6001 K blackbody star",
         )
-    wavelength = np.linspace(5.25, 11.75, 151)
+    # Hammond et al. (2024) use the 5-10.5 micron MIRI/LRS white channel and
+    # a 4300 K stellar effective temperature for the brightness conversion.
+    wavelength = np.linspace(5.0, 10.5, 151)
     stellar = blackbody_stellar_radiance(
-        wavelength, 4500.0, wavelength_unit="micron"
+        wavelength, 4300.0, wavelength_unit="micron"
     )
     return (
         BandpassTemperatureConverter(
@@ -93,7 +95,7 @@ def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureCo
             radius_ratio,
             wavelength_unit="micron",
         ),
-        "5.25-11.75 micron MIRI/LRS band; 4500 K blackbody star",
+        "5.0-10.5 micron MIRI/LRS band; 4300 K blackbody star",
     )
 
 
@@ -224,6 +226,34 @@ def _quantile_summary(values: np.ndarray) -> dict[str, float]:
 
     q16, median, q84 = np.quantile(np.asarray(values, dtype=float), [0.16, 0.50, 0.84])
     return {"q16": float(q16), "median": float(median), "q84": float(q84)}
+
+
+def _profile_peak_longitudes(
+    profiles: np.ndarray,
+    longitude_deg: np.ndarray,
+    dayside: np.ndarray,
+) -> np.ndarray:
+    """Return sub-grid dayside peaks from equally spaced longitude profiles."""
+
+    values = np.asarray(profiles, dtype=float)[:, np.asarray(dayside, dtype=bool)]
+    longitude = np.asarray(longitude_deg, dtype=float)[np.asarray(dayside, dtype=bool)]
+    indices = np.argmax(values, axis=1)
+    peaks = longitude[indices].astype(float, copy=True)
+    if longitude.size < 3:
+        return peaks
+    step = float(np.median(np.diff(longitude)))
+    interior = (indices > 0) & (indices < longitude.size - 1)
+    rows = np.flatnonzero(interior)
+    centres = indices[interior]
+    lower = values[rows, centres - 1]
+    middle = values[rows, centres]
+    upper = values[rows, centres + 1]
+    denominator = lower - 2.0 * middle + upper
+    valid = np.abs(denominator) > np.finfo(float).eps
+    delta = np.zeros(rows.size, dtype=float)
+    delta[valid] = 0.5 * (lower[valid] - upper[valid]) / denominator[valid]
+    peaks[rows] = longitude[centres] + np.clip(delta, -1.0, 1.0) * step
+    return peaks
 
 
 def _map_information_diagnostics(
@@ -471,9 +501,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
         profiles, [0.16, 0.50, 0.84], axis=0
     )
     dayside = (longitude_deg >= -90.0) & (longitude_deg <= 90.0)
-    offsets = longitude_deg[dayside][
-        np.argmax(profiles[:, dayside], axis=1)
-    ]
+    offsets = _profile_peak_longitudes(profiles, longitude_deg, dayside)
     plot_longitude_profile(
         longitude_deg,
         profile_median * 1.0e6,
@@ -564,9 +592,9 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
         conditioned_profile_q16, conditioned_profile_median, conditioned_profile_q84 = (
             np.quantile(conditioned_profiles, [0.16, 0.50, 0.84], axis=0)
         )
-        conditioned_offsets = longitude_deg[dayside][
-            np.argmax(conditioned_profiles[:, dayside], axis=1)
-        ]
+        conditioned_offsets = _profile_peak_longitudes(
+            conditioned_profiles, longitude_deg, dayside
+        )
         conditioned_temperature_draws = np.asarray(
             converter.temperature(
                 np.maximum(conditioned_contrast, positive_floor)

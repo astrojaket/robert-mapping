@@ -27,6 +27,42 @@ def test_nonzero_eccentricity_is_rejected_until_physics_is_implemented() -> None
         mapping_config_from_dict({"system": {"eccentricity": 0.1}})
 
 
+def test_hammond_prior_and_systematics_settings_parse() -> None:
+    config = mapping_config_from_dict(
+        {
+            "map": {
+                "pixel_prior_mean_ppm": 6000.0,
+                "pixel_prior_sd_ppm": 3000.0,
+            },
+            "model": {
+                "fit_error_scale": True,
+                "error_scale_log_sigma": 0.25,
+            },
+            "systematics": {
+                "mode": "multiplicative",
+                "exponential_ramp": True,
+                "fit_ramp_rate": True,
+                "ramp_rate_prior_mean_per_day": 3.7,
+                "ramp_rate_prior_sigma_per_day": 1.0,
+                "standardize_time": False,
+                "multiplicative_composition": "product",
+            },
+        }
+    )
+
+    assert config.map.pixel_prior_mean_ppm == 6000.0
+    assert config.map.pixel_prior_sd_ppm == 3000.0
+    assert config.model.fit_error_scale is True
+    assert config.systematics.fit_ramp_rate is True
+    assert config.systematics.standardize_time is False
+    assert config.systematics.multiplicative_composition == "product"
+
+
+def test_hammond_pixel_prior_requires_mean_and_sd() -> None:
+    with pytest.raises(ConfigError, match="must be supplied together"):
+        mapping_config_from_dict({"map": {"pixel_prior_mean_ppm": 6000.0}})
+
+
 def test_duplicate_yaml_keys_are_rejected(tmp_path: Path) -> None:
     path = tmp_path / "duplicate.yml"
     path.write_text("project:\n  name: first\n  name: second\n", encoding="utf-8")

@@ -7,7 +7,19 @@ import numpy as np
 from robert_mapping.benchmark.production_report import (
     _condition_positive_rendered_maps,
     _map_information_diagnostics,
+    _profile_peak_longitudes,
 )
+
+
+def test_profile_peak_longitudes_interpolates_below_grid_spacing() -> None:
+    longitude = np.arange(-180.0, 181.0, 3.0)
+    dayside = (longitude >= -90.0) & (longitude <= 90.0)
+    centres = np.array([7.75, -12.4])
+    profiles = np.stack([-(longitude - centre) ** 2 for centre in centres])
+
+    peaks = _profile_peak_longitudes(profiles, longitude, dayside)
+
+    np.testing.assert_allclose(peaks, centres, atol=1.0e-10)
 
 
 def test_positive_rendered_map_conditioning_checks_the_full_grid() -> None:

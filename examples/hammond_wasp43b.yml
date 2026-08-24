@@ -1,71 +1,109 @@
 schema_version: 1
 
+# Strict, small-sampling reproduction of Hammond et al. (2024), WASP-43b.
+# This profile uses the 8,424 valid points in the released Eureka white light
+# curve, including the detector-position and PSF-width regressors.
+# orbit at Hammond's reported map-fit medians so that the first corrected run
+# stays fast. See docs/hammond2024_audit.md for the remaining data limitation.
 project:
-  name: hammond-wasp43b
-  seed: 42
-  description: Hammond et al. (2024) WASP-43b benchmark configuration
+  name: hammond-2024-wasp43b-strict
+  seed: 20260824
+  description: Full-phase Hammond et al. 2024 method reproduction
 
 data:
-  time: ../w43b_time.npy
-  flux: ../w43b_flux.npy
-  flux_err: ../w43b_error.npy
+  file: ../data/hammond2024_wasp43b_raw.npz
+  format: npz
+  time_column: time
+  flux_column: flux
+  flux_err_column: flux_err
   time_unit: day
-  exposure_seconds: 10.04
+  exposure_seconds: 10.34
   normalize: none
 
 system:
-  period_days: 0.813474
-  transit_time: 55934.292283
+  period_days: 0.8134740621723353
+  # The paper epoch plus 4,892 periods. This is the same physical ephemeris
+  # placed next to the released BMJD time array.
+  transit_time: 59913.80739501201
   a_over_rstar: 4.859
   radius_ratio: 0.15839
   inclination_degrees: 82.106
   planet_flux_ratio: 0.005
-  limb_darkening_u1: 0.0182
-  limb_darkening_u2: 0.595
+  stellar_radius_rsun: 0.665
+  # Hammond reports Kipping q1=0.0182 and q2=0.595. These are the equivalent
+  # quadratic coefficients u1=0.160539777 and u2=-0.02563240137.
+  limb_darkening_u1: 0.160539777
+  limb_darkening_u2: -0.02563240137
+  eccentricity: 0.0
 
 map:
   representation: pixels
   harmonic_degree: 2
-  positive: true
-  regularization: cross_validate
-  entropy_penalty: 0.0
   n_pixels: 16
+  positive: true
+  regularization: none
+  entropy_penalty: 0.0
+  # Arithmetic-space LogNormal prior stated by Hammond et al.
+  pixel_prior_mean_ppm: 6000.0
+  pixel_prior_sd_ppm: 3000.0
 
 model:
   null_model: fourier
   mapped_model: spherical_harmonic
   fourier_degree: 2
   likelihood: gaussian
+  noise_model: white
+  include_light_delay: true
   integrate_exposure: true
+  fit_orbit: false
+  fit_limb_darkening: false
+  fit_error_scale: true
+  error_scale_log_sigma: 0.25
 
 systematics:
   mode: multiplicative
-  polynomial_order: 0
+  fit_offset: true
+  polynomial_order: 1
+  standardize_time: false
   exponential_ramp: true
-  ramp_timescale_hours: 88.8
-  regressor_columns: []
-  segment_column: null
-  standardize_regressors: true
-  coefficient_prior_sigma: 0.01
+  # The first joint run recovered 3.7 day^-1. Hammond then fixed nuisance
+  # parameters for the map re-fit. Fixing this rate also removes the dominant
+  # ramp-map sampling degeneracy.
+  fit_ramp_rate: false
+  ramp_timescale_hours: 6.486486486486487
+  ramp_rate_prior_mean_per_day: 3.7
+  ramp_rate_prior_sigma_per_day: 1.0
+  regressor_columns: [detector_y, psf_width_y]
+  # The archive conversion already mean-centres both regressors, matching the
+  # Eureka/Hammond model. Keep their physical scale.
+  standardize_regressors: false
+  multiplicative_composition: product
+  # Order: offset, linear time, ramp amplitude, detector_y, psf_width_y.
+  coefficient_prior_sigmas: [0.001, 0.01, 0.1, 0.1, 10.0]
+  ramp_amplitude_prior_sigma: 0.1
 
 inference:
   sampler: nuts
   chains: 2
-  warmup: 150
-  draws: 150
-  target_accept: 0.9
+  warmup: 1000
+  draws: 1000
+  target_accept: 0.95
+  dense_mass: true
+  init_strategy: jitter+adapt_diag
+  progress_bar: true
 
 compute:
   profile: local
   jax_platform: cpu
   x64: true
   max_cpus: 3
-  threads: 2
-  jit: true
+  threads: 3
+  quadrature_radial: 32
+  quadrature_azimuth: 128
 
 output:
-  directory: ../results/hammond-wasp43b
+  directory: ../results/hammond2024_strict
   save_resolved_config: true
   save_report: true
-  overwrite: false
+  overwrite: true
   best_fit_color: mediumpurple
