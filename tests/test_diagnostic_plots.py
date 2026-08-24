@@ -12,6 +12,7 @@ from robert_mapping.benchmark.diagnostic_plots import (  # noqa: E402
     BEST_FIT_COLOR,
     planck_brightness_temperature,
     plot_brightness_map,
+    plot_longitude_profile,
     plot_map_peak_posterior,
     plot_model_comparison,
     plot_north_south_asymmetry,
@@ -19,6 +20,26 @@ from robert_mapping.benchmark.diagnostic_plots import (  # noqa: E402
     plot_temperature_map,
     plot_white_light_curve,
 )
+
+
+def _longitude_references():
+    return [
+        {"kind": "substellar", "longitude": 0.0, "label": "Sub-stellar point: 0°"},
+        {
+            "kind": "robert",
+            "longitude": 7.49,
+            "lower": 6.86,
+            "upper": 8.14,
+            "label": "robert-mapping: +7.49° (−0.63°/+0.65°)",
+        },
+        {
+            "kind": "hammond",
+            "longitude": 7.75,
+            "lower": 7.39,
+            "upper": 8.11,
+            "label": "Hammond et al. (2024): +7.75° ± 0.36°",
+        },
+    ]
 
 
 def _planck(wavelength_m: float, temperature: float) -> float:
@@ -99,6 +120,41 @@ def test_brightness_and_temperature_maps_save_files(tmp_path) -> None:
     for stem in ("brightness", "temperature"):
         assert (tmp_path / f"{stem}.png").exists()
         assert (tmp_path / f"{stem}.pdf").exists()
+
+
+def test_maps_and_longitude_profile_label_hotspot_comparison() -> None:
+    longitude = np.linspace(-180.0, 180.0, 121)
+    latitude = np.linspace(-90.0, 90.0, 61)
+    brightness = 1.0 + np.cos(np.deg2rad(longitude - 7.49))[None, :] * np.cos(
+        np.deg2rad(latitude)
+    )[:, None]
+    metadata = {"longitude_references": _longitude_references()}
+
+    map_figure = plot_brightness_map(
+        longitude,
+        latitude,
+        brightness,
+        metadata=metadata,
+    )
+    profile_figure = plot_longitude_profile(
+        longitude,
+        np.mean(brightness, axis=0),
+        metadata=metadata,
+    )
+
+    expected_labels = {reference["label"] for reference in _longitude_references()}
+    for figure in (map_figure, profile_figure):
+        axis = figure.axes[0]
+        labels = {text.get_text() for text in axis.get_legend().get_texts()}
+        assert expected_labels <= labels
+        vertical_lines = {
+            float(np.asarray(line.get_xdata(), dtype=float)[0])
+            for line in axis.lines
+            if np.asarray(line.get_xdata()).size >= 2
+            and np.allclose(line.get_xdata(), np.asarray(line.get_xdata())[0])
+        }
+        assert {0.0, 7.49, 7.75} <= vertical_lines
+        assert len(axis.containers) >= 2
 
 
 def test_profile_recovery_and_model_comparison_save_files(tmp_path) -> None:

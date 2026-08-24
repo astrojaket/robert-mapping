@@ -32,6 +32,8 @@ _POSITIVITY_CONDITIONING_TOLERANCE = 1.0e-12
 # draws survive the conditioning.  This threshold affects reporting only; it
 # never changes the sampler or the original posterior products.
 _MIN_CONDITIONED_DRAWS = 100
+_HAMMOND_HOTSPOT_LONGITUDE_DEGREES = 7.75
+_HAMMOND_HOTSPOT_SIGMA_DEGREES = 0.36
 
 
 def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureConverter, str]:
@@ -226,6 +228,65 @@ def _quantile_summary(values: np.ndarray) -> dict[str, float]:
 
     q16, median, q84 = np.quantile(np.asarray(values, dtype=float), [0.16, 0.50, 0.84])
     return {"q16": float(q16), "median": float(median), "q84": float(q84)}
+
+
+def _longitude_comparison_references(
+    offsets: np.ndarray,
+    *,
+    include_hammond: bool,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Build shared longitude markers and their machine-readable summary."""
+
+    q16, median, q84 = np.quantile(
+        np.asarray(offsets, dtype=float), [0.16, 0.50, 0.84]
+    )
+    lower_error = float(median - q16)
+    upper_error = float(q84 - median)
+    references: list[dict[str, Any]] = [
+        {
+            "kind": "substellar",
+            "longitude": 0.0,
+            "label": "Sub-stellar point: 0°",
+        },
+        {
+            "kind": "robert",
+            "longitude": float(median),
+            "lower": float(q16),
+            "upper": float(q84),
+            "label": (
+                f"robert-mapping: {median:+.2f}° "
+                f"(−{lower_error:.2f}°/+{upper_error:.2f}°)"
+            ),
+        },
+    ]
+    summary: dict[str, Any] = {
+        "substellar_longitude_degrees": 0.0,
+        "robert_mapping": {
+            "q16": float(q16),
+            "median": float(median),
+            "q84": float(q84),
+        },
+        "hammond_et_al_2024": None,
+    }
+    if include_hammond:
+        hammond = _HAMMOND_HOTSPOT_LONGITUDE_DEGREES
+        sigma = _HAMMOND_HOTSPOT_SIGMA_DEGREES
+        references.append(
+            {
+                "kind": "hammond",
+                "longitude": hammond,
+                "lower": hammond - sigma,
+                "upper": hammond + sigma,
+                "label": f"Hammond et al. (2024): +{hammond:.2f}° ± {sigma:.2f}°",
+            }
+        )
+        summary["hammond_et_al_2024"] = {
+            "median": hammond,
+            "sigma": sigma,
+            "lower": hammond - sigma,
+            "upper": hammond + sigma,
+        }
+    return references, summary
 
 
 def _profile_peak_longitudes(
@@ -451,6 +512,17 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
     else:
         conditioned_status = "available"
     map_q16, map_median, map_q84 = np.quantile(contrast, [0.16, 0.50, 0.84], axis=0)
+    latitude_weights = np.cos(np.deg2rad(latitude_deg))
+    profiles = np.average(contrast, axis=1, weights=latitude_weights)
+    profile_q16, profile_median, profile_q84 = np.quantile(
+        profiles, [0.16, 0.50, 0.84], axis=0
+    )
+    dayside = (longitude_deg >= -90.0) & (longitude_deg <= 90.0)
+    offsets = _profile_peak_longitudes(profiles, longitude_deg, dayside)
+    longitude_references, longitude_comparison = _longitude_comparison_references(
+        offsets,
+        include_hammond=("hammond" in target.lower() or "wasp43" in target.lower()),
+    )
     for label, values, title in (
         ("brightness_map_q16", map_q16, "Brightness map: 16th percentile"),
         ("brightness_map_median", map_median, "Brightness map: posterior median"),
@@ -460,7 +532,11 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
             longitude_deg,
             latitude_deg,
             values * 1.0e6,
-            metadata={"title": f"{target}: {title}", "colorbar_label": "Contrast (ppm)"},
+            metadata={
+                "title": f"{target}: {title}",
+                "colorbar_label": "Contrast (ppm)",
+                "longitude_references": longitude_references,
+            },
             output=output / label,
             color=color,
         )
@@ -495,13 +571,6 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
         color=color,
     )
 
-    latitude_weights = np.cos(np.deg2rad(latitude_deg))
-    profiles = np.average(contrast, axis=1, weights=latitude_weights)
-    profile_q16, profile_median, profile_q84 = np.quantile(
-        profiles, [0.16, 0.50, 0.84], axis=0
-    )
-    dayside = (longitude_deg >= -90.0) & (longitude_deg <= 90.0)
-    offsets = _profile_peak_longitudes(profiles, longitude_deg, dayside)
     plot_longitude_profile(
         longitude_deg,
         profile_median * 1.0e6,
@@ -510,6 +579,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
         metadata={
             "title": f"{target}: longitude profile",
             "profile_label_axis": "Contrast (ppm)",
+            "longitude_references": longitude_references,
         },
         output=output / "longitude_profile",
         color=color,
@@ -537,6 +607,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
         metadata={
             "title": f"{target}: brightness-temperature map",
             "colorbar_label": "Brightness temperature (K)",
+            "longitude_references": longitude_references,
         },
         output=output / "temperature_map",
         color=color,
@@ -595,6 +666,10 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
         conditioned_offsets = _profile_peak_longitudes(
             conditioned_profiles, longitude_deg, dayside
         )
+        conditioned_longitude_references, _ = _longitude_comparison_references(
+            conditioned_offsets,
+            include_hammond=("hammond" in target.lower() or "wasp43" in target.lower()),
+        )
         conditioned_temperature_draws = np.asarray(
             converter.temperature(
                 np.maximum(conditioned_contrast, positive_floor)
@@ -636,6 +711,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
                     "title": f"{target}: {title}",
                     "colorbar_label": "Contrast (ppm)",
                     "warning": conditioning_warning,
+                    "longitude_references": conditioned_longitude_references,
                 },
                 output=output / label,
                 color=color,
@@ -648,6 +724,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
                 "title": f"{target}: brightness-temperature map (positivity-conditioned)",
                 "colorbar_label": "Brightness temperature (K)",
                 "warning": conditioning_warning,
+                "longitude_references": conditioned_longitude_references,
             },
             output=output / "temperature_map_positive_conditioned",
             color=color,
@@ -661,6 +738,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
                 "title": f"{target}: longitude profile (positivity-conditioned)",
                 "profile_label_axis": "Contrast (ppm)",
                 "warning": conditioning_warning,
+                "longitude_references": conditioned_longitude_references,
             },
             output=output / "longitude_profile_positive_conditioned",
             color=color,
@@ -791,6 +869,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
             "median": float(hotspot_median),
             "q84": float(hotspot_q84),
         },
+        "longitude_comparison": longitude_comparison,
         "map_peak_2d": {
             "longitude_degrees_east": _quantile_summary(peak_longitude),
             "latitude_degrees": _quantile_summary(peak_latitude),

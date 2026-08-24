@@ -28,6 +28,7 @@ BEST_FIT_COLOR = "mediumpurple"
 _BLACK = "#222222"
 _GREY = "#777777"
 _LIGHT_GREY = "#d9d9d9"
+_HAMMOND_COLOR = "#00838f"
 
 
 def _mpl():
@@ -132,6 +133,103 @@ def _axis_text(axis: Any, metadata: Mapping[str, Any], key: str, default: str) -
 def _finish(figure: Any, output: str | Path | None, *, dpi: int = 300) -> Any:
     _save_figure(figure, output, dpi=dpi)
     return figure
+
+
+def _draw_longitude_references(
+    axis: Any,
+    metadata: Mapping[str, Any],
+    *,
+    best_fit_color: str,
+    map_mode: bool,
+) -> bool:
+    """Draw sub-stellar, fitted-hotspot, and literature longitude markers."""
+
+    references = metadata.get("longitude_references")
+    if references is None:
+        return False
+    if not isinstance(references, Sequence) or isinstance(references, (str, bytes)):
+        raise TypeError("longitude_references must be a sequence of mappings")
+    if not references:
+        return False
+
+    style = {
+        "substellar": (_BLACK, ":"),
+        "robert": (best_fit_color, "-"),
+        "hammond": (_HAMMOND_COLOR, "--"),
+    }
+    errorbar_level = (
+        {"robert": 0.965, "hammond": 0.900}
+        if map_mode
+        else {"robert": 0.960, "hammond": 0.885}
+    )
+    for reference in references:
+        if not isinstance(reference, Mapping):
+            raise TypeError("each longitude reference must be a mapping")
+        kind = str(reference.get("kind", "reference")).lower()
+        longitude = float(reference["longitude"])
+        if not np.isfinite(longitude):
+            raise ValueError("reference longitude must be finite")
+        color, linestyle = style.get(kind, (_GREY, "--"))
+        label = str(reference.get("label", f"Reference: {longitude:+.2f}°"))
+        lower = reference.get("lower")
+        upper = reference.get("upper")
+        axis.axvline(
+            longitude,
+            color=color,
+            linestyle=linestyle,
+            linewidth=1.35 if kind != "substellar" else 1.0,
+            alpha=0.95,
+            label=label,
+            zorder=5,
+        )
+        if kind == "substellar" and map_mode:
+            axis.scatter(
+                [longitude],
+                [0.0],
+                marker="+",
+                s=64,
+                linewidths=1.5,
+                color=color,
+                zorder=7,
+            )
+        if lower is None and upper is None:
+            continue
+        if lower is None or upper is None:
+            raise ValueError("reference lower and upper bounds must be supplied together")
+        lower_value = float(lower)
+        upper_value = float(upper)
+        if not (
+            np.isfinite(lower_value)
+            and np.isfinite(upper_value)
+            and lower_value <= longitude <= upper_value
+        ):
+            raise ValueError("reference bounds must be finite and contain longitude")
+        axis.axvspan(
+            lower_value,
+            upper_value,
+            color=color,
+            alpha=0.13,
+            linewidth=0.0,
+            zorder=4,
+        )
+        level = errorbar_level.get(kind, 1.025)
+        axis.errorbar(
+            longitude,
+            level,
+            xerr=np.asarray(
+                [[longitude - lower_value], [upper_value - longitude]], dtype=float
+            ),
+            fmt="o",
+            markersize=4.5,
+            capsize=3.5,
+            elinewidth=1.35,
+            capthick=1.35,
+            color=color,
+            transform=axis.get_xaxis_transform(),
+            clip_on=False,
+            zorder=8,
+        )
+    return True
 
 
 def _validate_map_grid(
@@ -311,6 +409,19 @@ def plot_brightness_map(
     if info.get("xlim") is not None:
         axis.set_xlim(*info["xlim"])
     axis.set_ylim(float(lat[0]), float(lat[-1]))
+    has_references = _draw_longitude_references(
+        axis,
+        info,
+        best_fit_color=color,
+        map_mode=True,
+    )
+    if has_references:
+        axis.legend(
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.20),
+            ncol=1,
+            frameon=False,
+        )
     cbar = figure.colorbar(image_artist, ax=axis, pad=0.02)
     cbar.set_label(str(info.get("colorbar_label", "Relative brightness")))
     return _finish(figure, output, dpi=dpi)
@@ -492,19 +603,39 @@ def plot_longitude_profile(
                           linewidth=0.0, label=str(info.get("interval_label", "68% interval")))
     axis.plot(x[order], y[order], color=color, linewidth=1.8,
               label=str(info.get("profile_label", "Profile")))
+    has_comparison_references = _draw_longitude_references(
+        axis,
+        info,
+        best_fit_color=color,
+        map_mode=False,
+    )
     if "reference_longitude" in info:
         axis.axvline(float(info["reference_longitude"]), color=_BLACK, linestyle="--",
                      linewidth=1.0, label=str(info.get("reference_label", "Reference")))
     if "injected_longitude" in info:
         axis.axvline(float(info["injected_longitude"]), color=_GREY, linestyle=":",
                      linewidth=1.0, label=str(info.get("injected_label", "Injected")))
-    axis.axvline(0.0, color=_LIGHT_GREY, linewidth=0.8)
+    if not has_comparison_references:
+        axis.axvline(0.0, color=_LIGHT_GREY, linewidth=0.8)
     axis.set_xlabel(str(info.get("longitude_label", "Longitude (degrees east)")))
     axis.set_ylabel(str(info.get("profile_label_axis", "Relative brightness")))
     axis.set_title(str(info.get("title", "Longitude profile")))
     axis.grid(alpha=0.25)
-    if low is not None or "reference_longitude" in info or "injected_longitude" in info:
-        axis.legend(loc=str(info.get("legend_loc", "best")), frameon=False)
+    if (
+        low is not None
+        or has_comparison_references
+        or "reference_longitude" in info
+        or "injected_longitude" in info
+    ):
+        if has_comparison_references:
+            axis.legend(
+                loc="upper center",
+                bbox_to_anchor=(0.5, -0.24),
+                ncol=1,
+                frameon=False,
+            )
+        else:
+            axis.legend(loc=str(info.get("legend_loc", "best")), frameon=False)
     return _finish(figure, output, dpi=dpi)
 
 

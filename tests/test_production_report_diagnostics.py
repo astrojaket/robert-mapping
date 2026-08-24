@@ -7,6 +7,7 @@ import numpy as np
 from robert_mapping.benchmark.production_report import (
     _condition_positive_rendered_maps,
     _map_information_diagnostics,
+    _longitude_comparison_references,
     _profile_peak_longitudes,
 )
 
@@ -20,6 +21,26 @@ def test_profile_peak_longitudes_interpolates_below_grid_spacing() -> None:
     peaks = _profile_peak_longitudes(profiles, longitude, dayside)
 
     np.testing.assert_allclose(peaks, centres, atol=1.0e-10)
+
+
+def test_longitude_comparison_includes_hammond_and_asymmetric_robert_errors() -> None:
+    offsets = np.array([6.0, 7.0, 7.5, 8.0, 9.0])
+
+    references, summary = _longitude_comparison_references(
+        offsets,
+        include_hammond=True,
+    )
+
+    assert [reference["kind"] for reference in references] == [
+        "substellar",
+        "robert",
+        "hammond",
+    ]
+    assert references[0]["longitude"] == 0.0
+    assert references[2]["longitude"] == 7.75
+    assert references[2]["lower"] == 7.39
+    assert references[2]["upper"] == 8.11
+    assert summary["hammond_et_al_2024"]["sigma"] == 0.36
 
 
 def test_positive_rendered_map_conditioning_checks_the_full_grid() -> None:
