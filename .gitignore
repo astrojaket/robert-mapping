@@ -8,6 +8,10 @@ build/
 develop-eggs/
 dist/
 downloads/
+literature_data/**/source/
+literature_data/**/prepared/
+literature_data/input_audit.json
+literature_data/.partial_downloads/
 eggs/
 .eggs/
 lib/

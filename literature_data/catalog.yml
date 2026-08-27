@@ -1,0 +1,367 @@
+schema_version: 1
+updated: 2026-08-27
+policy:
+  max_parallel_downloads: 3
+  run_inference: false
+  run_simulations: false
+
+datasets:
+  - id: wasp43b-jwst-miri-lrs
+    planet: WASP-43b
+    instrument: JWST/MIRI LRS
+    observation: full_phase_curve
+    paper_doi: 10.1038/s41550-024-02230-x
+    archive_doi: 10.5281/zenodo.10525170
+    state: ready_for_input_audit
+    directory: WASP-43b/JWST-MIRI-LRS
+    files:
+      - name: WASP43b_MIRI_Data.zip
+        url: https://zenodo.org/records/10525170/files/WASP43b_MIRI_Data.zip?download=1
+        md5: d14c633b7cdc15a9c990a92cc4fc9b86
+        size_bytes: 11533870
+
+  - id: wasp121b-jwst-nirspec-g395h
+    planet: WASP-121b
+    instrument: JWST/NIRSpec G395H
+    observation: full_phase_curve
+    paper_doi: 10.3847/2041-8213/acb049
+    archive_doi: 10.5281/zenodo.20651891
+    state: ready_for_input_audit
+    directory: WASP-121b/JWST-NIRSpec-G395H
+    files:
+      - name: whitelc_data_nrs1.txt
+        url: https://zenodo.org/records/20651891/files/whitelc_data_nrs1.txt?download=1
+        md5: 6ba4a29c4ca694dd4f0e72286fbef2e1
+        size_bytes: 527372
+      - name: whitelc_data_nrs2.txt
+        url: https://zenodo.org/records/20651891/files/whitelc_data_nrs2.txt?download=1
+        md5: d19421b855f962baff3ad919b6399e1b
+        size_bytes: 530646
+      - name: whitelc_model_nrs1.txt
+        url: https://zenodo.org/records/20651891/files/whitelc_model_nrs1.txt?download=1
+        md5: f45026e246a434157ccb09f36cbf2184
+        size_bytes: 257309
+      - name: whitelc_model_nrs2.txt
+        url: https://zenodo.org/records/20651891/files/whitelc_model_nrs2.txt?download=1
+        md5: 694e2ad1533ccf29711e86b3adc5a72d
+        size_bytes: 257459
+
+  - id: gj1214b-jwst-miri-lrs
+    planet: GJ 1214b
+    instrument: JWST/MIRI LRS
+    observation: full_phase_curve
+    paper_doi: 10.1038/s41586-023-06159-5
+    archive_doi: 10.5281/zenodo.7703086
+    state: ready_for_input_audit
+    directory: GJ-1214b/JWST-MIRI-LRS
+    files:
+      - name: white_lightcurve.txt
+        url: https://zenodo.org/records/7703086/files/white_lightcurve.txt?download=1
+      - name: positions.txt
+        url: https://zenodo.org/records/7703086/files/positions.txt?download=1
+
+  - id: ltt9779b-jwst-niriss-soss
+    planet: LTT 9779b
+    instrument: JWST/NIRISS SOSS
+    observation: full_phase_curve
+    paper_doi: 10.1038/s41550-025-02488-9
+    state: input_incomplete_missing_uncertainty
+    directory: LTT-9779b/JWST-NIRISS-SOSS
+    notes: Author source-data white light curves are already present in the local project.
+    files: []
+
+  - id: hd189733b-jwst-miri-lrs
+    planet: HD 189733b
+    instrument: JWST/MIRI LRS
+    observation: multiple_eclipses
+    paper_doi: 10.3847/2041-8213/adc096
+    archive_doi: 10.5281/zenodo.15103479
+    state: ready_for_input_audit
+    directory: HD-189733b/JWST-MIRI-LRS
+    files:
+      - {name: Eureka_eclipse1_8mu_clipped-time.txt, url: "https://zenodo.org/records/15103479/files/Eureka_eclipse1_8mu_clipped-time.txt?download=1"}
+      - {name: Eureka_eclipse1_8mu_clipped-flux.txt, url: "https://zenodo.org/records/15103479/files/Eureka_eclipse1_8mu_clipped-flux.txt?download=1"}
+      - {name: Eureka_eclipse1_8mu_clipped-ferr.txt, url: "https://zenodo.org/records/15103479/files/Eureka_eclipse1_8mu_clipped-ferr.txt?download=1"}
+      - {name: Eureka_eclipse1_8mu_clipped-dvectors.txt, url: "https://zenodo.org/records/15103479/files/Eureka_eclipse1_8mu_clipped-dvectors.txt?download=1"}
+      - {name: Eureka_eclipse2_8mu_clipped-time.txt, url: "https://zenodo.org/records/15103479/files/Eureka_eclipse2_8mu_clipped-time.txt?download=1"}
+      - {name: Eureka_eclipse2_8mu_clipped-flux.txt, url: "https://zenodo.org/records/15103479/files/Eureka_eclipse2_8mu_clipped-flux.txt?download=1"}
+      - {name: Eureka_eclipse2_8mu_clipped-ferr.txt, url: "https://zenodo.org/records/15103479/files/Eureka_eclipse2_8mu_clipped-ferr.txt?download=1"}
+
+  - id: hd189733b-spitzer-irac-8um
+    planet: HD 189733b
+    instrument: Spitzer/IRAC 8 micron
+    observation: eclipse_and_phase_coverage
+    paper_doi: 10.3847/2041-8213/adc096
+    archive_doi: 10.5281/zenodo.15103479
+    state: ready_for_input_audit
+    directory: HD-189733b/Spitzer-IRAC-8um
+    files:
+      - {name: spitzer_time.txt, url: "https://zenodo.org/records/15103479/files/spitzer_time.txt?download=1"}
+      - {name: spitzer_flux.txt, url: "https://zenodo.org/records/15103479/files/spitzer_flux.txt?download=1"}
+      - {name: spitzer_ferr.txt, url: "https://zenodo.org/records/15103479/files/spitzer_ferr.txt?download=1"}
+      - {name: spitzer_throughput.txt, url: "https://zenodo.org/records/15103479/files/spitzer_throughput.txt?download=1"}
+
+  - id: wasp189b-cheops
+    planet: WASP-189b
+    instrument: CHEOPS
+    observation: two_full_phase_curves
+    paper_doi: 10.1051/0004-6361/202142400
+    state: ready_for_input_audit
+    directory: WASP-189b/CHEOPS
+    files:
+      - {name: ap_phot.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/659/A74/ap_phot.dat.gz"}
+      - {name: psf_phot.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/659/A74/psf_phot.dat.gz"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/659/A74/ReadMe"}
+
+  - id: wasp76b-cheops
+    planet: WASP-76b
+    instrument: CHEOPS
+    observation: three_phase_curves_twenty_eclipses
+    paper_doi: 10.1051/0004-6361/202348270
+    state: ready_for_input_audit
+    directory: WASP-76b/CHEOPS
+    files:
+      - {name: table.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/684/A27/table.dat.gz"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/684/A27/ReadMe"}
+
+  - id: hd209458b-spitzer-irac-4p5um
+    planet: HD 209458b
+    instrument: Spitzer/IRAC 4.5 micron
+    observation: full_phase_curve
+    paper_doi: 10.1088/0004-637X/790/1/53
+    state: ready_for_input_audit
+    directory: HD-209458b/Spitzer-IRAC-4p5um
+    files:
+      - {name: table1.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/ApJ/790/53/table1.dat.gz"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/ApJ/790/53/ReadMe"}
+
+  - id: 55cnce-jwst-nircam
+    planet: 55 Cancri e
+    instrument: JWST/NIRCam
+    observation: five_eclipses
+    paper_doi: 10.1051/0004-6361/202450748
+    state: ready_for_input_audit
+    directory: 55-Cancri-e/JWST-NIRCam
+    files:
+      - {name: tablee1.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/690/A159/tablee1.dat.gz"}
+      - {name: tablee2.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/690/A159/tablee2.dat.gz"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/690/A159/ReadMe"}
+
+  - id: wasp43b-cheops
+    planet: WASP-43b
+    instrument: CHEOPS
+    observation: eleven_eclipses
+    paper_doi: 10.1051/0004-6361/202243974
+    state: ready_for_input_audit
+    directory: WASP-43b/CHEOPS
+    files:
+      - {name: lc.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A17/lc.dat"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A17/ReadMe"}
+
+  - id: wasp12b-cheops
+    planet: WASP-12b
+    instrument: CHEOPS
+    observation: twenty_five_eclipses_and_partial_phase_curve
+    paper_doi: 10.1051/0004-6361/202348502
+    state: ready_for_input_audit
+    directory: WASP-12b/CHEOPS
+    notes: The CDS catalogue contains a visit list and 47 visit light curves.
+    files:
+      - {name: list.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/685/A63/list.dat"}
+      - {name: lc_all.tsv, url: "https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=J/A%2BA/685/A63/lc&-out.max=unlimited&-out.all=1"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/685/A63/ReadMe"}
+
+  - id: hd209458b-cheops
+    planet: HD 209458b
+    instrument: CHEOPS
+    observation: one_eclipse
+    paper_doi: 10.1051/0004-6361/202243082
+    state: ready_for_input_audit
+    directory: HD-209458b/CHEOPS
+    files:
+      - {name: table.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/659/L4/table.dat.gz"}
+      - {name: table1.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/659/L4/table1.dat.gz"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/659/L4/ReadMe"}
+
+  - id: kelt20b-cheops
+    planet: KELT-20b
+    instrument: CHEOPS
+    observation: seven_eclipses
+    paper_doi: 10.1051/0004-6361/202347533
+    state: ready_for_input_audit
+    directory: KELT-20b/CHEOPS
+    files:
+      - {name: tablec1.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/683/A1/tablec1.dat.gz"}
+      - {name: lc_det.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/683/A1/lc_det.dat"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/683/A1/ReadMe"}
+
+  - id: kelt1b-cheops
+    planet: KELT-1b
+    instrument: CHEOPS
+    observation: eight_eclipses
+    paper_doi: 10.1051/0004-6361/202142608
+    state: ready_for_input_audit
+    directory: KELT-1b/CHEOPS
+    files:
+      - {name: visit1.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/visit1.dat"}
+      - {name: visit2.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/visit2.dat"}
+      - {name: visit3.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/visit3.dat"}
+      - {name: visit4.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/visit4.dat"}
+      - {name: visit5.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/visit5.dat"}
+      - {name: visit6.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/visit6.dat"}
+      - {name: visit7.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/visit7.dat"}
+      - {name: visit8.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/visit8.dat"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/668/A93/ReadMe"}
+
+  - id: wasp103b-hst-wfc3-g141
+    planet: WASP-103b
+    instrument: HST/WFC3 G141
+    observation: one_eclipse
+    paper_doi: 10.1051/0004-6361/201731242
+    state: ready_for_input_audit
+    directory: WASP-103b/HST-WFC3-G141
+    files:
+      - {name: lcswhite.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/606/A18/lcswhite.dat"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/606/A18/ReadMe"}
+
+  - id: wasp43b-hst-wfc3-uvis
+    planet: WASP-43b
+    instrument: HST/WFC3 UVIS F350LP
+    observation: one_eclipse
+    paper_doi: 10.3847/1538-3881/abe8d6
+    state: ready_for_input_audit
+    directory: WASP-43b/HST-WFC3-UVIS
+    files:
+      - {name: fig4.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/AJ/161/269/fig4.dat"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/AJ/161/269/ReadMe"}
+
+  - id: wasp121b-tess
+    planet: WASP-121b
+    instrument: TESS
+    observation: full_phase_curve_binned
+    paper_doi: 10.1051/0004-6361/201936647
+    state: ready_for_input_audit
+    directory: WASP-121b/TESS
+    files:
+      - {name: lccurve.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/637/A36/lccurve.dat"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/637/A36/ReadMe"}
+
+  - id: kelt1b-tess
+    planet: KELT-1b
+    instrument: TESS
+    observation: full_phase_curve_binned
+    paper_doi: 10.1051/0004-6361/202038524
+    state: ready_for_input_audit
+    directory: KELT-1b/TESS
+    files:
+      - {name: kelt1.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/648/A71/kelt1.dat"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/648/A71/ReadMe"}
+
+  - id: wasp18b-spitzer-irac
+    planet: WASP-18b
+    instrument: Spitzer/IRAC
+    observation: full_phase_curve
+    paper_doi: 10.1051/0004-6361/202450939
+    state: ready_for_input_audit
+    directory: WASP-18b/Spitzer-IRAC
+    files:
+      - {name: spitzerw.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/699/A150/spitzerw.dat"}
+      - {name: spitzelc.dat.gz, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/699/A150/spitzelc.dat.gz"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/699/A150/ReadMe"}
+
+  - id: wasp18b-jwst-niriss-soss
+    planet: WASP-18b
+    instrument: JWST/NIRISS SOSS
+    observation: spectroscopic_eclipse_map
+    paper_doi: 10.1038/s41550-025-02666-9
+    archive_doi: 10.5281/zenodo.14751570
+    state: archive_reduction_required
+    directory: WASP-18b/JWST-NIRISS-SOSS
+    notes: The 1.4 GB archive mixes light curves, retrievals, and fit products.
+    files: []
+
+  - id: wasp17b-jwst-miri-lrs
+    planet: WASP-17b
+    instrument: JWST/MIRI LRS
+    observation: eclipse
+    paper_doi: 10.3847/1538-3881/ad5c61
+    archive_doi: 10.5281/zenodo.12571830
+    state: archive_reduction_required
+    directory: WASP-17b/JWST-MIRI-LRS
+    notes: The author release is split into 104 MB Eureka and 92 MB ExoTiC archives.
+    files: []
+
+  - id: wasp121b-hst-wfc3-g141
+    planet: WASP-121b
+    instrument: HST/WFC3 G141
+    observation: two_full_phase_curves
+    paper_doi: 10.1038/s41550-021-01592-w
+    state: archive_reduction_required
+    directory: WASP-121b/HST-WFC3-G141
+    files: []
+
+  - id: wasp43b-hst-wfc3-g141
+    planet: WASP-43b
+    instrument: HST/WFC3 G141
+    observation: three_phase_curves
+    paper_doi: 10.1126/science.1256758
+    state: archive_reduction_required
+    directory: WASP-43b/HST-WFC3-G141
+    notes: Public MAST program GO-13467; no verified author white-light table.
+    files: []
+
+  - id: toi1685b-jwst-nirspec-g395h
+    planet: TOI-1685b
+    instrument: JWST/NIRSpec G395H
+    observation: full_phase_curve
+    paper_doi: 10.3847/1538-3881/addb40
+    state: archive_reduction_required
+    directory: TOI-1685b/JWST-NIRSpec-G395H
+    files: []
+
+  - id: 55cnce-jwst-miri-lrs
+    planet: 55 Cancri e
+    instrument: JWST/MIRI LRS
+    observation: one_eclipse
+    paper_doi: 10.1038/s41586-024-07432-x
+    state: archive_reduction_required
+    directory: 55-Cancri-e/JWST-MIRI-LRS
+    notes: The public OSF release is a mixed reduction archive and needs an internal file audit.
+    files: []
+
+  - id: wasp43b-spitzer-irac
+    planet: WASP-43b
+    instrument: Spitzer/IRAC
+    observation: three_phase_curves
+    paper_doi: 10.3847/1538-3881/153/2/68
+    state: archive_reduction_required
+    directory: WASP-43b/Spitzer-IRAC
+    notes: Level-1 BCD data must be obtained by AOR from the Spitzer Heritage Archive.
+    files: []
+
+  - id: wasp19b-spitzer-irac
+    planet: WASP-19b
+    instrument: Spitzer/IRAC
+    observation: full_phase_curves
+    paper_doi: 10.3847/0004-637X/823/2/122
+    state: archive_reduction_required
+    directory: WASP-19b/Spitzer-IRAC
+    files: []
+
+  - id: hatp7b-spitzer-irac
+    planet: HAT-P-7b
+    instrument: Spitzer/IRAC
+    observation: full_phase_curves
+    paper_doi: 10.3847/0004-637X/823/2/122
+    state: archive_reduction_required
+    directory: HAT-P-7b/Spitzer-IRAC
+    files: []
+
+  - id: wasp14b-spitzer-irac
+    planet: WASP-14b
+    instrument: Spitzer/IRAC
+    observation: full_phase_curves
+    paper_doi: 10.1088/0004-637X/811/2/122
+    state: archive_reduction_required
+    directory: WASP-14b/Spitzer-IRAC
+    files: []
