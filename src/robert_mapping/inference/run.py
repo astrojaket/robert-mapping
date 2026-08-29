@@ -142,14 +142,8 @@ def _noise_diagnostics(
         "maximum_noise_rhat": None,
         "minimum_noise_effective_sample_size": None,
     }
-    if noise_model != "ou":
-        for name in ("ou_amplitude", "ou_timescale", "jitter"):
-            summary[f"{name}_mean"] = None
-            summary[f"{name}_standard_deviation"] = None
-        return summary
-
     finite_names: list[str] = []
-    for name in ("ou_amplitude", "ou_timescale", "jitter"):
+    for name in ("ou_amplitude", "ou_timescale", "jitter", "white_jitter"):
         values = run.samples.get(name)
         if values is None:
             summary[f"{name}_mean"] = None
@@ -189,7 +183,7 @@ def _add_noise_samples(
 ) -> None:
     """Add sampled OU parameters to the portable samples archive."""
 
-    for name in ("ou_amplitude", "ou_timescale", "jitter"):
+    for name in ("ou_amplitude", "ou_timescale", "jitter", "white_jitter"):
         if name in run.samples:
             payload[name] = np.asarray(run.samples[name])
         if run.grouped_samples is not None and name in run.grouped_samples:
@@ -442,11 +436,19 @@ def _harmonic_nuts_fit(
     """
 
     ncoefficients = ncoeff(bundle.harmonic_degree)
+    active_indices = np.asarray(
+        config.map.active_harmonic_indices
+        if config.map.active_harmonic_indices
+        else tuple(range(ncoefficients)),
+        dtype=int,
+    )
+    active_design = np.asarray(bundle.map_design, dtype=float)[:, active_indices]
+    n_active = int(active_indices.size)
     planet_scale = max(float(config.system.planet_flux_ratio), 1.0e-8)
-    prior_mean = np.zeros(ncoefficients, dtype=float)
+    prior_mean = np.zeros(n_active, dtype=float)
     prior_mean[0] = float(config.system.planet_flux_ratio)
     prior_sigma = np.full(
-        ncoefficients,
+        n_active,
         float(config.map.pixel_log_sigma) * planet_scale,
         dtype=float,
     )
@@ -468,7 +470,7 @@ def _harmonic_nuts_fit(
             "Install or add numpyro_backend.sample_harmonic_map."
         )
     run = sampler(
-        bundle.map_design,
+        active_design,
         curve.flux,
         curve.flux_err,
         stellar_flux=bundle.stellar_flux,
@@ -509,6 +511,7 @@ def _harmonic_nuts_fit(
         ),
         ou_timescale_prior_sigma_ln=float(config.model.ou_timescale_prior_sigma_ln),
         jitter_prior_scale=float(config.model.jitter_prior_scale_ppm) * 1.0e-6,
+        fit_white_jitter=bool(config.model.fit_white_jitter),
     )
     raw_coefficients = run.samples.get("harmonic_coefficients")
     if raw_coefficients is None:
@@ -517,12 +520,16 @@ def _harmonic_nuts_fit(
         raise ValueError(
             "sample_harmonic_map must return harmonic_coefficients or coefficients"
         )
-    harmonic_samples = np.asarray(raw_coefficients, dtype=float)
-    if harmonic_samples.ndim != 2 or harmonic_samples.shape[1] != ncoefficients:
+    active_samples = np.asarray(raw_coefficients, dtype=float)
+    if active_samples.ndim != 2 or active_samples.shape[1] != n_active:
         raise ValueError(
             "Direct harmonic samples must have shape "
-            f"(draw, {ncoefficients})"
+            f"(draw, {n_active})"
         )
+    harmonic_samples = np.zeros(
+        (active_samples.shape[0], ncoefficients), dtype=float
+    )
+    harmonic_samples[:, active_indices] = active_samples
     fallback_flux = (
         bundle.stellar_flux[None, :]
         + harmonic_samples @ np.asarray(bundle.map_design, dtype=float).T
@@ -538,6 +545,15 @@ def _harmonic_nuts_fit(
         float(np.mean(np.asarray(run.samples["error_scale"], dtype=float)))
         if "error_scale" in run.samples
         else 1.0
+    )
+    white_jitter_mean = (
+        float(np.mean(np.asarray(run.samples["white_jitter"], dtype=float)))
+        if "white_jitter" in run.samples
+        else 0.0
+    )
+    effective_error = np.sqrt(
+        np.square(np.asarray(curve.flux_err, dtype=float) * error_scale_mean)
+        + white_jitter_mean**2
     )
     divergences = np.asarray(
         run.extra_fields.get(
@@ -555,20 +571,30 @@ def _harmonic_nuts_fit(
         if grouped is None:
             grouped = run.grouped_samples.get("coefficients")
         if grouped is not None:
-            harmonic_by_chain = np.asarray(grouped, dtype=float)
-            if harmonic_by_chain.ndim != 3 or harmonic_by_chain.shape[-1] != ncoefficients:
+            active_by_chain = np.asarray(grouped, dtype=float)
+            if active_by_chain.ndim != 3 or active_by_chain.shape[-1] != n_active:
                 raise ValueError("Grouped direct harmonic samples have an invalid shape")
-            if harmonic_by_chain.shape[0] > 1:
+            harmonic_by_chain = np.zeros(
+                active_by_chain.shape[:-1] + (ncoefficients,), dtype=float
+            )
+            harmonic_by_chain[..., active_indices] = active_by_chain
+            if active_by_chain.shape[0] > 1:
                 from numpyro.diagnostics import summary as diagnostic_summary
 
                 diagnostics = diagnostic_summary(
-                    {"harmonics": harmonic_by_chain},
+                    {"harmonics": active_by_chain},
                     prob=0.68,
                     group_by_chain=True,
                 )["harmonics"]
-                maximum_rhat = float(np.nanmax(diagnostics["r_hat"]))
-                minimum_effective_sample_size = float(
-                    np.nanmin(diagnostics["n_eff"])
+                finite_rhat = np.asarray(diagnostics["r_hat"], dtype=float)
+                finite_rhat = finite_rhat[np.isfinite(finite_rhat)]
+                finite_ess = np.asarray(diagnostics["n_eff"], dtype=float)
+                finite_ess = finite_ess[np.isfinite(finite_ess)]
+                maximum_rhat = (
+                    float(np.max(finite_rhat)) if finite_rhat.size else None
+                )
+                minimum_effective_sample_size = (
+                    float(np.min(finite_ess)) if finite_ess.size else None
                 )
                 if "systematics_coefficients" in run.grouped_samples:
                     systematics_diagnostics = diagnostic_summary(
@@ -599,10 +625,9 @@ def _harmonic_nuts_fit(
         "coefficient_prior_mean": prior_mean.tolist(),
         "coefficient_prior_sigma": prior_sigma.tolist(),
         "residual_rms": float(np.sqrt(np.mean(residual**2))),
-        "chi_squared": float(
-            np.sum((residual / (curve.flux_err * error_scale_mean)) ** 2)
-        ),
-        "n_parameters": int(ncoefficients),
+        "chi_squared": float(np.sum((residual / effective_error) ** 2)),
+        "n_parameters": int(n_active),
+        "active_harmonic_indices": active_indices.tolist(),
         "n_samples": int(harmonic_samples.shape[0]),
         "chains": effective_chains,
         "warmup": int(config.inference.warmup),
@@ -618,7 +643,7 @@ def _harmonic_nuts_fit(
             minimum_systematics_effective_sample_size
         ),
         "mean_entropy": None,
-        "design_shape": [int(value) for value in bundle.map_design.shape],
+        "design_shape": [int(value) for value in active_design.shape],
         "threads": int(threads),
         "pixel_transform_shape": [0, 0],
         "pixel_grid": "none",
@@ -784,6 +809,7 @@ def _pixel_fit(
         ),
         fit_error_scale=bool(config.model.fit_error_scale),
         error_scale_log_sigma=float(config.model.error_scale_log_sigma),
+        fit_white_jitter=bool(config.model.fit_white_jitter),
         multiplicative_composition=str(
             config.systematics.multiplicative_composition
         ),

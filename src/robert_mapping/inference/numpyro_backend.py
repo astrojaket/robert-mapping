@@ -211,6 +211,7 @@ def sample_positive_map(
     ramp_amplitude_prior_sigma: float = 0.1,
     fit_error_scale: bool = False,
     error_scale_log_sigma: float = 0.1,
+    fit_white_jitter: bool = False,
     multiplicative_composition: str = "linearized",
     systematics_names: tuple[str, ...] | list[str] | None = None,
 ) -> NumpyroRun:
@@ -509,6 +510,12 @@ def sample_positive_map(
         else:
             error_scale = jnp.asarray(1.0, dtype=error_jax.dtype)
         scaled_error = error_jax * error_scale
+        if fit_white_jitter:
+            white_jitter = numpyro.sample(
+                "white_jitter",
+                dist.HalfNormal(float(jitter_prior_scale)),
+            )
+            scaled_error = jnp.sqrt(scaled_error**2 + white_jitter**2)
         if noise_model == "ou":
             ou_amplitude = numpyro.sample(
                 "ou_amplitude",
@@ -814,6 +821,7 @@ def sample_harmonic_map(
     ou_timescale_prior_median: float = 900.0,
     ou_timescale_prior_sigma_ln: float = 1.0,
     jitter_prior_scale: float = 100.0e-6,
+    fit_white_jitter: bool = False,
 ) -> NumpyroRun:
     """Sample direct harmonic coefficients with a posterior-whitened state.
 
@@ -1042,6 +1050,14 @@ def sample_harmonic_map(
             )
         numpyro.deterministic("systematics_model", nuisance_model)
         numpyro.deterministic("flux", flux)
+        if fit_white_jitter:
+            white_jitter = numpyro.sample(
+                "white_jitter",
+                dist.HalfNormal(float(jitter_prior_scale)),
+            )
+            effective_error = jnp.sqrt(error_jax**2 + white_jitter**2)
+        else:
+            effective_error = error_jax
         if noise_model == "ou":
             ou_amplitude = numpyro.sample(
                 "ou_amplitude",
@@ -1062,7 +1078,7 @@ def sample_harmonic_map(
                 "ou_log_likelihood",
                 _ou_kalman_log_likelihood(
                     y_jax - flux,
-                    error_jax,
+                    effective_error,
                     times_jax,
                     ou_amplitude,
                     ou_timescale,
@@ -1076,9 +1092,9 @@ def sample_harmonic_map(
             )
         else:
             observation_distribution = (
-                dist.StudentT(student_t_nu, flux, error_jax)
+                dist.StudentT(student_t_nu, flux, effective_error)
                 if likelihood == "student_t"
-                else dist.Normal(flux, error_jax)
+                else dist.Normal(flux, effective_error)
             )
             numpyro.sample("obs", observation_distribution, obs=y_jax)
 

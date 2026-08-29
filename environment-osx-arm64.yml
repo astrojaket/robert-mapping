@@ -17,6 +17,9 @@ dependencies:
   # The conda-forge CPU build is the portable choice for Apple Silicon.
   - jax>=0.4.35
   - numpyro>=0.15
+  - jupyterlab>=4.2
+  - ipykernel>=6.29
+  - nbclient>=0.10
   - pytest>=8.0
   - pip
   - pip:

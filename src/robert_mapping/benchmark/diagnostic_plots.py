@@ -156,11 +156,12 @@ def _draw_longitude_references(
         "substellar": (_BLACK, ":"),
         "robert": (best_fit_color, "-"),
         "hammond": (_HAMMOND_COLOR, "--"),
+        "literature": (_HAMMOND_COLOR, "--"),
     }
     errorbar_level = (
-        {"robert": 0.965, "hammond": 0.900}
+        {"robert": 0.965, "hammond": 0.900, "literature": 0.900}
         if map_mode
-        else {"robert": 0.960, "hammond": 0.885}
+        else {"robert": 0.960, "hammond": 0.885, "literature": 0.885}
     )
     for reference in references:
         if not isinstance(reference, Mapping):

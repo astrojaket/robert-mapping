@@ -26,6 +26,9 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "ipykernel>=6.29",
+  "jupyterlab>=4.2",
+  "nbclient>=0.10",
   "pytest>=8.0",
   "ruff>=0.6",
 ]
@@ -46,4 +49,3 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-

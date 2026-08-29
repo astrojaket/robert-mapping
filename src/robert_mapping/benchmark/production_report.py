@@ -34,6 +34,10 @@ _POSITIVITY_CONDITIONING_TOLERANCE = 1.0e-12
 _MIN_CONDITIONED_DRAWS = 100
 _HAMMOND_HOTSPOT_LONGITUDE_DEGREES = 7.75
 _HAMMOND_HOTSPOT_SIGMA_DEGREES = 0.36
+_WASP121_NRS1_HOTSPOT_DEGREES = 3.36
+_WASP121_NRS1_HOTSPOT_SIGMA_DEGREES = 0.11
+_WASP121_NRS2_HOTSPOT_DEGREES = 2.66
+_WASP121_NRS2_HOTSPOT_SIGMA_DEGREES = 0.12
 
 
 def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureConverter, str]:
@@ -41,6 +45,31 @@ def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureCo
 
     name = config.project.name.lower()
     radius_ratio = float(config.system.radius_ratio)
+    if "wasp121" in name:
+        if "nrs1" in name:
+            lower, upper, channel = 2.70, 3.72, "NIRSpec NRS1"
+        elif "nrs2" in name:
+            lower, upper, channel = 3.82, 5.15, "NIRSpec NRS2"
+        elif "miri" in name:
+            lower, upper, channel = 5.00, 12.00, "MIRI LRS"
+        elif "tess" in name:
+            lower, upper, channel = 0.60, 1.00, "TESS"
+        else:
+            lower, upper, channel = 2.70, 5.15, "NIRSpec G395H"
+        wavelength = np.linspace(lower, upper, 501)
+        stellar = blackbody_stellar_radiance(
+            wavelength, 6460.0, wavelength_unit="micron"
+        )
+        return (
+            BandpassTemperatureConverter(
+                wavelength,
+                stellar,
+                np.ones_like(wavelength),
+                radius_ratio,
+                wavelength_unit="micron",
+            ),
+            f"{lower:.2f}-{upper:.2f} micron {channel} band; 6460 K blackbody star; top-hat response",
+        )
     if "wasp178" in name:
         phoenix = Path(os.environ.get("ROBERT_MAPPING_WASP178_PHOENIX", ""))
         spectrum_path = Path(os.environ.get("ROBERT_MAPPING_WASP178_SPECTRUM", ""))
@@ -234,6 +263,7 @@ def _longitude_comparison_references(
     offsets: np.ndarray,
     *,
     include_hammond: bool,
+    published_reference: dict[str, Any] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Build shared longitude markers and their machine-readable summary."""
 
@@ -267,6 +297,7 @@ def _longitude_comparison_references(
             "q84": float(q84),
         },
         "hammond_et_al_2024": None,
+        "published_reference": None,
     }
     if include_hammond:
         hammond = _HAMMOND_HOTSPOT_LONGITUDE_DEGREES
@@ -286,7 +317,46 @@ def _longitude_comparison_references(
             "lower": hammond - sigma,
             "upper": hammond + sigma,
         }
+    if published_reference is not None:
+        longitude = float(published_reference["longitude"])
+        sigma = float(published_reference["sigma"])
+        label = str(published_reference["label"])
+        references.append(
+            {
+                "kind": "literature",
+                "longitude": longitude,
+                "lower": longitude - sigma,
+                "upper": longitude + sigma,
+                "label": label,
+            }
+        )
+        summary["published_reference"] = {
+            "label": label,
+            "median": longitude,
+            "sigma": sigma,
+            "lower": longitude - sigma,
+            "upper": longitude + sigma,
+        }
     return references, summary
+
+
+def _published_longitude_reference(target: str) -> dict[str, Any] | None:
+    """Return the white-light literature offset for a validation target."""
+
+    name = target.lower()
+    if "wasp121" in name and "nrs1" in name:
+        return {
+            "longitude": _WASP121_NRS1_HOTSPOT_DEGREES,
+            "sigma": _WASP121_NRS1_HOTSPOT_SIGMA_DEGREES,
+            "label": "Mikal-Evans et al. (2023), NRS1: +3.36° ± 0.11°",
+        }
+    if "wasp121" in name and "nrs2" in name:
+        return {
+            "longitude": _WASP121_NRS2_HOTSPOT_DEGREES,
+            "sigma": _WASP121_NRS2_HOTSPOT_SIGMA_DEGREES,
+            "label": "Mikal-Evans et al. (2023), NRS2: +2.66° ± 0.12°",
+        }
+    return None
 
 
 def _profile_peak_longitudes(
@@ -522,6 +592,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
     longitude_references, longitude_comparison = _longitude_comparison_references(
         offsets,
         include_hammond=("hammond" in target.lower() or "wasp43" in target.lower()),
+        published_reference=_published_longitude_reference(target),
     )
     for label, values, title in (
         ("brightness_map_q16", map_q16, "Brightness map: 16th percentile"),
@@ -669,6 +740,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
         conditioned_longitude_references, _ = _longitude_comparison_references(
             conditioned_offsets,
             include_hammond=("hammond" in target.lower() or "wasp43" in target.lower()),
+            published_reference=_published_longitude_reference(target),
         )
         conditioned_temperature_draws = np.asarray(
             converter.temperature(

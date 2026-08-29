@@ -1,5 +1,5 @@
 schema_version: 1
-updated: 2026-08-27
+updated: 2026-08-29
 policy:
   max_parallel_downloads: 3
   run_inference: false
@@ -26,8 +26,9 @@ datasets:
     observation: full_phase_curve
     paper_doi: 10.3847/2041-8213/acb049
     archive_doi: 10.5281/zenodo.20651891
-    state: ready_for_input_audit
+    state: prepared_white_and_spectroscopic
     directory: WASP-121b/JWST-NIRSpec-G395H
+    notes: The 349-channel v8 spectroscopic release is downloaded, checksum-verified, and split into 146 NRS1 plus 203 NRS2 channels.
     files:
       - name: whitelc_data_nrs1.txt
         url: https://zenodo.org/records/20651891/files/whitelc_data_nrs1.txt?download=1
@@ -45,6 +46,67 @@ datasets:
         url: https://zenodo.org/records/20651891/files/whitelc_model_nrs2.txt?download=1
         md5: 694e2ad1533ccf29711e86b3adc5a72d
         size_bytes: 257459
+      - name: emspec_wav.txt
+        url: https://zenodo.org/records/20651891/files/emspec_wav.txt?download=1
+        md5: e0de1affa3c318580a4f2d48bfa24179
+        size_bytes: 17578
+      - name: speclc_bjd.txt
+        url: https://zenodo.org/records/20651891/files/speclc_bjd.txt?download=1
+        md5: 5bdd4fe6b4810dfeb2a4429235777443
+        size_bytes: 29962049
+      - name: speclc_vals.txt
+        url: https://zenodo.org/records/20651891/files/speclc_vals.txt?download=1
+        md5: 834dfe04c86eb6fcfd901d9eb721bf39
+        size_bytes: 29961843
+      - name: speclc_uncs.txt
+        url: https://zenodo.org/records/20651891/files/speclc_uncs.txt?download=1
+        md5: 6ae117c0ae23949f476ca479d9c8a210
+        size_bytes: 29961850
+      - name: speclc_xjitt.txt
+        url: https://zenodo.org/records/20651891/files/speclc_xjitt.txt?download=1
+        md5: f36bdc0c9c2f14728d330572d4aa28e7
+        size_bytes: 30685394
+      - name: speclc_yjitt.txt
+        url: https://zenodo.org/records/20651891/files/speclc_yjitt.txt?download=1
+        md5: a67c0e3b2b2f73476baf55dbc5b5133b
+        size_bytes: 30365049
+      - name: speclc_fits_bjd.txt
+        url: https://zenodo.org/records/20651891/files/speclc_fits_bjd.txt?download=1
+        md5: 1ad25ed956e63272438052f77f4abb01
+        size_bytes: 29953847
+      - name: speclc_fits_mod_phasecurve.txt
+        url: https://zenodo.org/records/20651891/files/speclc_fits_mod_phasecurve.txt?download=1
+        md5: cc515a9cb88f54a47937fb1a0678fe39
+        size_bytes: 29953853
+      - name: speclc_fits_mod_systematics.txt
+        url: https://zenodo.org/records/20651891/files/speclc_fits_mod_systematics.txt?download=1
+        md5: 9a8e8e064d7f11ccbe67c9254b6946a7
+        size_bytes: 29953952
+
+  - id: wasp121b-jwst-niriss-soss
+    planet: WASP-121b
+    instrument: JWST/NIRISS SOSS
+    observation: full_phase_curve
+    paper_doi: 10.48550/arXiv.2509.09760
+    archive_doi: 10.17909/ppjp-9743
+    state: local_processed_white_only
+    directory: WASP-121b/JWST-NIRISS-SOSS
+    notes: Local Order 1 and Order 2 white curves lack masks, regressors, exposure metadata, and a reduction manifest. Do not count alternative reductions as independent data.
+    files: []
+
+  - id: wasp121b-jwst-miri-lrs
+    planet: WASP-121b
+    instrument: JWST/MIRI LRS
+    observation: one_eclipse
+    paper_doi: 10.48550/arXiv.2606.21855
+    archive_doi: 10.5281/zenodo.20767846
+    state: prepared_for_white_light_audit
+    directory: WASP-121b/JWST-MIRI-LRS
+    files:
+      - name: eureka_LCs_WASP121b_MIRI_LRS.zip
+        url: https://zenodo.org/api/records/20767846/files/eureka_LCs_WASP121b_MIRI_LRS.zip/content
+        md5: 1e68f7adf855e4de789cfebdec9f9842
+        size_bytes: 4550878
 
   - id: gj1214b-jwst-miri-lrs
     planet: GJ 1214b
@@ -296,9 +358,68 @@ datasets:
     instrument: HST/WFC3 G141
     observation: two_full_phase_curves
     paper_doi: 10.1038/s41550-021-01592-w
-    state: archive_reduction_required
+    state: prepared_author_light_curves
     directory: WASP-121b/HST-WFC3-G141
+    files:
+      - name: 41550_2021_1592_MOESM2_ESM.zip
+        url: https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41550-021-01592-w/MediaObjects/41550_2021_1592_MOESM2_ESM.zip
+        md5: b338aacad827b26ae27574a47cc90aca
+        size_bytes: 2632488
+      - name: 41550_2021_1592_MOESM5_ESM.zip
+        url: https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41550-021-01592-w/MediaObjects/41550_2021_1592_MOESM5_ESM.zip
+        md5: 00248326ce25bf4905d422001af2ed63
+        size_bytes: 21156
+
+  - id: wasp121b-hst-wfc3-g102
+    planet: WASP-121b
+    instrument: HST/WFC3 G102
+    observation: two_eclipse_visits
+    paper_doi: 10.1093/mnras/stz1753
+    state: mast_reduction_required
+    directory: WASP-121b/HST-WFC3-G102
+    notes: Two independent GO-15135 eclipse visits. Native reduced time series are not yet local.
     files: []
+
+  - id: wasp121b-hst-wfc3-g141-2016-eclipse
+    planet: WASP-121b
+    instrument: HST/WFC3 G141
+    observation: one_eclipse
+    paper_doi: 10.1038/nature23266
+    state: mast_or_supplementary_download_required
+    directory: WASP-121b/HST-WFC3-G141-2016-Eclipse
+    notes: Independent GO-14767 eclipse. It is not part of the 2018 or 2019 phase curves.
+    files: []
+
+  - id: wasp121b-spitzer-irac-program-13242
+    planet: WASP-121b
+    instrument: Spitzer/IRAC
+    observation: two_full_phase_curves
+    paper_doi: 10.1051/0004-6361/202346643
+    state: spitzer_archive_reduction_required
+    directory: WASP-121b/Spitzer-IRAC-13242
+    notes: One 3.6 micron visit and one 4.5 micron visit. Later papers can be reanalyses of these same photons.
+    files: []
+
+  - id: wasp121b-spitzer-irac-program-13044
+    planet: WASP-121b
+    instrument: Spitzer/IRAC
+    observation: two_eclipses
+    paper_doi: 10.1038/nature23266
+    state: spitzer_archive_reduction_required
+    directory: WASP-121b/Spitzer-IRAC-13044
+    notes: Two total independent eclipse visits, one at 3.6 micron and one at 4.5 micron. The Garhart et al. 2020 3.6 micron result uses the same visit.
+    files: []
+
+  - id: wasp121b-smarts-2mass-k
+    planet: WASP-121b
+    instrument: SMARTS 1.3m/ANDICAM 2MASS K
+    observation: three_night_eclipse_sequence
+    paper_doi: 10.1051/0004-6361/201834059
+    state: source_downloaded_input_audit_required
+    directory: WASP-121b/SMARTS-2MASS-K
+    files:
+      - {name: wasp-121.dat, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/625/A80/wasp-121.dat"}
+      - {name: ReadMe, url: "https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/625/A80/ReadMe"}
 
   - id: wasp43b-hst-wfc3-g141
     planet: WASP-43b

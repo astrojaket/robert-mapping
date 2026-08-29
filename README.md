@@ -30,6 +30,20 @@ robert-mapping init config.yml
 robert-mapping validate config.yml
 ```
 
+## Student WASP-121b study
+
+Start with
+[`notebooks/wasp121b_student_study.ipynb`](notebooks/wasp121b_student_study.ipynb).
+It explains the science goal, data audit, time systems, systematics, white-light
+plots, phase coverage, spectral batches, map plots, temperature conversion,
+and validation tests. It uses at most three CPU threads. Inference and recovery
+tests are off by default.
+
+The full observation inventory is in
+[`literature_data/wasp121b_suite.yml`](literature_data/wasp121b_suite.yml).
+Read [`docs/wasp121b_observation_suite.md`](docs/wasp121b_observation_suite.md)
+before you add a new instrument or planet.
+
 The Hammond example uses the NumPy arrays already in this repository:
 
 ```bash

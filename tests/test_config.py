@@ -63,6 +63,48 @@ def test_hammond_pixel_prior_requires_mean_and_sd() -> None:
         mapping_config_from_dict({"map": {"pixel_prior_mean_ppm": 6000.0}})
 
 
+def test_white_jitter_parses_and_rejects_degenerate_noise_scales() -> None:
+    config = mapping_config_from_dict(
+        {
+            "model": {
+                "fit_white_jitter": True,
+                "jitter_prior_scale_ppm": 120.0,
+            }
+        }
+    )
+    assert config.model.fit_white_jitter is True
+    assert config.model.jitter_prior_scale_ppm == 120.0
+
+    with pytest.raises(ConfigError, match="cannot both be true"):
+        mapping_config_from_dict(
+            {"model": {"fit_white_jitter": True, "fit_error_scale": True}}
+        )
+
+
+def test_restricted_direct_harmonic_indices_parse() -> None:
+    config = mapping_config_from_dict(
+        {
+            "map": {
+                "representation": "direct_harmonics",
+                "harmonic_degree": 1,
+                "active_harmonic_indices": [0, 1, 3],
+            }
+        }
+    )
+    assert config.map.active_harmonic_indices == (0, 1, 3)
+
+    with pytest.raises(ConfigError, match="include coefficient 0"):
+        mapping_config_from_dict(
+            {
+                "map": {
+                    "representation": "direct_harmonics",
+                    "harmonic_degree": 1,
+                    "active_harmonic_indices": [1, 3],
+                }
+            }
+        )
+
+
 def test_duplicate_yaml_keys_are_rejected(tmp_path: Path) -> None:
     path = tmp_path / "duplicate.yml"
     path.write_text("project:\n  name: first\n  name: second\n", encoding="utf-8")

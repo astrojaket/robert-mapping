@@ -9,6 +9,7 @@ from robert_mapping.benchmark.production_report import (
     _map_information_diagnostics,
     _longitude_comparison_references,
     _profile_peak_longitudes,
+    _published_longitude_reference,
 )
 
 
@@ -116,3 +117,13 @@ def test_boundary_pinned_peaks_are_prior_dominated_even_with_narrow_interval() -
     assert result["latitude_information_status"] == "prior_dominated"
     assert "boundary-pinned" in result["latitude_information_warning"]
     assert "not evidence for latitude" in result["latitude_information_warning"]
+
+
+def test_wasp121_published_longitude_references_are_channel_specific() -> None:
+    nrs1 = _published_longitude_reference("wasp121b-nirspec-nrs1")
+    nrs2 = _published_longitude_reference("wasp121b-nirspec-nrs2")
+
+    assert nrs1 is not None and nrs1["longitude"] == 3.36
+    assert nrs1["sigma"] == 0.11
+    assert nrs2 is not None and nrs2["longitude"] == 2.66
+    assert nrs2["sigma"] == 0.12

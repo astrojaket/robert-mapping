@@ -144,6 +144,32 @@ def _combined(
                     f"NPZ file {source} is missing systematics column(s): "
                     f"{', '.join(extra_missing)}."
                 )
+            time_values = np.asarray(archive[time_name], dtype=float)
+            flux_values = np.asarray(archive[flux_name], dtype=float)
+            error_values = np.asarray(archive[err_name], dtype=float)
+            original_flux_shape = flux_values.shape
+            if config.channel_index is not None:
+                channel = int(config.channel_index)
+                if flux_values.ndim != 2 or error_values.ndim != 2:
+                    raise DataError(
+                        "data.channel_index requires two-dimensional flux and "
+                        "flux_err arrays in the NPZ file."
+                    )
+                if flux_values.shape != error_values.shape:
+                    raise DataError("Two-dimensional flux and flux_err shapes do not match.")
+                if channel >= flux_values.shape[1]:
+                    raise DataError(
+                        f"data.channel_index={channel} is outside the available "
+                        f"0..{flux_values.shape[1] - 1} range."
+                    )
+                flux_values = flux_values[:, channel]
+                error_values = error_values[:, channel]
+                if time_values.ndim == 2:
+                    if time_values.shape != original_flux_shape:
+                        raise DataError(
+                            "Two-dimensional time must have the same shape as flux."
+                        )
+                    time_values = time_values[:, channel]
             regressors = (
                 np.column_stack([np.asarray(archive[name], dtype=float) for name in regressor_columns])
                 if regressor_columns
@@ -155,9 +181,9 @@ def _combined(
                 else None
             )
             return (
-                np.asarray(archive[time_name], dtype=float),
-                np.asarray(archive[flux_name], dtype=float),
-                np.asarray(archive[err_name], dtype=float),
+                time_values,
+                flux_values,
+                error_values,
                 source,
                 regressors,
                 regressor_columns,

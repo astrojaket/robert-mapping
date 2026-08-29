@@ -151,3 +151,46 @@ def test_direct_harmonic_fit_passes_centered_times_for_ou_noise(
     assert np.isclose(summary["ou_amplitude_mean"], 50.0e-6)
     archive = np.load(result.samples_path)
     assert archive["ou_timescale"].shape == (4,)
+
+
+def test_direct_harmonic_fit_expands_restricted_coefficients(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import importlib
+
+    engine = importlib.import_module("robert_mapping.inference.run")
+    config = _direct_config(tmp_path)
+    config = replace(
+        config,
+        map=replace(
+            config.map,
+            harmonic_degree=1,
+            active_harmonic_indices=(0, 1, 3),
+        ),
+    )
+
+    def fake_sampler(design, observed, sigma, **kwargs):
+        del observed, sigma
+        assert design.shape == (24, 3)
+        coefficients = np.tile(np.array([0.004, 0.0002, 0.0003]), (8, 1))
+        flux = np.asarray(kwargs["stellar_flux"])[None, :] + coefficients @ design.T
+        return NumpyroRun(
+            samples={"coefficients": coefficients, "flux": flux},
+            extra_fields={"diverging": np.zeros(8, dtype=bool)},
+            sampler=None,
+            grouped_samples={
+                "coefficients": coefficients.reshape(2, 4, 3),
+                "flux": flux.reshape(2, 4, 24),
+            },
+        )
+
+    monkeypatch.setattr(engine, "sample_harmonic_map", fake_sampler)
+    result = run_fit(config)
+
+    summary = json.loads(result.summary_path.read_text(encoding="utf-8"))
+    assert summary["active_harmonic_indices"] == [0, 1, 3]
+    assert summary["n_parameters"] == 3
+    with np.load(result.samples_path) as archive:
+        coefficients = archive["harmonic_coefficients"]
+        assert coefficients.shape == (8, 4)
+        np.testing.assert_allclose(coefficients[:, 2], 0.0)

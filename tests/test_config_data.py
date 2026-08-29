@@ -132,3 +132,44 @@ def test_systematics_fit_offset_defaults_true_and_can_be_disabled() -> None:
         }
     )
     assert config.systematics.fit_offset is False
+
+
+def test_npz_channel_index_selects_one_spectral_light_curve(tmp_path: Path) -> None:
+    source = tmp_path / "spectroscopic.npz"
+    np.savez(
+        source,
+        time=np.array([1.0, 2.0, 3.0]),
+        flux=np.array([[1.0, 1.1], [0.9, 1.0], [1.1, 1.2]]),
+        flux_err=np.array([[0.01, 0.02], [0.01, 0.02], [0.01, 0.02]]),
+    )
+    config_path = tmp_path / "run.yml"
+    config_path.write_text(
+        "data:\n"
+        "  file: spectroscopic.npz\n"
+        "  format: npz\n"
+        "  channel_index: 1\n",
+        encoding="utf-8",
+    )
+    curve = load_light_curve(load_config(config_path))
+    np.testing.assert_allclose(curve.flux, [1.1, 1.0, 1.2])
+    np.testing.assert_allclose(curve.flux_err, [0.02, 0.02, 0.02])
+
+
+def test_npz_channel_index_rejects_out_of_range_column(tmp_path: Path) -> None:
+    source = tmp_path / "spectroscopic.npz"
+    np.savez(
+        source,
+        time=np.array([1.0, 2.0]),
+        flux=np.ones((2, 2)),
+        flux_err=np.full((2, 2), 0.01),
+    )
+    config_path = tmp_path / "run.yml"
+    config_path.write_text(
+        "data:\n"
+        "  file: spectroscopic.npz\n"
+        "  format: npz\n"
+        "  channel_index: 2\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(DataError, match="outside"):
+        load_light_curve(load_config(config_path))

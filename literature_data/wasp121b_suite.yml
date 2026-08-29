@@ -1,0 +1,642 @@
+# WASP-121b observation-suite manifest
+#
+# This file records unique photon sets.  A detector, spectral order, or
+# wavelength bin can be an analysis block within one photon set.  It is not a
+# new observation.  This distinction prevents duplicate reductions from being
+# counted as extra data.
+#
+# State policy: source files can be downloaded and audited before inference.
+# No inference or simulation is implied by this manifest.
+
+schema_version: 1
+updated: 2026-08-29
+target: WASP-121b
+purpose: >-
+  Keep every published phase-curve and eclipse light curve in one auditable
+  suite for wavelength-dependent eclipse mapping.
+environment:
+  conda_environment: eclipse-mapping
+  maximum_cpus: 3
+  plotting:
+    main_colour: mediumpurple
+    temperature_map: lighter_purple_is_hotter_and_brighter
+  current_policy:
+    download_and_prepare: allowed
+    inference: staged_only
+    simulations: false
+
+time_and_orbit:
+  period_days: 1.27492504
+  reference_transit_bjd_tdb: 2458119.72074
+  longitude_convention: >-
+    Positive longitude is east of the sub-stellar point in the direction of
+    planetary rotation.  The sub-stellar point is longitude 0 degrees.
+  time_rules:
+    - >-
+      Convert BMJD_TDB to BJD_TDB by adding 2400000.5 before using the common
+      ephemeris.
+    - >-
+      Keep the original time column and the conversion in the preparation
+      audit.  Never silently replace a time system.
+    - >-
+      Treat each detector/order/visit as its own nuisance block.  Share only
+      parameters that the staged fit explicitly marks as shared.
+
+status_legend:
+  source_downloaded: The author or archive source is present locally.
+  source_ready_for_audit: A source time series is present, but units, masks, or correction status still need an audit.
+  prepared_waiting_for_fit: A robert-mapping input and audit exist; no new fit is started by this manifest.
+  not_downloaded: A public source is known, but it is not present locally.
+  archive_reduction_required: Raw archive data or a mixed archive needs a reproducible reduction before mapping.
+  map_ready: The input passed the preparation checks needed for a staged map fit.
+  eclipse_only_warning: One eclipse has weak longitude and latitude information; use strong priors and do not over-interpret a 2-D peak.
+
+unique_photon_sets:
+  - id: wasp121_jwst_nirspec_g395h_go1729
+    planet: WASP-121b
+    facility: JWST
+    instrument: NIRSpec G395H
+    program: GO-1729
+    observation: one_full_phase_curve_visit
+    unique_photons: >-
+      One full-orbit visit.  NRS1 and NRS2 are two detector analysis blocks
+      from this same visit, not two independent visits.
+    detectors_orders:
+      - name: NRS1
+        global_channels: 0-145
+        channel_count: 146
+        wavelength_micron: 2.725-3.713
+        prepared_file: literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/spectroscopic/nrs1_spectroscopic.npz
+      - name: NRS2
+        global_channels: 146-348
+        channel_count: 203
+        wavelength_micron: 3.823-5.170
+        prepared_file: literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/spectroscopic/nrs2_spectroscopic.npz
+    wavelength_micron: 2.725-5.170
+    event_coverage: >-
+      Full orbit: two secondary eclipses and one transit in the local 3434-
+      integration product.  The NRS1 and NRS2 time columns differ by about
+      2.54 seconds and must remain detector-specific.
+    cadence_seconds: 38.8085
+    time_system: BJD_TDB
+    local:
+      source_directory: literature_data/WASP-121b/JWST-NIRSpec-G395H/source
+      source_status: source_downloaded
+      prepared_status: prepared_waiting_for_fit
+      prepared_manifest: literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/spectroscopic/spectroscopic_manifest.json
+      source_notes: >-
+        Zenodo v8 files contain flux, uncertainty, x/y jitter, wavelength
+        edges, and published phase-curve/systematics model arrays.  All nine
+        spectroscopic source checksums pass the strict Zenodo validation.
+    required_systematics:
+      - detector-specific x and y jitter regressors
+      - time baseline and visit/segment normalisation
+      - published systematics model retained for comparison, not silently used as a correction
+      - independent detector error scale and residual check
+      - verify exposure time; the local source records cadence but not a trusted integration-time column
+    map_readiness:
+      white_light: map_ready
+      spectral: map_ready
+      note: Full-phase data are the first spectral-map validation target.
+    sources:
+      paper: https://arxiv.org/abs/2301.03209
+      archive: https://zenodo.org/records/20651891
+      archive_doi: https://doi.org/10.5281/zenodo.20651891
+    duplicate_reductions:
+      - >-
+        The NRS1/NRS2 white files and the 349-channel files describe the same
+        visit at different spectral resolutions.  Do not add the white and
+        spectral products as independent likelihood data.
+      - >-
+        Any NAMELESS, Eureka, or later re-reduction of this visit must be
+        selected as a comparison product, not stacked with the Zenodo v8
+        photons.
+
+  - id: wasp121_jwst_niriss_soss_gto1201
+    planet: WASP-121b
+    facility: JWST
+    instrument: NIRISS SOSS
+    program: GTO-1201
+    observation: one_full_phase_curve_visit
+    unique_photons: >-
+      One full-orbit visit with order 1 and order 2 spectral products.  The
+      local o1 and o2 files are order products, not two visits.
+    detectors_orders:
+      - name: SOSS order 1
+        wavelength_micron: approximately 0.8-2.85
+        local_source: WASP-121b/SOSS/W-121b-exoTEDRF-WLC-o1.csv
+      - name: SOSS order 2
+        wavelength_micron: approximately 0.6-0.8
+        local_source: WASP-121b/SOSS/W-121b-exoTEDRF-WLC-o2.csv
+    wavelength_micron: 0.6-2.85
+    event_coverage: >-
+      Full orbit: two secondary eclipses and one transit.  Local products have
+      3447 integrations at about 38.459 seconds cadence.
+    cadence_seconds: 38.4594
+    time_system: >-
+      BMJD_TDB in the local CSV despite the BJD header.  Add 2400000.5 for
+      BJD_TDB before fitting.
+    local:
+      source_directory: WASP-121b/SOSS
+      source_status: source_ready_for_audit
+      prepared_status: prepared_waiting_for_fit
+      prepared_files:
+        - literature_data/WASP-121b/JWST-NIRISS-SOSS/prepared/white_order1.npz
+        - literature_data/WASP-121b/JWST-NIRISS-SOSS/prepared/white_order2.npz
+      audit_file: literature_data/WASP-121b/JWST-NIRISS-SOSS/prepared/input_audit.json
+      source_notes: >-
+        The local products are processed/detrended light curves.  No source
+        archive, mask, detector regressors, exposure time, or reduction
+        manifest is present.  The NumPy products differ from the CSV fluxes;
+        keep them as alternate products until provenance is resolved.
+    required_systematics:
+      - order-specific baseline and visit normalisation
+      - detector/jitter regressors when the upstream reduction provides them
+      - time-correlated noise or GP test on approximately 30-35 minute scales
+      - stellar-variability and common-mode check
+      - error-scale fit or a documented uncertainty inflation
+    map_readiness:
+      white_light: source_ready_for_audit
+      spectral: source_ready_for_audit
+      note: Do not start a map until the BMJD conversion and reduction choice are recorded.
+    sources:
+      paper: https://doi.org/10.3847/1538-3881/ae0e52
+      preprint: https://arxiv.org/abs/2509.09760
+      archive: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+      archive_note: Search the MAST portal for WASP-121b and GTO-1201; record the exact data release before fitting.
+    duplicate_reductions:
+      - >-
+        exoTEDRF and NAMELESS products are independent reductions of the same
+        JWST visit.  Use one as the primary fit and the other as a robustness
+        check; never count both as independent photons.
+      - >-
+        The local exoTEDRF CSV and detrended NumPy arrays are alternate
+        reductions/products.  The o1 and o2 files are orders, so they may be
+        fitted as separate spectral blocks only after their provenance is
+        fixed.
+
+  - id: wasp121_jwst_miri_lrs_go2961
+    planet: WASP-121b
+    facility: JWST
+    instrument: MIRI LRS
+    program: GO-2961
+    observation: one_secondary_eclipse_visit
+    unique_photons: >-
+      One MIRI LRS visit.  It has one broadband product plus 47 spectral
+      channels from the same time series.
+    detectors_orders:
+      - name: LRS broadband
+        wavelength_micron: 5.0-12.0
+        local_source: literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch0_Broadband.txt
+        prepared_file: literature_data/WASP-121b/JWST-MIRI-LRS/prepared/white_light_curve.npz
+      - name: LRS spectral channels
+        channel_count: 47
+        wavelength_micron: 5.0745-11.9255
+        local_source_directory: literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC
+        prepared_directory: literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic
+    wavelength_micron: 5.0-12.0
+    event_coverage: >-
+      Eclipse-only coverage around one secondary eclipse.  The prepared
+      broadband product has 1712 kept points from 1714 source rows.
+    cadence_seconds: 13.3590
+    time_system: BMJD_TDB
+    local:
+      source_directory: literature_data/WASP-121b/JWST-MIRI-LRS/source
+      source_status: source_downloaded
+      prepared_status: prepared_waiting_for_fit
+      audit_file: literature_data/WASP-121b/JWST-MIRI-LRS/prepared/input_audit.json
+      source_notes: >-
+        The local Eureka source and prepared channel files were just
+        downloaded/prepared.  Published astrophysical, polynomial, ramp, and
+        residual arrays are preserved.  This is an eclipse-only data set.
+    required_systematics:
+      - visit baseline and normalisation
+      - time-dependent detector ramp
+      - background, detector-position, and PSF-width regressors when present in the source release
+      - channel-specific error scale and correlated-residual check
+      - keep the two masked broadband rows and all channel masks auditable
+    map_readiness:
+      white_light: map_ready
+      spectral: map_ready
+      note: Use as the first eclipse-only JWST spectral map after the full-phase validation.
+    sources:
+      paper: https://arxiv.org/abs/2606.21855
+      archive: https://zenodo.org/records/20767846
+      archive_doi: https://doi.org/10.5281/zenodo.20767846
+    duplicate_reductions:
+      - >-
+        Broadband and 47 channels are views of the same MIRI photons.  Choose
+        one channel or model the channels jointly; do not sum them as visits.
+      - >-
+        The ZIP, unpacked Eureka text files, and prepared NPZ files are the
+        same source set at different preparation stages.
+
+  - id: wasp121_hst_wfc3_g141_go15134
+    planet: WASP-121b
+    facility: HST
+    instrument: WFC3 G141
+    program: GO-15134
+    observation: two_full_phase_curve_visits
+    unique_photons: >-
+      Two HST visits: 2018-03-12/13 and 2019-02-03/04.  Fit each visit as its
+      own block first, then test a shared-orbit model.
+    detectors_orders:
+      - name: G141 visit 2018
+        wavelength_micron: 1.12-1.64
+        local_source: literature_data/WASP-121b/HST-WFC3-G141/source/broadBand_lightCurve_2018.txt
+      - name: G141 visit 2019
+        wavelength_micron: 1.12-1.64
+        local_source: literature_data/WASP-121b/HST-WFC3-G141/source/broadBand_lightCurve_2019.txt
+    wavelength_micron: 1.12-1.64
+    event_coverage: >-
+      Each visit is about 40.3 hours and contains two secondary eclipses in
+      the published full-phase design.  The local source also contains raw,
+      unbinned spectral light curves and time-series spectra.
+    exposure_seconds: 103
+    time_system: JD_UTC_in_source; convert and document the adopted BJD_TDB correction before fitting
+    local:
+      source_directory: literature_data/WASP-121b/HST-WFC3-G141/source
+      source_status: source_downloaded
+      prepared_status: prepared_waiting_for_time_conversion
+      prepared_directory: literature_data/WASP-121b/HST-WFC3-G141/prepared
+      audit_file: literature_data/WASP-121b/HST-WFC3-G141/prepared/input_audit.json
+      source_files:
+        - broadBand_lightCurve_2018.txt
+        - broadBand_lightCurve_2019.txt
+        - SupplementaryData/timeSeriesSpectra/
+        - SupplementaryData/spectroLightCurves_Raw/
+      source_notes: >-
+        Broadband and spectral NPZ files now exist.  The 2019 author spectral
+        files carry 2018 timestamps, and 11 channels duplicate 2018 values.
+        All 2019 spectral products are marked not fit-ready.  Broadband times
+        still need a documented JD_UTC to BJD_TDB conversion.
+    required_systematics:
+      - HST orbit-long ramp or RECTE-style charge-trap model
+      - visit and HST-orbit offsets/baselines
+      - scan direction and detector-state terms when available
+      - wavelength common-mode treatment for spectral bins
+      - visit-specific error scale and residual correlation check
+    map_readiness:
+      white_light: source_ready_for_audit
+      spectral: source_ready_for_audit
+      note: Full-phase data should constrain longitude better than latitude after the HST audit.
+    sources:
+      paper: https://www.nature.com/articles/s41550-021-01592-w
+      archive: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+      local_supplement: https://www.nature.com/articles/s41550-021-01592-w#Sec17
+    duplicate_reductions:
+      - >-
+        The broad-band files, raw spectroscopic light curves, and time-series
+        spectra are alternate views of the same two visits.  Select one source
+        representation per analysis block.
+      - >-
+        Any later HST re-reduction of GO-15134 must be compared, not stacked,
+        with these source products.
+
+  - id: wasp121_hst_wfc3_g102_go15135
+    planet: WASP-121b
+    facility: HST
+    instrument: WFC3 G102
+    program: GO-15135
+    observation: two_secondary_eclipse_visits
+    unique_photons: >-
+      Two eclipse-only HST visits in the G102 band.  They are distinct from
+      the G141 phase-curve visits.
+    detectors_orders:
+      - name: G102 visit 1
+        wavelength_micron: 0.80-1.10
+      - name: G102 visit 2
+        wavelength_micron: 0.80-1.10
+    wavelength_micron: 0.80-1.10
+    event_coverage: two_secondary_eclipses_only
+    time_system: archive_product_time_system_to_be_audited
+    local:
+      source_directory: literature_data/WASP-121b/HST-WFC3-G102/source
+      source_status: not_downloaded
+      prepared_status: not_downloaded
+      source_notes: >-
+        The G102 source and raw archive reduction are not present locally in
+        this checkout.  Do not create a map from a paper figure alone.
+    required_systematics:
+      - HST orbit-long ramp or RECTE-style charge-trap model
+      - visit and orbit baselines/offsets
+      - scan direction and detector-state terms
+      - wavelength common-mode terms for spectral bins
+      - visit-specific error scale and residual check
+    map_readiness:
+      white_light: not_downloaded
+      spectral: not_downloaded
+      note: eclipse_only_warning
+    sources:
+      paper: https://academic.oup.com/mnras/article/488/2/2222/5524368
+      archive: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+      archive_note: Search the MAST portal for WASP-121b and GO-15135, then record the exact products and checksums.
+    duplicate_reductions:
+      - >-
+        The two visits are separate photons, but a broad-band and spectral
+        extraction of one visit are not separate data sets.
+
+  - id: wasp121_hst_wfc3_g141_go14767
+    planet: WASP-121b
+    facility: HST
+    instrument: WFC3 G141
+    program: GO-14767
+    observation: one_secondary_eclipse_visit
+    unique_photons: >-
+      One independent G141 eclipse visit.  Keep it separate from the two
+      GO-15134 full-phase visits until timing and reduction provenance match.
+    detectors_orders:
+      - name: G141 eclipse visit
+        wavelength_micron: 1.10-1.70
+    wavelength_micron: 1.10-1.70
+    event_coverage: one_secondary_eclipse_only
+    time_system: archive_product_time_system_to_be_audited
+    local:
+      source_directory: literature_data/WASP-121b/HST-WFC3-G141-GO14767/source
+      source_status: not_downloaded
+      prepared_status: not_downloaded
+      source_notes: >-
+        The independent GO-14767 time series is not present locally.  The
+        existing GO-15134 directory must not be used as a substitute.
+    required_systematics:
+      - HST orbit-long ramp or RECTE-style charge-trap model
+      - visit and orbit baselines/offsets
+      - scan direction and detector-state terms
+      - wavelength common-mode terms for spectral bins
+      - visit-specific error scale and residual check
+    map_readiness:
+      white_light: not_downloaded
+      spectral: not_downloaded
+      note: eclipse_only_warning
+    sources:
+      paper: https://academic.oup.com/mnras/article/496/2/1638/5855500
+      archive: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+      archive_note: Search the MAST portal for WASP-121b and GO-14767.
+    duplicate_reductions:
+      - >-
+        Keep GO-14767 separate from GO-15134.  Alternative broad-band and
+        spectral extractions from this same eclipse are not extra photons.
+
+  - id: wasp121_spitzer_irac_p13242_phase_curves
+    planet: WASP-121b
+    facility: Spitzer
+    instrument: IRAC
+    program: P-13242
+    observation: full_phase_curves_at_two_channels
+    unique_photons: >-
+      One program with 3.6 and 4.5 micron phase-curve light curves.  Treat
+      each channel as its own instrument block and verify whether the channel
+      visits overlap in time before a joint fit.
+    detectors_orders:
+      - name: IRAC channel 1
+        wavelength_micron: 3.6
+      - name: IRAC channel 2
+        wavelength_micron: 4.5
+    wavelength_micron: 3.6_and_4.5
+    event_coverage: full_phase_curve_products
+    time_system: archive_product_time_system_to_be_audited
+    local:
+      source_directory: literature_data/WASP-121b/Spitzer-IRAC-P13242/source
+      source_status: not_downloaded
+      prepared_status: not_downloaded
+      source_notes: >-
+        The public Heritage Archive data need a reproducible BCD extraction
+        and intrapixel/systematics audit before mapping.
+    required_systematics:
+      - IRAC intrapixel sensitivity correction (pixel-phase)
+      - pointing and centroid regressors
+      - time baseline and detector ramp terms
+      - channel-specific correlated-noise and error-scale check
+    map_readiness:
+      white_light: archive_reduction_required
+      spectral: archive_reduction_required
+      note: Full phase is preferable to an eclipse-only fit, but the old IRAC systematics must be re-fit.
+    sources:
+      paper: https://arxiv.org/abs/2307.00669
+      archive: https://irsa.ipac.caltech.edu/Missions/spitzer.html
+      archive_note: Search the Spitzer Heritage Archive for program 13242 and the WASP-121b AORs.
+    duplicate_reductions:
+      - >-
+        Different published reductions of P-13242 use the same IRAC photons.
+        Select one primary reduction and use other reductions only for a
+        robustness comparison.
+      - >-
+        The 3.6 and 4.5 micron channel time series are separate channel blocks,
+        not duplicate visits when their AORs are distinct.
+
+  - id: wasp121_spitzer_irac_p13044_eclipses
+    planet: WASP-121b
+    facility: Spitzer
+    instrument: IRAC
+    program: P-13044
+    observation: eclipse_products_at_two_channels
+    unique_photons: >-
+      Spitzer 3.6 and 4.5 micron secondary-eclipse observations.  Keep each
+      channel and each AOR as a separate visit block.
+    detectors_orders:
+      - name: IRAC channel 1
+        wavelength_micron: 3.6
+      - name: IRAC channel 2
+        wavelength_micron: 4.5
+    wavelength_micron: 3.6_and_4.5
+    event_coverage: secondary_eclipse_only
+    time_system: archive_product_time_system_to_be_audited
+    local:
+      source_directory: literature_data/WASP-121b/Spitzer-IRAC-P13044/source
+      source_status: not_downloaded
+      prepared_status: not_downloaded
+      source_notes: >-
+        The public Heritage Archive data need a reproducible BCD extraction
+        and intrapixel/systematics audit before mapping.
+    required_systematics:
+      - IRAC intrapixel sensitivity correction (pixel-phase)
+      - pointing and centroid regressors
+      - time baseline and detector ramp terms
+      - channel/AOR-specific correlated-noise and error-scale check
+    map_readiness:
+      white_light: archive_reduction_required
+      spectral: archive_reduction_required
+      note: eclipse_only_warning
+    sources:
+      paper: https://doi.org/10.3847/1538-3881/ab6cff
+      archive: https://irsa.ipac.caltech.edu/Missions/spitzer.html
+      archive_note: Search the Spitzer Heritage Archive for program 13044 and the WASP-121b AORs.
+    duplicate_reductions:
+      - >-
+        A P-13044 3.6 or 4.5 micron light curve and a re-reduction of the same
+        AOR are one photon set.  Do not count reduction variants twice.
+      - >-
+        Keep P-13044 separate from P-13242 even when the bandpass is the same;
+        they are different observing programs.
+
+  - id: wasp121_tess_sector7
+    planet: WASP-121b
+    facility: TESS
+    instrument: TESS wide band
+    program: Sector 7
+    observation: phase_folded_binned_light_curve
+    unique_photons: >-
+      One phase-folded, binned public product.  It is not a native cadence
+      time series and has no absolute BJD in the local table.
+    detectors_orders:
+      - name: TESS band
+        wavelength_micron: approximately 0.6-1.0
+    wavelength_micron: approximately 0.6-1.0
+    event_coverage: >-
+      Phase curve bins from -15 to +15 hours around transit.  The nominal
+      secondary-eclipse centre is just outside the last local bin, so the
+      eclipse centre is not fully sampled by this table.
+    cadence_seconds: 720
+    time_system: relative_hours_from_mid_transit_in_source
+    local:
+      source_directory: literature_data/WASP-121b/TESS/source
+      source_status: source_downloaded
+      prepared_status: prepared_waiting_for_fit
+      prepared_file: literature_data/WASP-121b/TESS/prepared/white_light_curve.npz
+      source_notes: >-
+        The CDS table is normalised to unity during secondary eclipse and has
+        151 bins.  It is useful for a broad optical phase comparison, not as a
+        replacement for an unbinned full-orbit light curve.
+    required_systematics:
+      - use the published binned uncertainties and record that covariance is unknown
+      - do not fit raw detector systematics from this table
+      - verify phase-bin integration and the adopted ephemeris
+      - include an error-scale or model-discrepancy check before map fitting
+    map_readiness:
+      white_light: prepared_waiting_for_fit
+      spectral: not_applicable
+      note: >-
+        Use as a low-resolution phase-curve comparison after JWST/HST input
+        validation.  The table alone is not sufficient for a detailed 2-D map.
+    sources:
+      paper: https://arxiv.org/abs/1909.03010
+      archive: https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/637/A36/lccurve.dat
+      archive_readme: https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/637/A36/ReadMe
+    duplicate_reductions:
+      - >-
+        Any unbinned TESS Sector 7 extraction and this binned CDS table share
+        the same sector photons.  Choose one representation for a fit.
+
+  - id: wasp121_smarts_2mass_k
+    planet: WASP-121b
+    facility: SMARTS 1.3 m
+    instrument: ANDICAM 2MASS K
+    program: published three-night sequence
+    observation: one_eclipse_sequence_across_three_nights
+    unique_photons: >-
+      One ground-based K-band eclipse data set with target/comparison flux,
+      detector positions, detrended flux, trapezoid model, and weights.
+    detectors_orders:
+      - name: 2MASS K
+        wavelength_micron: approximately 2.2
+    wavelength_micron: approximately 2.2
+    event_coverage: three_ground_based_nights_around_one_secondary_eclipse
+    time_system: BJD_as_published; exact scale suffix needs confirmation
+    local:
+      source_directory: literature_data/WASP-121b/SMARTS-2MASS-K/source
+      source_status: source_downloaded
+      prepared_status: source_ready_for_audit
+      source_file: literature_data/WASP-121b/SMARTS-2MASS-K/source/wasp-121.dat
+      source_notes: >-
+        The CDS table has 585 rows.  Twenty-four detrended rows are flagged
+        with 9.999999.  Keep night, dither, target/comparison positions, and
+        weights in the systematics audit.
+    required_systematics:
+      - independent night normalisations and baselines
+      - target and comparison detector-position regressors
+      - dither-dependent offsets
+      - airmass or time trends when available
+      - derive the detrended-flux uncertainty from the published weights and method
+    map_readiness:
+      white_light: source_ready_for_audit
+      spectral: not_applicable
+      note: eclipse_only_warning
+    sources:
+      paper: https://doi.org/10.1051/0004-6361/201834059
+      archive: https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/625/A80/wasp-121.dat
+      archive_readme: https://cdsarc.cds.unistra.fr/ftp/J/A%2BA/625/A80/ReadMe
+    duplicate_reductions:
+      - >-
+        Raw target/comparison flux and the detrended flux are two forms of the
+        same 585 measurements.  Do not fit both as independent data.
+
+staged_fit_order:
+  - stage: 0
+    name: data_and_provenance_audit
+    action: >-
+      Check shape, finite values, masks, time units, wavelength edges, event
+      labels, and source checksums.  Record whether a product is raw,
+      systematics-corrected, or only a published model.
+    output: one audit JSON per photon set; no sampler
+  - stage: 1
+    name: full_phase_white_light
+    data_sets:
+      - wasp121_jwst_nirspec_g395h_go1729
+      - wasp121_jwst_niriss_soss_gto1201
+      - wasp121_hst_wfc3_g141_go15134
+      - wasp121_tess_sector7
+    action: >-
+      Fit one visit/order/detector block at a time with fixed orbit and a
+      degree-2 positive map.  Use mediumpurple for the best fit and show the
+      sub-stellar point and the meridional hotspot offset with its error bar.
+  - stage: 2
+    name: full_phase_spectral_maps
+    data_sets:
+      - wasp121_jwst_nirspec_g395h_go1729
+      - wasp121_jwst_niriss_soss_gto1201
+      - wasp121_hst_wfc3_g141_go15134
+    action: >-
+      Fit a small, selected set of wavelength bins first.  Keep detector,
+      order, visit, and channel systematics separate.  Increase the bin count
+      only after white-light residuals and injection recovery pass.
+  - stage: 3
+    name: eclipse_only_validation
+    data_sets:
+      - wasp121_jwst_miri_lrs_go2961
+      - wasp121_hst_wfc3_g102_go15135
+      - wasp121_hst_wfc3_g141_go14767
+      - wasp121_spitzer_irac_p13044_eclipses
+      - wasp121_smarts_2mass_k
+    action: >-
+      Fit one eclipse or AOR at a time with strong ephemeris and map priors.
+      Report longitude and latitude as weakly constrained unless recovery
+      tests show otherwise.  Eclipse-only data have weaker longitude and
+      latitude information than full phase curves.
+  - stage: 4
+    name: shared_orbit_stacked_model
+    data_sets: all_validated_sets
+    action: >-
+      Concatenate only unique photon sets.  Share the orbit and coordinate
+      convention, but keep one systematics and error block for every visit,
+      detector, order, channel, and AOR.  Keep map coefficients separate at
+      first.
+  - stage: 5
+    name: hierarchical_wavelength_maps
+    data_sets: all_validated_spectral_sets
+    action: >-
+      Add wavelength-dependent map amplitudes with shrinkage around a shared
+      morphology.  Use instrument response functions and keep the same
+      eclipse/phase-curve event model.
+  - stage: 6
+    name: pressure_node_temperature_model
+    data_sets: all_validated_spectral_sets
+    action: >-
+      Only after stages 1-5 pass, connect a small number of pressure-node
+      temperature maps with contribution functions.  Do not fit an independent
+      unconstrained map in every spectral bin.
+
+reporting_rules:
+  - >-
+    Mark the sub-stellar longitude at 0 degrees on every map and longitude
+    plot.  Report the hotspot as a meridionally averaged dayside brightness
+    peak, with posterior error bars, not only a noisy 2-D pixel maximum.
+  - >-
+    Use a lighter purple for hotter/brighter pixels and mediumpurple for the
+    best-fit curve or reference map.
+  - >-
+    State whether each result uses full phase, one eclipse, or multiple
+    eclipses.  Do not compare an eclipse-only 2-D peak to a full-phase
+    longitude without this label.
+  - >-
+    A different reduction of the same photons is a systematic robustness test,
+    not an additional independent observation.

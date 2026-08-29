@@ -174,6 +174,9 @@ class DataConfig:
     time_column: str = "time"
     flux_column: str = "flux"
     flux_err_column: str = "flux_err"
+    # Select one wavelength column from a compact two-dimensional NPZ file.
+    # Leave this unset for an ordinary one-dimensional white light curve.
+    channel_index: int | None = None
     time_unit: str = "day"
     exposure_seconds: float = 10.04
     normalize: str = "none"
@@ -211,6 +214,9 @@ class MapConfig:
     # Values describe the rendered pixel intensity before starry's division by pi.
     pixel_prior_mean_ppm: float | None = None
     pixel_prior_sd_ppm: float | None = None
+    # Optional zero-based coefficient indices for a restricted direct-harmonic
+    # model. An empty tuple uses every coefficient through harmonic_degree.
+    active_harmonic_indices: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -237,6 +243,9 @@ class ModelConfig:
     fit_limb_darkening: bool = False
     fit_error_scale: bool = False
     error_scale_log_sigma: float = 0.1
+    # Add independent white variance in quadrature with the reported errors.
+    # This matches published models that use sigma_total^2 = sigma_i^2 + s^2.
+    fit_white_jitter: bool = False
 
 
 @dataclass(frozen=True)
@@ -525,7 +534,8 @@ def mapping_config_from_dict(
         data,
         {
             "kind", "file", "time", "flux", "flux_err", "format", "time_column",
-            "flux_column", "flux_err_column", "time_unit", "exposure_seconds", "normalize",
+            "flux_column", "flux_err_column", "channel_index", "time_unit",
+            "exposure_seconds", "normalize",
         },
         "data",
     )
@@ -564,6 +574,11 @@ def mapping_config_from_dict(
         time_column=_string(data.get("time_column", DataConfig.time_column), "data.time_column"),
         flux_column=_string(data.get("flux_column", DataConfig.flux_column), "data.flux_column"),
         flux_err_column=_string(data.get("flux_err_column", DataConfig.flux_err_column), "data.flux_err_column"),
+        channel_index=(
+            None
+            if data.get("channel_index") is None
+            else _integer(data["channel_index"], "data.channel_index", minimum=0)
+        ),
         time_unit=_choice(data.get("time_unit", DataConfig.time_unit), "data.time_unit", {"day", "days", "hour", "hours", "second", "seconds"}),
         exposure_seconds=_number(data.get("exposure_seconds", DataConfig.exposure_seconds), "data.exposure_seconds", minimum=0.0),
         normalize=normalize,
@@ -623,6 +638,7 @@ def mapping_config_from_dict(
         "representation", "harmonic_degree", "positive", "regularization",
         "entropy_penalty", "n_pixels", "pixel_log_sigma",
         "pixel_prior_mean_ppm", "pixel_prior_sd_ppm",
+        "active_harmonic_indices",
     }, "map")
     map_obj = MapConfig(
         representation=_choice(
@@ -658,6 +674,16 @@ def mapping_config_from_dict(
                 minimum=1.0e-12,
             )
         ),
+        active_harmonic_indices=(
+            ()
+            if not map_section.get("active_harmonic_indices")
+            else _integer_tuple(
+                map_section["active_harmonic_indices"],
+                "map.active_harmonic_indices",
+                minimum=0,
+                maximum=440,
+            )
+        ),
     )
     if (map_obj.pixel_prior_mean_ppm is None) != (
         map_obj.pixel_prior_sd_ppm is None
@@ -668,6 +694,29 @@ def mapping_config_from_dict(
         )
     if map_obj.representation == "spherical_harmonics":
         map_obj = replace(map_obj, representation="harmonics")
+    if map_obj.active_harmonic_indices:
+        maximum_index = (map_obj.harmonic_degree + 1) ** 2 - 1
+        if len(set(map_obj.active_harmonic_indices)) != len(
+            map_obj.active_harmonic_indices
+        ):
+            raise _error(
+                "map.active_harmonic_indices", "indices must be unique."
+            )
+        if max(map_obj.active_harmonic_indices) > maximum_index:
+            raise _error(
+                "map.active_harmonic_indices",
+                f"indices must not exceed {maximum_index} for this harmonic degree.",
+            )
+        if 0 not in map_obj.active_harmonic_indices:
+            raise _error(
+                "map.active_harmonic_indices",
+                "include coefficient 0 so the map has a uniform component.",
+            )
+        if map_obj.representation != "direct_harmonics":
+            raise _error(
+                "map.active_harmonic_indices",
+                "restricted indices currently require representation: direct_harmonics.",
+            )
 
     model = _section(root, "model")
     _check_keys(model, {
@@ -676,7 +725,7 @@ def mapping_config_from_dict(
         "ou_timescale_prior_median_seconds", "ou_timescale_prior_sigma_ln",
         "jitter_prior_scale_ppm", "fit_baseline",
         "fit_ramp", "include_light_delay", "integrate_exposure", "fit_orbit", "fit_limb_darkening",
-        "fit_error_scale", "error_scale_log_sigma",
+        "fit_error_scale", "error_scale_log_sigma", "fit_white_jitter",
     }, "model")
     noise_model = _choice(
         model.get("noise_model", ModelConfig.noise_model),
@@ -739,7 +788,22 @@ def mapping_config_from_dict(
             "model.error_scale_log_sigma",
             minimum=1.0e-6,
         ),
+        fit_white_jitter=_bool(
+            model.get("fit_white_jitter", ModelConfig.fit_white_jitter),
+            "model.fit_white_jitter",
+        ),
     )
+    if model_obj.fit_white_jitter and model_obj.fit_error_scale:
+        raise _error(
+            "model",
+            "fit_white_jitter and fit_error_scale cannot both be true.",
+        )
+    if model_obj.fit_white_jitter and model_obj.noise_model == "ou":
+        raise _error(
+            "model",
+            "fit_white_jitter cannot be combined with noise_model: ou; "
+            "the OU model already samples white jitter.",
+        )
 
     systematics = _section(root, "systematics")
     _check_keys(

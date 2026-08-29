@@ -41,6 +41,10 @@ class _FakeDistributions:
     Normal = _FakeDistribution
 
     @staticmethod
+    def HalfNormal(scale):
+        return _FakeDistribution(0.0, scale)
+
+    @staticmethod
     def StudentT(_nu, location, scale):
         return _FakeDistribution(location, scale)
 
@@ -335,6 +339,26 @@ def test_positive_sampler_returns_whitened_latent_and_physical_deterministics(
     )
     assert np.asarray(map_start).shape == (4,)
     assert np.allclose(map_start, 0.0)
+
+
+def test_positive_sampler_adds_independent_white_jitter(monkeypatch) -> None:
+    monkeypatch.setattr(backend, "_imports", _fake_imports)
+    result = backend.sample_positive_map(
+        np.ones((4, 1)),
+        np.ones(4),
+        np.full(4, 0.01),
+        pixel_prior_mean=0.01,
+        pixel_log_sigma=0.5,
+        warmup=2,
+        draws=3,
+        chains=1,
+        progress_bar=False,
+        fit_white_jitter=True,
+        jitter_prior_scale=100.0e-6,
+    )
+
+    assert result.samples["white_jitter"].shape == (3,)
+    assert np.all(result.samples["white_jitter"] >= 0.0)
 
 
 def test_positive_sampler_supports_student_t_and_multiplicative_systematics(
