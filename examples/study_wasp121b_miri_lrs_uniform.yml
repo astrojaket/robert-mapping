@@ -1,0 +1,88 @@
+schema_version: 1
+
+project:
+  name: wasp121b-miri-lrs-uniform-control
+  seed: 20260903
+  description: Uniform-map control for the MIRI/LRS broadband eclipse
+
+data:
+  file: ../literature_data/WASP-121b/JWST-MIRI-LRS/prepared/white_light_curve.npz
+  format: npz
+  time_column: time
+  flux_column: flux
+  flux_err_column: flux_err
+  time_unit: day
+  exposure_seconds: 13.3590184
+  normalize: none
+
+system:
+  period_days: 1.274924790
+  transit_time: 58661.063794
+  a_over_rstar: 3.7927
+  radius_ratio: 0.123180
+  inclination_degrees: 88.33
+  planet_flux_ratio: 0.006188
+  stellar_radius_rsun: 1.437
+  eccentricity: 0.0
+  argument_of_periastron_degrees: 10.0
+
+map:
+  representation: harmonics
+  harmonic_degree: 0
+  n_pixels: 4
+  positive: true
+  regularization: none
+  pixel_log_sigma: 0.60
+
+model:
+  null_model: uniform_disk
+  mapped_model: spherical_harmonic
+  likelihood: gaussian
+  noise_model: white
+  include_light_delay: true
+  integrate_exposure: true
+  fit_orbit: false
+  fit_limb_darkening: false
+  fit_error_scale: true
+  error_scale_log_sigma: 0.30
+  fit_white_jitter: false
+
+systematics:
+  mode: multiplicative
+  fit_offset: true
+  polynomial_order: 1
+  standardize_time: false
+  exponential_ramp: true
+  fit_ramp_rate: true
+  ramp_rate_prior_mean_per_day: 27.3
+  ramp_rate_prior_sigma_per_day: 7.0
+  regressor_columns: []
+  coefficient_prior_sigmas: [0.001, 0.01]
+  ramp_amplitude_prior_sigma: 0.0004
+  multiplicative_composition: product
+
+inference:
+  sampler: nuts
+  chains: 3
+  warmup: 1500
+  draws: 1500
+  target_accept: 0.995
+  dense_mass: true
+  init_strategy: jitter+adapt_diag
+  progress_bar: true
+
+compute:
+  profile: local
+  jax_platform: cpu
+  x64: true
+  max_cpus: 3
+  threads: 3
+  quadrature_radial: 24
+  quadrature_azimuth: 96
+
+output:
+  directory: ../results/wasp121b_miri_lrs_uniform
+  save_resolved_config: true
+  save_report: true
+  overwrite: true
+  best_fit_color: mediumpurple

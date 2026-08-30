@@ -38,6 +38,20 @@ _WASP121_NRS1_HOTSPOT_DEGREES = 3.36
 _WASP121_NRS1_HOTSPOT_SIGMA_DEGREES = 0.11
 _WASP121_NRS2_HOTSPOT_DEGREES = 2.66
 _WASP121_NRS2_HOTSPOT_SIGMA_DEGREES = 0.12
+_WASP121_MIRI_HOTSPOT_DEGREES = 4.8
+_WASP121_MIRI_HOTSPOT_LOWER_DEGREES = 2.0
+_WASP121_MIRI_HOTSPOT_UPPER_DEGREES = 7.5
+
+
+def _latitude_profile_weights(target: str, latitude_degrees: np.ndarray) -> np.ndarray:
+    """Return the latitude weighting used for a published profile comparison."""
+
+    cosine = np.cos(np.deg2rad(np.asarray(latitude_degrees, dtype=float)))
+    name = target.lower()
+    if "wasp121" in name and "miri" in name:
+        # The published MIRI profile uses cosine-squared latitude weighting.
+        return cosine**2
+    return cosine
 
 
 def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureConverter, str]:
@@ -68,7 +82,10 @@ def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureCo
                 radius_ratio,
                 wavelength_unit="micron",
             ),
-            f"{lower:.2f}-{upper:.2f} micron {channel} band; 6460 K blackbody star; top-hat response",
+            (
+                f"{lower:.2f}-{upper:.2f} micron {channel} band; "
+                "portable 6460 K blackbody star; top-hat response"
+            ),
         )
     if "wasp178" in name:
         phoenix = Path(os.environ.get("ROBERT_MAPPING_WASP178_PHOENIX", ""))
@@ -319,14 +336,16 @@ def _longitude_comparison_references(
         }
     if published_reference is not None:
         longitude = float(published_reference["longitude"])
-        sigma = float(published_reference["sigma"])
+        sigma = float(published_reference.get("sigma", 0.0))
+        lower = float(published_reference.get("lower", longitude - sigma))
+        upper = float(published_reference.get("upper", longitude + sigma))
         label = str(published_reference["label"])
         references.append(
             {
                 "kind": "literature",
                 "longitude": longitude,
-                "lower": longitude - sigma,
-                "upper": longitude + sigma,
+                "lower": lower,
+                "upper": upper,
                 "label": label,
             }
         )
@@ -334,8 +353,8 @@ def _longitude_comparison_references(
             "label": label,
             "median": longitude,
             "sigma": sigma,
-            "lower": longitude - sigma,
-            "upper": longitude + sigma,
+            "lower": lower,
+            "upper": upper,
         }
     return references, summary
 
@@ -355,6 +374,13 @@ def _published_longitude_reference(target: str) -> dict[str, Any] | None:
             "longitude": _WASP121_NRS2_HOTSPOT_DEGREES,
             "sigma": _WASP121_NRS2_HOTSPOT_SIGMA_DEGREES,
             "label": "Mikal-Evans et al. (2023), NRS2: +2.66° ± 0.12°",
+        }
+    if "wasp121" in name and "miri" in name:
+        return {
+            "longitude": _WASP121_MIRI_HOTSPOT_DEGREES,
+            "lower": _WASP121_MIRI_HOTSPOT_LOWER_DEGREES,
+            "upper": _WASP121_MIRI_HOTSPOT_UPPER_DEGREES,
+            "label": "Kahle et al. (2026), MIRI: +4.8° -2.8°/+2.7°",
         }
     return None
 
@@ -582,7 +608,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
     else:
         conditioned_status = "available"
     map_q16, map_median, map_q84 = np.quantile(contrast, [0.16, 0.50, 0.84], axis=0)
-    latitude_weights = np.cos(np.deg2rad(latitude_deg))
+    latitude_weights = _latitude_profile_weights(target, latitude_deg)
     profiles = np.average(contrast, axis=1, weights=latitude_weights)
     profile_q16, profile_median, profile_q84 = np.quantile(
         profiles, [0.16, 0.50, 0.84], axis=0

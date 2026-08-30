@@ -8,6 +8,42 @@ The main rule is simple:
 
 > Count photons, not files.
 
+## Completed real-data study
+
+The current reproducible study fits the three white-light products that pass
+the local provenance and time checks:
+
+| Data set | Main model | Hot-spot offset | Sampling check | Map status |
+|---|---|---:|---|---|
+| NIRSpec NRS1, 2.70-3.72 microns | Published linear baseline, white jitter, degree-1 dipole | +2.90 (-0.11/+0.11) degrees east | 0 divergences; R-hat 1.0001; minimum ESS 5706 | Longitude/contrast diagnostic only |
+| NIRSpec NRS2, 3.82-5.15 microns | Published linear baseline, white jitter, degree-1 dipole | +2.37 (-0.12/+0.11) degrees east | 0 divergences; R-hat 1.0005; minimum ESS 4816 | Longitude/contrast diagnostic only |
+| MIRI LRS, 5-12 microns | Linear baseline times exponential ramp, fitted ramp rate and error scale, positive degree-1 map | +7.60 (-4.11/+4.57) degrees east | 0 divergences; R-hat 1.0017; minimum ESS 1059 | 99.7% of rendered draws are non-negative |
+
+Each main run has 3 chains, 2,000 warm-up steps per chain, and 2,000 saved
+draws per chain. Uniform-map controls use 3 chains and 1,500 warm-up plus
+1,500 saved draws per chain. The combined report is made with:
+
+```bash
+conda run -n eclipse-mapping python tools/report_wasp121b_study.py
+```
+
+The paper-matched NIRSpec residuals have time correlation. Two additional OU
+noise sensitivity fits therefore test this assumption. Their hot-spot offsets
+are +2.94 (-0.59/+0.57) degrees for NRS1 and +3.03 (-0.77/+0.89) degrees for
+NRS2. The OU innovations are close to white. The wider intervals show why the
+paper-matched small formal errors must not be used as the only uncertainty
+statement.
+
+The NIRSpec direct-harmonic posteriors have no globally non-negative rendered
+draws. Their longitude profiles are useful, but their clipped temperature
+figures are not physical temperature maps. The MIRI degree-1 result passes the
+positivity check and can be used as a physical broad-band brightness map. Its
+temperature scale still uses a portable blackbody and top-hat passband, not the
+published PHOENIX stellar spectrum.
+
+The result summary and figures are in `results/wasp121b_study/`. Result data
+are ignored by Git. Run the saved YAML files to reproduce them locally.
+
 A paper can publish a broad-band light curve, 20 spectral light curves, and a
 model file from the same visit.  These are not 22 independent observations.
 The manifest calls the visit a **photon set** and lists its detector, order,
@@ -63,8 +99,10 @@ need the same check when they arrive.
 Do not assume that a published or “detrended” flux has no systematics.  Each
 instrument has a different nuisance model:
 
-- NIRSpec: detector x/y jitter, time baseline, detector-specific normalisation,
-  error scale, and a comparison to the published systematics arrays.
+- NIRSpec: the paper-matched main fit uses a detector-specific linear time
+  baseline and independent white jitter. The source keeps detector x/y jitter
+  for audit, but the published extraction alignment largely removed those
+  correlations. An OU sensitivity fit checks the residual time correlation.
 - NIRISS: order-specific baseline, jitter terms when available, common-mode
   and stellar-variability checks, time-correlated noise, and error scale.
 - MIRI: visit baseline, time-dependent ramp, detector/background/PSF terms when
@@ -101,10 +139,10 @@ This step does not run a sampler.
 
 ### 1. Fit full-phase white light
 
-Start with NIRSpec, then NIRISS, then the two HST G141 visits.  Use fixed
-orbital parameters and a small degree-2 positive map.  Fit each detector,
-order, or visit separately.  TESS is a later broad optical comparison because
-its local product is binned.
+Start with NIRSpec, then NIRISS, then the two HST G141 visits. Use fixed orbital
+parameters and the smallest map that the event coverage can identify. Fit each
+detector, order, or visit separately. TESS is a later broad optical comparison
+because its local product is binned.
 
 The plots must show:
 

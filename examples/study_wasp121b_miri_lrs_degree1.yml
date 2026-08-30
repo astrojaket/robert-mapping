@@ -1,0 +1,94 @@
+schema_version: 1
+
+# Production check for the eclipse-only WASP-121b MIRI/LRS broadband data.
+# Degree 1 is deliberate: one eclipse does not identify a full degree-2 map
+# and the wider model produced chain disagreement in the first audit run.
+project:
+  name: wasp121b-miri-lrs-degree1-production
+  seed: 20260830
+  description: Convergence-safe MIRI/LRS eclipse-only longitude map
+
+data:
+  file: ../literature_data/WASP-121b/JWST-MIRI-LRS/prepared/white_light_curve.npz
+  format: npz
+  time_column: time
+  flux_column: flux
+  flux_err_column: flux_err
+  time_unit: day
+  exposure_seconds: 13.3590184
+  normalize: none
+
+system:
+  period_days: 1.274924790
+  # BMJD_TDB, which is BJD_TDB minus 2400000.5.
+  transit_time: 58661.063794
+  a_over_rstar: 3.7927
+  radius_ratio: 0.123180
+  inclination_degrees: 88.33
+  planet_flux_ratio: 0.006188
+  stellar_radius_rsun: 1.437
+  eccentricity: 0.0
+  argument_of_periastron_degrees: 10.0
+
+map:
+  representation: harmonics
+  harmonic_degree: 1
+  n_pixels: 16
+  positive: true
+  regularization: none
+  pixel_log_sigma: 0.60
+
+model:
+  null_model: fourier
+  mapped_model: spherical_harmonic
+  fourier_degree: 1
+  likelihood: gaussian
+  noise_model: white
+  include_light_delay: true
+  integrate_exposure: true
+  fit_orbit: false
+  fit_limb_darkening: false
+  fit_error_scale: true
+  error_scale_log_sigma: 0.30
+  fit_white_jitter: false
+
+systematics:
+  # Published form: (c0 + c1 t) * (1 + r0 exp(-r1 t)).
+  mode: multiplicative
+  fit_offset: true
+  polynomial_order: 1
+  standardize_time: false
+  exponential_ramp: true
+  fit_ramp_rate: true
+  ramp_rate_prior_mean_per_day: 27.3
+  ramp_rate_prior_sigma_per_day: 7.0
+  regressor_columns: []
+  coefficient_prior_sigmas: [0.001, 0.01]
+  ramp_amplitude_prior_sigma: 0.0004
+  multiplicative_composition: product
+
+inference:
+  sampler: nuts
+  chains: 3
+  warmup: 2000
+  draws: 2000
+  target_accept: 0.995
+  dense_mass: true
+  init_strategy: jitter+adapt_diag
+  progress_bar: true
+
+compute:
+  profile: local
+  jax_platform: cpu
+  x64: true
+  max_cpus: 3
+  threads: 3
+  quadrature_radial: 24
+  quadrature_azimuth: 96
+
+output:
+  directory: ../results/wasp121b_miri_lrs_degree1_production
+  save_resolved_config: true
+  save_report: true
+  overwrite: true
+  best_fit_color: mediumpurple
