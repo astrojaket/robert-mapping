@@ -43,6 +43,14 @@ from .systematics_selection import (
     run_systematics_selection,
     select_systematics,
 )
+from .wasp18b import (
+    Wasp18bBenchmarkReport,
+    Wasp18bBinResult,
+    Wasp18bInput,
+    load_wasp18b_25bin,
+    run_wasp18b_benchmark,
+    run_wasp18b_validation,
+)
 
 __all__ = [
     "BenchmarkCase",
@@ -81,4 +89,10 @@ __all__ = [
     "compare_systematics_candidates",
     "run_systematics_selection",
     "select_systematics",
+    "Wasp18bBenchmarkReport",
+    "Wasp18bBinResult",
+    "Wasp18bInput",
+    "load_wasp18b_25bin",
+    "run_wasp18b_benchmark",
+    "run_wasp18b_validation",
 ]

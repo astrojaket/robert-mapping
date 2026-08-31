@@ -6,6 +6,7 @@ import numpy as np
 
 from robert_mapping.benchmark.production_report import (
     _condition_positive_rendered_maps,
+    _latitude_profile_weights,
     _map_information_diagnostics,
     _longitude_comparison_references,
     _profile_peak_longitudes,
@@ -117,6 +118,16 @@ def test_boundary_pinned_peaks_are_prior_dominated_even_with_narrow_interval() -
     assert result["latitude_information_status"] == "prior_dominated"
     assert "boundary-pinned" in result["latitude_information_warning"]
     assert "not evidence for latitude" in result["latitude_information_warning"]
+
+
+def test_wasp18_profile_uses_published_cosine_squared_weighting() -> None:
+    latitude = np.array([-60.0, 0.0, 60.0])
+
+    wasp18 = _latitude_profile_weights("wasp18b-niriss", latitude)
+    wasp43 = _latitude_profile_weights("hammond-wasp43b", latitude)
+
+    np.testing.assert_allclose(wasp18, np.array([0.25, 1.0, 0.25]))
+    np.testing.assert_allclose(wasp43, np.array([0.5, 1.0, 0.5]))
 
 
 def test_wasp121_published_longitude_references_are_channel_specific() -> None:

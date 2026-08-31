@@ -32,6 +32,10 @@ robert-mapping validate config.yml
 
 ## Student WASP-121b study
 
+For the full learning order, start with
+[`docs/student_learning_path.md`](docs/student_learning_path.md). It begins
+with WASP-43b and WASP-18b validation before the WASP-121b study.
+
 Start with
 [`notebooks/wasp121b_student_study.ipynb`](notebooks/wasp121b_student_study.ipynb).
 It explains the science goal, data audit, time systems, systematics, white-light

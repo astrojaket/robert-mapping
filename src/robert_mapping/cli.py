@@ -60,6 +60,26 @@ def _parser() -> argparse.ArgumentParser:
     benchmark.add_argument("--dry-run", action="store_true", help="validate and print the benchmark plan only")
     benchmark.add_argument("--output-dir", help="override output.directory for this run")
 
+    wasp18b = subparsers.add_parser(
+        "benchmark-wasp18b",
+        help="validate 25 wavelength-dependent WASP-18b eclipse maps",
+    )
+    wasp18b.add_argument(
+        "--data",
+        help="published spec_lambin_25.npz file or its containing directory",
+    )
+    wasp18b.add_argument(
+        "--output-dir",
+        default="results/wasp18b_25bin_benchmark",
+        help="directory for the validation tables and plots",
+    )
+    wasp18b.add_argument(
+        "--quick",
+        action="store_true",
+        help="fit three representative wavelength bins instead of all 25",
+    )
+    wasp18b.add_argument("--no-plots", action="store_true", help="write data products only")
+
     frozen = subparsers.add_parser(
         "frozen-reference",
         help="compare the saved HAT-P-32b starry products without starry",
@@ -384,6 +404,34 @@ def _run_starry_matrix(args: argparse.Namespace) -> int:
     return 0 if report["status"] == "pass" else 1
 
 
+def _run_wasp18b_benchmark(args: argparse.Namespace) -> int:
+    """Run the serial published-data wavelength-map validation."""
+
+    _limit_threads(1)
+    output = Path(args.output_dir).expanduser().resolve()
+    selected = (0, 12, 24) if args.quick else None
+    try:
+        from .benchmark.wasp18b import run_wasp18b_benchmark
+
+        report = run_wasp18b_benchmark(
+            args.data,
+            output,
+            bin_indices=selected,
+            save_plot=not args.no_plots,
+        )
+    except (FileNotFoundError, OSError, RuntimeError, ValueError) as exc:
+        raise ConfigError(str(exc)) from exc
+    strong = sum(item.delta_bic_mapped_preference >= 10.0 for item in report.bins)
+    physical = sum(item.mapped_is_non_negative for item in report.bins)
+    print("WASP-18b wavelength-map validation")
+    print(f"Bins fitted: {len(report.bins)}")
+    print(f"Strong mapped-model preference: {strong}")
+    print(f"Non-negative fitted maps: {physical}")
+    print("Sampling: none (fast constrained maximum-likelihood benchmark)")
+    print(f"Results: {output}")
+    return 0
+
+
 def _run_recovery(args: argparse.Namespace) -> int:
     """Run one small, configured recovery or rejection calibration."""
 
@@ -483,6 +531,8 @@ def main(argv: list[str] | None = None) -> int:
             return _run_frozen_reference(args)
         if args.command == "starry-matrix":
             return _run_starry_matrix(args)
+        if args.command == "benchmark-wasp18b":
+            return _run_wasp18b_benchmark(args)
         if args.command == "recover":
             return _run_recovery(args)
         if args.command == "report":

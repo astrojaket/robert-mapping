@@ -43,13 +43,41 @@ _WASP121_MIRI_HOTSPOT_LOWER_DEGREES = 2.0
 _WASP121_MIRI_HOTSPOT_UPPER_DEGREES = 7.5
 
 
+def _wasp18_input_path(
+    config: MappingConfig,
+    filename: str,
+    *,
+    environment_variable: str,
+) -> Path | None:
+    """Return one local WASP-18 stellar or instrument input file."""
+
+    configured = os.environ.get(environment_variable)
+    candidates = [Path(configured).expanduser()] if configured else []
+    candidates.append(
+        config.base_dir.parent
+        / "literature_data"
+        / "WASP-18b"
+        / "JWST-NIRISS-SOSS"
+        / "source"
+        / "WASP-18b 3D Mapping Archive"
+        / "theresa"
+        / "inputs"
+        / filename
+    )
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return None
+
+
 def _latitude_profile_weights(target: str, latitude_degrees: np.ndarray) -> np.ndarray:
     """Return the latitude weighting used for a published profile comparison."""
 
     cosine = np.cos(np.deg2rad(np.asarray(latitude_degrees, dtype=float)))
     name = target.lower()
-    if "wasp121" in name and "miri" in name:
-        # The published MIRI profile uses cosine-squared latitude weighting.
+    if "wasp18" in name or ("wasp121" in name and "miri" in name):
+        # Coulombe et al. (2025) report the longitudinal profile with cos^2
+        # latitude weighting. Match that definition for the validation.
         return cosine**2
     return cosine
 
@@ -86,6 +114,55 @@ def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureCo
                 f"{lower:.2f}-{upper:.2f} micron {channel} band; "
                 "portable 6460 K blackbody star; top-hat response"
             ),
+        )
+    if "wasp18" in name:
+        if config.data.file is None:
+            raise ValueError("WASP-18 temperature conversion needs a combined NPZ file")
+        with np.load(config.data.file, allow_pickle=False) as archive:
+            centre = float(np.asarray(archive["wavelength_micron"]))
+            width = float(np.asarray(archive["wavelength_width_micron"]))
+        lower = centre - 0.5 * width
+        upper = centre + 0.5 * width
+        wavelength = np.linspace(lower, upper, 1_000)
+        phoenix_path = _wasp18_input_path(
+            config,
+            "phoenix-spectrum.txt",
+            environment_variable="ROBERT_MAPPING_WASP18_PHOENIX",
+        )
+        throughput_path = _wasp18_input_path(
+            config,
+            "niriss-firstorder.txt",
+            environment_variable="ROBERT_MAPPING_WASP18_THROUGHPUT",
+        )
+        if phoenix_path is not None:
+            phoenix = np.loadtxt(phoenix_path)
+            stellar = np.interp(wavelength, phoenix[:, 0], phoenix[:, 1])
+            stellar_source = "published 6435 K PHOENIX stellar radiance"
+        else:
+            stellar = blackbody_stellar_radiance(
+                wavelength, 6435.0, wavelength_unit="micron"
+            )
+            stellar_source = "portable 6435 K blackbody fallback"
+        if throughput_path is not None:
+            throughput = np.loadtxt(throughput_path)
+            weights = np.interp(wavelength, throughput[:, 0], throughput[:, 1])
+            response_source = "published NIRISS first-order throughput"
+        else:
+            weights = np.ones_like(wavelength)
+            response_source = "uniform within-bin response fallback"
+        assumption = (
+            f"{lower:.4f}-{upper:.4f} micron NIRISS bin; {stellar_source}; "
+            f"{response_source}"
+        )
+        return (
+            BandpassTemperatureConverter(
+                wavelength,
+                stellar,
+                weights,
+                radius_ratio,
+                wavelength_unit="micron",
+            ),
+            assumption,
         )
     if "wasp178" in name:
         phoenix = Path(os.environ.get("ROBERT_MAPPING_WASP178_PHOENIX", ""))
