@@ -33,10 +33,12 @@ robert-mapping doctor
 
 The profile files limit JAX, BLAS, and NumPy to three CPU threads.
 
-Install the research data bundle in the root of the clone:
+Fetch the Git LFS data bundle, then install it in the root of the clone:
 
 ```bash
-tar -xzf /path/to/robert-mapping-student-data-2026-08-31.tar.gz -C .
+git lfs install --local
+git lfs pull
+tar -xzf dist/robert-mapping-student-data-2026-08-31.tar.gz -C .
 python tools/verify_student_data_bundle.py student_data_bundle/manifest.json
 ```
 

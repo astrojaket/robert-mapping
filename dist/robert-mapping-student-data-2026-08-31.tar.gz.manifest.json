@@ -1,0 +1,1517 @@
+{
+  "contains_results": false,
+  "contains_simulations": false,
+  "created_utc": "2026-08-31T20:10:06.688245+00:00",
+  "file_count": 249,
+  "files": [
+    {
+      "path": "WASP-121b/SOSS/W-121b-exoTEDRF-WLC-o1.csv",
+      "sha256": "42da7079280160d120aebb56327fde5ca9ccfeb8c30632e02096f7932543d154",
+      "size_bytes": 258557,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "WASP-121b/SOSS/W-121b-exoTEDRF-WLC-o2.csv",
+      "sha256": "78adf961d99cd36ad318b14afac95ea3713088234b58f564fd78b513e9d1d084",
+      "size_bytes": 258557,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "WASP-121b/SOSS/detrended_flux.npy",
+      "sha256": "1ecd04ee468483acbe87bd9d29422b259ccdeb5528e3dbe71f293452fc6f406a",
+      "size_bytes": 55280,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "WASP-121b/SOSS/detrended_flux_o2-new.npy",
+      "sha256": "5ddc566e6b76cee83c0d381ff2ac7c44cd2222690bf2067065c02f9c6a11385b",
+      "size_bytes": 55280,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/broadband/visit_2018.npz",
+      "sha256": "ee5413ed735558c8b0df1c2fb7dcce49573131d16f61459df5aa1188768a8736",
+      "size_bytes": 13533,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/broadband/visit_2019.npz",
+      "sha256": "34fba6213de7832b6dcce43a76ecb2437f58d1ec17a108fb8e78d4ab96e4e0aa",
+      "size_bytes": 13590,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/input_audit.json",
+      "sha256": "f1da7328904381e1ecc28c494b6fdfe0c6088b2a05496a1f034ae41e80e8c969",
+      "size_bytes": 47692,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_00.npz",
+      "sha256": "5c123f7fe6085ceabe8eeb68ac860f98d403c48fc86f715ce6064c08d7df96f1",
+      "size_bytes": 16587,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_01.npz",
+      "sha256": "ca35fbfd3f817aeec7e3191cb39ca788451dff324f4cd55a0b56946be7761ef6",
+      "size_bytes": 16580,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_02.npz",
+      "sha256": "2cdf41ae6f426eb2af56ce52941a876d0b3d48f40e109b238864428eb214976f",
+      "size_bytes": 16546,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_03.npz",
+      "sha256": "063f93074f54de40318c1351a2877f2c9d6fc157cef533be7c84f42e9b6f89d2",
+      "size_bytes": 16557,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_04.npz",
+      "sha256": "5d8d49e9960a8a4a20da744bd255d52a4f1375ad287354530b12e932c4c08419",
+      "size_bytes": 16557,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_05.npz",
+      "sha256": "b1e77edc01a61a34eb10109052b87e85138f3118196ce6d5c7401cebccd20a9c",
+      "size_bytes": 16575,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_06.npz",
+      "sha256": "cf34b2975c228d8ebc486422af3657d143c35e08051b7b92a9950c102e145863",
+      "size_bytes": 16571,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_07.npz",
+      "sha256": "2010d8f1da9d2eb4d93562ed975b1d0133eb16060e66645542740df1a88d76ad",
+      "size_bytes": 16576,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_08.npz",
+      "sha256": "b6b44d0a466cd2a63326f079a5afdbc34cb677089f687e569421ff3726f7f195",
+      "size_bytes": 16588,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_09.npz",
+      "sha256": "0058995a9e2adab988c537c8ca40013bcc9232ee12e6232f2d1327d2c8bfc0fe",
+      "size_bytes": 16604,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_10.npz",
+      "sha256": "368af77d70bbf04560065dc9d9ccec5c8dc0e2d18ecddd3cfeceeb47ffc5f9c9",
+      "size_bytes": 16530,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2018/channel_11.npz",
+      "sha256": "ae665bd00519c273aa601f32a25073c17898c07080b71484dca51f807e5affbe",
+      "size_bytes": 16567,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_00.npz",
+      "sha256": "e037d826b9e5e05e5070db90e50e79b6b5aed7a08a5409f57034f093f16fa94c",
+      "size_bytes": 15031,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_01.npz",
+      "sha256": "8913191e8f0e670f522dcb0fa6c56fe294eed83ff70e36b247f85f07d850bfad",
+      "size_bytes": 15023,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_02.npz",
+      "sha256": "f638d2d92d264a3933ea7b3a67453637d62c3cd08e4866d3fa2cee60b5fff4c8",
+      "size_bytes": 14991,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_03.npz",
+      "sha256": "f8647818103d193b3b485327fe2ad3a3b4eae2e021db032f19508c649ce96f5c",
+      "size_bytes": 15001,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_04.npz",
+      "sha256": "10add3d70080fd3c9df0ac83f1e1968806beb881f0cd182ae1bfe5f0266991c5",
+      "size_bytes": 14998,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_05.npz",
+      "sha256": "0d40c410c5b64b64e3ec870a91db580adb3045c53e687b0132062144db38cda8",
+      "size_bytes": 15017,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_06.npz",
+      "sha256": "3762e54b3765446731635c4d7c4699e1dba285efdb3d782b0f1ebd846dac32c4",
+      "size_bytes": 15014,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_07.npz",
+      "sha256": "c50cd1d876a27b535dea6e97cc4c124ebea869345bdbccf871cc23aae54cfcf7",
+      "size_bytes": 15016,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_08.npz",
+      "sha256": "1f376e8a44ebcd8afb1c7346f61c0c96927bc6cadab905f522ce7bbafcb724bf",
+      "size_bytes": 15034,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_09.npz",
+      "sha256": "532d8072c4633e4c9849ffeccad991436f39fd21541902014567209e14365c65",
+      "size_bytes": 15051,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_10.npz",
+      "sha256": "612a8131b85b2061e598a78bbab4e3d6be39915ea1907165eaf0a1efb0a0f0a0",
+      "size_bytes": 14973,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/prepared/spectral/visit_2019/channel_11.npz",
+      "sha256": "2ae84c14f06d784a6a572f09cc4bb61fd784a4f9354bf40f43d10485887a180e",
+      "size_bytes": 15004,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/41550_2021_1592_MOESM2_ESM.zip",
+      "sha256": "54fd5527e5c3c8d3c9266f32b7cb6b2a26bd38ef71575c3ada99b487484b6c10",
+      "size_bytes": 2632488,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/41550_2021_1592_MOESM5_ESM.zip",
+      "sha256": "a6732ae2dfa22fabdbcdb4f2f407054e7347ccd977ebfa3a56d9a91a05482e3b",
+      "size_bytes": 21156,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/README.txt",
+      "sha256": "7bdf8db6e697bbbc693b8aafff3450ddd905b3917ea9a34f8e510d2c2420f45b",
+      "size_bytes": 1073,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.137-1.179micr.txt",
+      "sha256": "e18aaf75d9970b4a10a373580433364d645f1d2eb947febf2ec78a0ce68a1adb",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.179-1.220micr.txt",
+      "sha256": "21f1a88b993f3a4adc420ff42a6412270c28ba6b52f8e2d3063956e69f62f128",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.220-1.262micr.txt",
+      "sha256": "56a91e86f3a2a91484f63e9d3e0083300b67a536a06cff2c5814eec64b9b79da",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.262-1.304micr.txt",
+      "sha256": "0530714dbc274ebf69e97fffc5461a5877a45858e535104ce11e9bd2b4004425",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.304-1.345micr.txt",
+      "sha256": "97c761cef4e5abe33384ae951708a72017dfb275ae13ae52b5937d0da70d4063",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.345-1.387micr.txt",
+      "sha256": "5c2b7701869e6064ed56a7b41c313090b3ce21445c5d7ae5490350fedf547783",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.387-1.429micr.txt",
+      "sha256": "4fbee905fdd8d3d380a43ce38ad7f50e25b61fbc7d23b08f4ba400751276c52a",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.429-1.470micr.txt",
+      "sha256": "c4e6befb6023e84614ca6c12aa7f07b91a0479dca3fafafc5f17b315982ed7c1",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.470-1.512micr.txt",
+      "sha256": "7786f181e3c86b43ae1dfc7ecc788f34c0e74c9d405f699f40b1a21489438812",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.512-1.553micr.txt",
+      "sha256": "3e386da13692775e14e063ffdc5c4825b18d3a1ae8b644b46df40dcc22d3bc99",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.553-1.595micr.txt",
+      "sha256": "a4ecb8a447f69d777dc792a33e34d9fe36f4769a730c29e2ccda6934661e5888",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2018_1.595-1.637micr.txt",
+      "sha256": "613c220b95dbdf3a5bd5fc8e50c581d566d4a048db9129cb9d10bb07f3a5acc2",
+      "size_bytes": 28107,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.137-1.179micr.txt",
+      "sha256": "c5654dfc08d41d9eac0f330ac811862cbb477447059ec6d25938288037b41efb",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.179-1.220micr.txt",
+      "sha256": "9453b361f42d40c92b86c2a9f7bf6269e50e44b76b93a4754930a42db5642069",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.220-1.262micr.txt",
+      "sha256": "2a47a6197055eadaaafabb8057d52e9147498f1cdfc4de1567e1868e4fd84efe",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.262-1.304micr.txt",
+      "sha256": "da4d70255535469c2434b2eeeb23bfebca4e7e5092e65eeb3bcd25b36bb4d3f8",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.304-1.345micr.txt",
+      "sha256": "12b37087be6420ef025842fa2c1afbdf9cb0f65a3f32eaf8b694f4c83b6664fd",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.345-1.387micr.txt",
+      "sha256": "9c0caccbeb1d2ae6c122ece8c5bbea1aa5c69acc8a2f07155c3000c7f2901617",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.387-1.429micr.txt",
+      "sha256": "22666d10987cfcbe00f67e9a56a5160a45a9ef9d4ec5f2699ac73275a7952187",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.429-1.470micr.txt",
+      "sha256": "e248343a0f628615d542bf347ab208702cf9f746fec263ec17a354ca0e86ddc5",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.470-1.512micr.txt",
+      "sha256": "7f5b4453be4a77e98af84bb9843025dc3b5ccb54f5e903ff5c35ec56bd0b6e62",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.512-1.553micr.txt",
+      "sha256": "46d15a93a0a808bc512408b67eea845520973ef1006d9b93fc94b991f52d6ad4",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.553-1.595micr.txt",
+      "sha256": "ca26a27e4543c04dea623c0e172a5f68e29f61a983531d480c341f6ef2661382",
+      "size_bytes": 28032,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/spectroLightCurve_2019_1.595-1.637micr.txt",
+      "sha256": "2d93854f13bb0fc74912835c10a423afb87eb9a977da99404451bcaf4b080f8d",
+      "size_bytes": 27957,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/spectroLightCurves_Raw/wavEdgesMicr.txt",
+      "sha256": "3bf6240a7eaada549f349c69639dff0f3afaf8bfd7dba216a7fd8a08598311d1",
+      "size_bytes": 202,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/timeSeriesSpectra/spectra_2018_ecounts.txt",
+      "sha256": "826bf7fdb3f9d6909811f75c2bac89e16da4ed7f5502ffdcf1372ec61d9b2f62",
+      "size_bytes": 2771573,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/timeSeriesSpectra/spectra_2018_jd.txt",
+      "sha256": "89b978da8be9ed593e4287dbcbe6556170afb57c83865c88fd761234527af7b1",
+      "size_bytes": 10421,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/timeSeriesSpectra/spectra_2018_wavMicr.txt",
+      "sha256": "bd840577be30bc6a5d0ea72de204147f104b0de82e4b4a5f250c286a5e5bd958",
+      "size_bytes": 6700,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/timeSeriesSpectra/spectra_2019_ecounts.txt",
+      "sha256": "e7bc2d1520d1de54112945c39d034a30d93894aaf752e892f4bfbb0a9d9a1f08",
+      "size_bytes": 2770028,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/timeSeriesSpectra/spectra_2019_jd.txt",
+      "sha256": "984b260f3b347d6674a55a7d1f758c574cb86c4149346137c7f30eb58b14482b",
+      "size_bytes": 10421,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/SupplementaryData/timeSeriesSpectra/spectra_2019_wavMicr.txt",
+      "sha256": "3401a802d2baf31238070ca08c0878a6b1a2513cbbc0656d012f2bd88d70a72b",
+      "size_bytes": 6700,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/broadBand_lightCurve_2018.txt",
+      "sha256": "5af0916804c13d827ff57ee0e67b1b030310248e7081fa83ff3474571a72e3d8",
+      "size_bytes": 29157,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/HST-WFC3-G141/source/broadBand_lightCurve_2019.txt",
+      "sha256": "54ef7935c60abc7983ad957941347e93fedf37ff884d50075189e359a7bb3cab",
+      "size_bytes": 29082,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/input_audit.json",
+      "sha256": "4bb9777b344a4a6515486d2d58f502d4758e59e580b2bc2a50fbf979ad5d1f7b",
+      "size_bytes": 25956,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_00.npz",
+      "sha256": "7fe4a78ed5d47938a2a6776594a071532380c8caf4a385066be734dbc1b00e13",
+      "size_bytes": 82129,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_01.npz",
+      "sha256": "2fdc1231d983eb5a04b58349f8331a5f83abc1bdea74d33c06d66ce158efc90d",
+      "size_bytes": 79448,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_02.npz",
+      "sha256": "e4a19a56df3fef15ccd5fc0f9ff2e08d8fe7f3f8088c7e1b20fb18f051664871",
+      "size_bytes": 82552,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_03.npz",
+      "sha256": "df135d1481bebc6aeafcb2fc0a5ae99ce11d8588e1723810236bca70b11eeb5a",
+      "size_bytes": 79459,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_04.npz",
+      "sha256": "5ede752f8695a412fe870990cb648e841fab8fa64098b5996fd50b088ef47b2d",
+      "size_bytes": 80511,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_05.npz",
+      "sha256": "8551287347aa31af2faccf6b52b70d63b3aaa91d8164efe0d89aa7bcdddf56aa",
+      "size_bytes": 81548,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_06.npz",
+      "sha256": "6d9e75aab7b97dcef055177de517ca093a508cbb6d0344849ee94d4bd1287142",
+      "size_bytes": 82151,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_07.npz",
+      "sha256": "8769a6ca7e0b8da32985f72b80eea259b75e553fc2f6944c51029a62ab5fdf77",
+      "size_bytes": 83380,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_08.npz",
+      "sha256": "6c2d0f05ee644f0464fdc6064dba1704d50cef9ab422f2cf939ffb0b00144d4f",
+      "size_bytes": 82386,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_09.npz",
+      "sha256": "c5ba40b2a02d6e0b46127758732ec19fc2e94b3a24ba94926aca5f633e92d380",
+      "size_bytes": 80982,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_10.npz",
+      "sha256": "ce7ded24feb048cc38654f5ad434e32f74b9d7703980d81f3d277c2ef000555c",
+      "size_bytes": 82478,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_11.npz",
+      "sha256": "09242599f2d365d65ee72ea0ea1a9eb6586b8afb8a6279a99e31e18093e69284",
+      "size_bytes": 81961,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_12.npz",
+      "sha256": "ac4c9a4ce1289393fbb8539c366e81d2e1458016118c100801de0e60d45ab001",
+      "size_bytes": 83576,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_13.npz",
+      "sha256": "dd9cfac6a53a27f164a94f05845c976ec0f44b278ece138d8ea44579a3378351",
+      "size_bytes": 82812,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_14.npz",
+      "sha256": "418b7ddebaaa264c98d15c440aba88582b3b33fa2d55e5e60e1799d6ff2dec05",
+      "size_bytes": 83202,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_15.npz",
+      "sha256": "f217723e9797621cb072821ba7638fb1d5617d29e907527c216418f9f555e07e",
+      "size_bytes": 82343,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_16.npz",
+      "sha256": "13f02a2f92c308539da59eaf8a48efc1776494f716bfcda1c70e7860d9de9f65",
+      "size_bytes": 82404,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_17.npz",
+      "sha256": "5edafcef49d284d6245b85497b7b88f0df23c7af8e2b563fe74096330d4bce7b",
+      "size_bytes": 84075,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_18.npz",
+      "sha256": "943fcaaae590a8280107134937ae31e414ec3ff7238c9431fda168cfd68993d9",
+      "size_bytes": 83808,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_19.npz",
+      "sha256": "254ad3af4dd31fb89628223d70726f8fdddcd2492a970dbbd7e4103ff459b29c",
+      "size_bytes": 84892,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_20.npz",
+      "sha256": "9ebfc1d68d51566a9852659b7ccb19103795b0c3fafd61861f7479d0f5e7abf2",
+      "size_bytes": 83070,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_21.npz",
+      "sha256": "350dde47be9244938a6d28ce73eeac884596dfe54a9aae0caebb101de223267d",
+      "size_bytes": 84145,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_22.npz",
+      "sha256": "dabd11522d1b93e5abe59bf5a21b1df38414f04a81b52476a8c04351e88eecf0",
+      "size_bytes": 81789,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_23.npz",
+      "sha256": "c161e08818b41e84bd98fdc5927e41d4c5ecfd347f4ec8d681d72ed6e1e279da",
+      "size_bytes": 80621,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_24.npz",
+      "sha256": "9151d19193098db2e8dc5db9e871c3b18e5d96ad6b3afef04d2e71fd6f5786b7",
+      "size_bytes": 83600,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_25.npz",
+      "sha256": "12c6532710592158ddc5e6e26f3688cb8bb3bc150a8de832210e8c72a84f9c52",
+      "size_bytes": 84062,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_26.npz",
+      "sha256": "fa676718dbea74dd7be2b1c5dc6406ecb8a5e91e1e88aa23c272ab4d8e638a76",
+      "size_bytes": 82528,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_27.npz",
+      "sha256": "a9994d6fb19f8e0038f52eb0c027e57f12ef7f294b150bd72f77bfbbda0ae1f2",
+      "size_bytes": 81913,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_28.npz",
+      "sha256": "cdd12b5b84a4d97784d807ca2de7b760622996fdc69e1e57c4b22a1dfa470cb1",
+      "size_bytes": 81642,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_29.npz",
+      "sha256": "619d6533cd4c9acf2119adf80e38210c1500c41d70a009d1783b670238bc49fa",
+      "size_bytes": 83082,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_30.npz",
+      "sha256": "ef67af1e58a10e4e16b8acc93262e31802b99ced61a63138e29b7c112f30f9b6",
+      "size_bytes": 82160,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_31.npz",
+      "sha256": "fd326639d1fcb00da0c6e6050a10f7ce00757588f600d99b329f16c37f59d377",
+      "size_bytes": 81767,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_32.npz",
+      "sha256": "72af0356e7b57dccc574a4fe94031020e827907b191e31bbba3e37b1c88da343",
+      "size_bytes": 81767,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_33.npz",
+      "sha256": "a63368f4983029f7b8cbbdce9f155ca81103b8b545cdc8ac9db755c5a3553343",
+      "size_bytes": 81528,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_34.npz",
+      "sha256": "7f4456674abd62a7af03f0ba1c9800412691ac71c23a8164b6ca7be2cf564048",
+      "size_bytes": 80412,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_35.npz",
+      "sha256": "c1a5a37b4ceeca4942e15f65991fa1f1b929cc6992869c6b76696e5806766776",
+      "size_bytes": 83197,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_36.npz",
+      "sha256": "a1c4e62fa5450b2ba46f09c09459ac250b8bd9d20867cc687be0f564edcaf2a9",
+      "size_bytes": 82364,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_37.npz",
+      "sha256": "2cfca7d7c1b1b210c4dd4cf2d5dc2f23f899ee1f0cb12f3a5a37750e4585163e",
+      "size_bytes": 83032,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_38.npz",
+      "sha256": "d72c0ed8560d55295d52ad5b1432a7e11e07cbe5b82d26b9322deec6adf39676",
+      "size_bytes": 82872,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_39.npz",
+      "sha256": "e6d5df019a29c7302813aa8b00d9aed370205b3c869031a12a384d2d0c84068e",
+      "size_bytes": 82786,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_40.npz",
+      "sha256": "640e47525b29ca0fbf9436be9546a27bf0dc7fc67c16c93059eeecc3535ba9e1",
+      "size_bytes": 81757,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_41.npz",
+      "sha256": "62e7816ff7bbd23032a5a61e0f6d7c178e6a0280945efbc4a188729783d0b09b",
+      "size_bytes": 82423,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_42.npz",
+      "sha256": "a93431eaf739b15367635caf87f675b3193afecf9d660a7cd021492216b882d2",
+      "size_bytes": 83481,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_43.npz",
+      "sha256": "82a5b23c546eba93bd85c1336c712b8c0cdc15104e5dd8441274024f704211ae",
+      "size_bytes": 82036,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_44.npz",
+      "sha256": "fa66765680086deb9e042126372b745c44ae6c3199dbc9aa8b7c01aaf403cbbe",
+      "size_bytes": 81188,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_45.npz",
+      "sha256": "933adf0bfd39412130471b1c306f570d5828e66ecccf8fb15623f712bb6c024f",
+      "size_bytes": 82778,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/spectroscopic/channel_46.npz",
+      "sha256": "6e10ed6e80c5540a0fe73e57b7d15913bdb558f3733a20fd98a9242900c9a60f",
+      "size_bytes": 84536,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/prepared/white_light_curve.npz",
+      "sha256": "0058940ca56fcb1e8a31e5c83d122fe87ba51bbe6a7a635712aef0b7ff9cac1a",
+      "size_bytes": 81669,
+      "state": "production_white_light_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch00.txt",
+      "sha256": "80f46cc7900eaf432a0034a0759684712a0e54c3fb176c334cd46af14692df0d",
+      "size_bytes": 326493,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch01.txt",
+      "sha256": "a5df90075f9578b11710872bc93e0db396c23069282baae8cea95238c3c8a951",
+      "size_bytes": 303218,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch02.txt",
+      "sha256": "2928b8726579e1940c9cfd6b82ab942862a3f00d94d2cbfc23aa56043fe241a9",
+      "size_bytes": 326566,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch03.txt",
+      "sha256": "f3d98c2e3f37f31f7c39f05a290f8a88c12148f246f5ac3509517124d70c0bbf",
+      "size_bytes": 303114,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch04.txt",
+      "sha256": "4c3f7cd99260b75ac9935ed8abcec146ebc86e87682b23b5c0e7c7892ee858b3",
+      "size_bytes": 326425,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch05.txt",
+      "sha256": "9757893bec5ed9d313e1bf83d02bfaf8caf8888c44f40465e65e9bc28d14df16",
+      "size_bytes": 305898,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch06.txt",
+      "sha256": "799b1e7fad7837c9660027ec01385a0cc777ee5b283d22b9f7d22ccf18343531",
+      "size_bytes": 324743,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch07.txt",
+      "sha256": "211a10c7cef0a7407aa3aaec27f36d9454e95c01b29f0781a5d20af0883bc9eb",
+      "size_bytes": 304217,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch08.txt",
+      "sha256": "8c7a37a2af0fe7fbd02e2d628f4144465d6d8a022c18df2e554896b1a1c0287a",
+      "size_bytes": 324594,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch09.txt",
+      "sha256": "fa189920ecaf199a2feb3d1977a66d9973e3526455343b2afc576cb2ddbf5ed1",
+      "size_bytes": 305794,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch0_Broadband.txt",
+      "sha256": "ac72e7a8e15f0350b47ebc2db4e7e2545e002b09295950b9fa3ea06509cb0501",
+      "size_bytes": 274910,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch10.txt",
+      "sha256": "6e87380980ffb52c775d14a775e1a2cd92f978a19081a49ec11c500d6365b596",
+      "size_bytes": 326431,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch11.txt",
+      "sha256": "ad6f3ad3f4a9534e9ee970ede111e9e67e60c1cbd7689139917b59597ae4348f",
+      "size_bytes": 305698,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch12.txt",
+      "sha256": "27ee040ecfbe44b3f31d7c2fa8b5b87b62f87f7cd5bfa2db35e9d35e27559113",
+      "size_bytes": 325795,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch13.txt",
+      "sha256": "cd81c5aa37b885397d319424e19433cd037f112b0704c6eafe1d29eac7bfd662",
+      "size_bytes": 305759,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch14.txt",
+      "sha256": "4e49e5307c733df801393dd79dc598d15ed0caa6678061fefcb3dee5ec2cf23f",
+      "size_bytes": 326286,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch15.txt",
+      "sha256": "07792e4cb7883d65149b4d13c8c66bb7810e4b0bbcd77376b06967fa7123c351",
+      "size_bytes": 305659,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch16.txt",
+      "sha256": "d0bf3c073f29eec3cf3b3a4d421bb98bee8767757cb78b0d1934f8564b1107df",
+      "size_bytes": 305164,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch17.txt",
+      "sha256": "9559cf512b8872b9c2ac0e7ed1463369c5feb7dfb3099fc91c52c25c7500860c",
+      "size_bytes": 325781,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch18.txt",
+      "sha256": "1e87ba54a3b1dafcbba8d857d495d38be5c995d56eaa9a5902a06663c9897a80",
+      "size_bytes": 305680,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch19.txt",
+      "sha256": "223a585c0ce175bfbbe7711766d9adf753651749a01da02affc0be1c0a431e41",
+      "size_bytes": 326131,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch20.txt",
+      "sha256": "8af75a6438a10fdae79b6f3d94f17e65e6f0b37d4eee64e0f42aaf30dcaa9c22",
+      "size_bytes": 305214,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch21.txt",
+      "sha256": "260732b7547cfa3db1afe0221a067c265d7791b2b7eb40cee219ed2dd6aed7da",
+      "size_bytes": 305154,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch22.txt",
+      "sha256": "e6362c6c34a6aa81bffba7db1240da1e5dad43e08dc09a01122ce4c19615f3d0",
+      "size_bytes": 305222,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch23.txt",
+      "sha256": "aa781ff6bb949c49a5106bf5321a3be931d0741d81d401c569ef82f7fc569151",
+      "size_bytes": 300037,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch24.txt",
+      "sha256": "c3c0fe6421ecc2e93c1142bcb3dd8e9d95773d97577f4dcf8a93d9a3c1233af6",
+      "size_bytes": 305264,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch25.txt",
+      "sha256": "6a5af55283d4b720048e6f0a2fb7bd542280280fcbd60a3ef02232dd9a31328b",
+      "size_bytes": 305118,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch26.txt",
+      "sha256": "4e6f67e573be06ab570b5b82b5c16a595ab97640c84e30aa71be3401d7ce7624",
+      "size_bytes": 305051,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch27.txt",
+      "sha256": "57d0be2aab501cac90b42a27542555630cc947766cc8ede4cf09a7cb51125f74",
+      "size_bytes": 323965,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch28.txt",
+      "sha256": "11c1f0b2f362765c4c9270700038c4b6c8e1ecc21af5a9c2f7d4a8b8779a5498",
+      "size_bytes": 304370,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch29.txt",
+      "sha256": "9ca7944e86fd041cdd6b338197df3a8a83ffefbd2df923edae9519a434e1c44d",
+      "size_bytes": 305191,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch30.txt",
+      "sha256": "2a8ec650cf6b854d2676a0e747639f5529299859156b69a6000d9cf27b8450f7",
+      "size_bytes": 305227,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch31.txt",
+      "sha256": "492b9096d3580efdbc3063cde974a6a491dcc7df4d37749e511973a34cea247b",
+      "size_bytes": 323733,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch32.txt",
+      "sha256": "1224bcb9b91c0525c7171b576ce75477ac020121ef4a5b3f00bed267f3f92b80",
+      "size_bytes": 323404,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch33.txt",
+      "sha256": "5d1dd85711939f19823b3d8ed7460cbf9097e9db46f3004ecc06b53b4cc8c205",
+      "size_bytes": 300845,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch34.txt",
+      "sha256": "5d03929b91b449692e15492cca792d495e25474e466d0f9e3ebbd906c53a5efb",
+      "size_bytes": 306755,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch35.txt",
+      "sha256": "172a2bb3f1d67ce1e15b48337cb6d097c5174c93fe59b875433f90a72b70457d",
+      "size_bytes": 306462,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch36.txt",
+      "sha256": "13ee5490960db135abd75c5f24d19af2a59242e4ac7f2f2f9e95be01ab661849",
+      "size_bytes": 324677,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch37.txt",
+      "sha256": "3d0492da9853c2a3a420785d00ae3e9ad45cac7f0e3cdb9216490c52f60550d7",
+      "size_bytes": 305479,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch38.txt",
+      "sha256": "6fffe6a8fefeb0120876db255f34a60a264aac06d4a2f395ff544ec1fa0c4f37",
+      "size_bytes": 305635,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch39.txt",
+      "sha256": "736a55b7a55ce8f7cd990dc3abdb31a4447efc2fa0c4043bfd033a0c5af06b65",
+      "size_bytes": 303717,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch40.txt",
+      "sha256": "1af3687992467ff6ad2367d394d053c8f5484b43292ff6a45965eb307bb19b48",
+      "size_bytes": 324206,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch41.txt",
+      "sha256": "832957b4995a89308532457a9fd574d14bca268c0af495b3f0750007a9a06c2d",
+      "size_bytes": 305548,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch42.txt",
+      "sha256": "08bd66171925803731d84a8ad8761c0d3cb9a73e2d28a67137f351e6868db01d",
+      "size_bytes": 305346,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch43.txt",
+      "sha256": "bec3d48f0054be2b3bfe92227a015163fe5b65b8e90e2eb30a2ef552702ee96b",
+      "size_bytes": 304887,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch44.txt",
+      "sha256": "8ec7d35e3298f06f47cfeacac4980074e1bb0a71e8ba0016db1a414b6bcf0716",
+      "size_bytes": 323749,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch45.txt",
+      "sha256": "d8827cdfa99e641de5cb48cc2aabe6789010c084576a6cf9008adba41c359034",
+      "size_bytes": 304657,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LC/S5_wasp121b_ap3_bg12_Table_Save_ch46.txt",
+      "sha256": "24c7c5858cc6b2be499d06146884a5a6433bff62df3eae4312abcab7eac002f0",
+      "size_bytes": 304736,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-MIRI-LRS/source/eureka_LCs_WASP121b_MIRI_LRS.zip",
+      "sha256": "76645fb4480ce2953bbc97e4418fd664a997eb587ee8910393bf6dd01e67c38a",
+      "size_bytes": 4550878,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRISS-SOSS/prepared/input_audit.json",
+      "sha256": "17c9e8584eba558783bd923d594783228e0e57ed80aea10f6180eec0b1226162",
+      "size_bytes": 1893,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRISS-SOSS/prepared/white_order1.npz",
+      "sha256": "da898e52d6babc6df0dae029fb66fa9d8a9c09ad9f7cc7b7e50092de8de8a8ee",
+      "size_bytes": 98282,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRISS-SOSS/prepared/white_order2.npz",
+      "sha256": "1a5734d7e97397fcb508481a3dbbc215156d8603e8c6cea13ea3945abc59bb3a",
+      "size_bytes": 98662,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/spectroscopic/nrs1_spectroscopic.npz",
+      "sha256": "3c87b857b5a09aa7de0b3815af2354d2a0ab70cbfd455f78aa94f722aa147907",
+      "size_bytes": 9973406,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/spectroscopic/nrs2_spectroscopic.npz",
+      "sha256": "670878d0563429f980a9f7503554fb5b8c8df9202104e28ff09cc6d05de1ef39",
+      "size_bytes": 13825813,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/spectroscopic/spectroscopic_manifest.json",
+      "sha256": "57a2d4354727c417eed6047046ade6a5d840a5595a421a32bcef80f1f5b1c2a8",
+      "size_bytes": 7445,
+      "state": "prepared_spectral_requires_map_validation"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/white_nrs1.npz",
+      "sha256": "5e64dc523de62e97c4635465833fce679ca0a03d943e23f8ed1515c2fa3777bb",
+      "size_bytes": 157290,
+      "state": "production_white_light_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/white_nrs2.npz",
+      "sha256": "70493c36e7bc22cba707a529baab347ddd19d9e332b4247335a8ab9ddcec6e2e",
+      "size_bytes": 156485,
+      "state": "production_white_light_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/README.md",
+      "sha256": "47b2c408b51de62822d71be1f46008d36ab829d45cb0a7e1a8f2fad45ed4a7c6",
+      "size_bytes": 1202,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/download_manifest.json",
+      "sha256": "d4b4f09c9d37669c3021f79fe61370d68651a4bd3c4dafeef93febacdec93f5b",
+      "size_bytes": 875,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/emspec_wav.txt",
+      "sha256": "6c4a467dbb36e470b0cf66b377074ffe20e6161d98586ee7899b49d64a5ce869",
+      "size_bytes": 17578,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/speclc_bjd.txt",
+      "sha256": "b45ba2c0689d8ec79cc481c38e8af5c519f14046da10e77e48e0b37a7228ec19",
+      "size_bytes": 29962049,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/speclc_fits_bjd.txt",
+      "sha256": "c043f8ceaf5b50e74fd8e10308d92c5dcc01dc7c4f2d33d389826949a554fbcc",
+      "size_bytes": 29953847,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/speclc_fits_mod_phasecurve.txt",
+      "sha256": "2c1a991cd0a03a0291f518b7d151eba6e01d3af3f6dc861fa00edb4f6643195e",
+      "size_bytes": 29953853,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/speclc_fits_mod_systematics.txt",
+      "sha256": "953c5f19cea1689ede95dc0be39cfe25e569157f499da1b80a6d78c6bfe4a9f8",
+      "size_bytes": 29953952,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/speclc_uncs.txt",
+      "sha256": "016f2a2edde3b65afbdc99c3ff86b641a7285534ece2c5b05e46e9e95369bf63",
+      "size_bytes": 29961850,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/speclc_vals.txt",
+      "sha256": "bf7ba96cc8f61a9530c9f99d5a526610537cc99c0ef20748c0c16631b4c814e0",
+      "size_bytes": 29961843,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/speclc_xjitt.txt",
+      "sha256": "6144b9888cf0cff98b31dce21dcefdcc983e73938a6a8734c7d19eb6c54bd970",
+      "size_bytes": 30685394,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/spectroscopic/speclc_yjitt.txt",
+      "sha256": "fec1e02b20ceb3139b5776c82401da8a58632a3ceac894cc65d2310d76072c41",
+      "size_bytes": 30365049,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/whitelc_data_nrs1.txt",
+      "sha256": "11225430be442a6ba15d59379af54f945af1324b6d97f97f7142f53bb0efbc1b",
+      "size_bytes": 527372,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/whitelc_data_nrs2.txt",
+      "sha256": "969bdb65ade24789b633f1cbb797e27f161e777a0c11318720580cb9ffe1b4f6",
+      "size_bytes": 530646,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/whitelc_model_nrs1.txt",
+      "sha256": "02c60646f88d08c8c039b2be38b50ae3ec562d96d0c817a6a3290c5de38df3d1",
+      "size_bytes": 257309,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/whitelc_model_nrs2.txt",
+      "sha256": "26bc613a2f7ae53bd68575c2c2ab3b3dbee8b7a2aa266be439bc920d6e2aafb3",
+      "size_bytes": 257459,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/JWST-NIRSpec-G395H/source/whitelc_nrs1.txt",
+      "sha256": "bd7fa5910ffcb2d353bf7db8d10a9761cce236fcdeab07af63dc3ff30b9cdd07",
+      "size_bytes": 527363,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/SMARTS-2MASS-K/source/ReadMe",
+      "sha256": "8218e13d71a953d9eb38cf87a781033c959b4f1b202b66caa9bf3625e5d6d693",
+      "size_bytes": 5324,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/SMARTS-2MASS-K/source/wasp-121.dat",
+      "sha256": "aab512b07fcd952a35aefb0ef2bd144bb02f1be6de51a8f3d1b98fa5947a3e5d",
+      "size_bytes": 85995,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/TESS/prepared/white_light_curve.npz",
+      "sha256": "3f6edb62dcda48f00f0ccd97fd3ed19fab0ccd2fc6804e49654fe75099d41ccf",
+      "size_bytes": 4672,
+      "state": "audit_only_not_production_ready"
+    },
+    {
+      "path": "literature_data/WASP-121b/TESS/source/ReadMe",
+      "sha256": "2a55203a5e54feaab5554a4c89742dc26c7b5a5213b9e0dfeb6d74e5e7d86c4a",
+      "size_bytes": 3725,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-121b/TESS/source/lccurve.dat",
+      "sha256": "edc533d1dbb6c1ea5113f79653671bb736e58d4b19a7f6674d8bb6340f2315fc",
+      "size_bytes": 5285,
+      "state": "source_or_provenance"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_01.npz",
+      "sha256": "f5b3e69e4f2d4c4cfc849a6a2d0acd7d7df7e91be045151c823217fa9a5cdeb8",
+      "size_bytes": 50336,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_02.npz",
+      "sha256": "6a4003b0ba695e5a323e863654d57f3395d0c0d2aca763723a96ccb5c25de339",
+      "size_bytes": 50230,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_03.npz",
+      "sha256": "11f0681a121a09b23d5166411ef83d1053c2ffa2d7b21f52093d122db213deeb",
+      "size_bytes": 50214,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_04.npz",
+      "sha256": "19db60ef196cec412a7294862a30fd1152775057a34a1d5d55a3734663487259",
+      "size_bytes": 50208,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_05.npz",
+      "sha256": "34c7ade40b72f6f7c948715e985656bad326d216d2af88077f8e29dceed2ed19",
+      "size_bytes": 50227,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_06.npz",
+      "sha256": "ac5620de507c2dea98d80a3120789bd665db80a9b4868f683231414e62753c0d",
+      "size_bytes": 50238,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_07.npz",
+      "sha256": "adf2239fb877fc43dfb8d4e6c59f3b696bda2a66ec2d35ea5419922903cbf5e4",
+      "size_bytes": 50241,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_08.npz",
+      "sha256": "52ff1b784712962f36dfcd8ca52320be8d37729711e00ec420b710f22b4a105f",
+      "size_bytes": 50293,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_09.npz",
+      "sha256": "7e6517a5e44b4a9967eb4857da74df7f665f55b0358b3603a19d7d02e02b6276",
+      "size_bytes": 50335,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_10.npz",
+      "sha256": "727e0c23bd2970b19555d9acc0c2b2b33248a11b1956fd8bfe950fb49ada20d7",
+      "size_bytes": 50374,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_11.npz",
+      "sha256": "82fbeebc7c535474eb203932b5e7ef0ff23736e8ecc62b79b21d4113016ccaff",
+      "size_bytes": 50448,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_12.npz",
+      "sha256": "0e92c9e1fbc716ee59252625127066bbdb3b23dedcaa4bd5d67ff966bf8700b8",
+      "size_bytes": 50529,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_13.npz",
+      "sha256": "3b24121a15001276f5a2032388d15ea11720e8058ac2f10b21482061b7120bb8",
+      "size_bytes": 50512,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_14.npz",
+      "sha256": "d7403b2903b8d48df3974025b49caa0348e8f85bdfcf957aeeb62beb6c17cd70",
+      "size_bytes": 50598,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_15.npz",
+      "sha256": "6a31219c6c02d7c70e6e278c67e4359662d3f9fe4b69e9d449961bd89b3dcb68",
+      "size_bytes": 50621,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_16.npz",
+      "sha256": "9a0ee7336e4ef9a39e6ae1056cdc1340656b69185dc7efe953c83a0acbfe1c0a",
+      "size_bytes": 50706,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_17.npz",
+      "sha256": "d849a3ee0f141f7c501fa13f6a46b214f04521ee6501d30b5aa7b6b52cd0beb4",
+      "size_bytes": 50752,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_18.npz",
+      "sha256": "723e0eadb13202867a56877af1f7acff189d10426c60dd3353dd816e639e39ca",
+      "size_bytes": 50813,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_19.npz",
+      "sha256": "3f53610b642812a99d4b41c4ca00d45c53eea28a75e6f7de1a551ecce251f6b9",
+      "size_bytes": 50859,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_20.npz",
+      "sha256": "3f5cdb23462032cfb135409d59106957208452ac2f38785586b5dbb945eed254",
+      "size_bytes": 50892,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_21.npz",
+      "sha256": "8f2cfe48211fd34c5659afa0086a6eeabcd5e9e6cbce6ed55725d004473b42e4",
+      "size_bytes": 50968,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_22.npz",
+      "sha256": "099da347f7aae1289e5df114b7c4f74ef63a678493ecf5ae170a92550a96113c",
+      "size_bytes": 51078,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_23.npz",
+      "sha256": "4eef3929f1ba881ef0084ad4ac46f5928517ccef679cfb992054b9eec32709a7",
+      "size_bytes": 51079,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_24.npz",
+      "sha256": "a04a65a582e608350a8870539311beb83552b22b66e11ce2b36084d5a8641711",
+      "size_bytes": 51198,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/bin_25.npz",
+      "sha256": "9ce40dfd72d82e9ce1fd129ee2320b59f82a96c2989933b989631d258dcec36c",
+      "size_bytes": 51287,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin/manifest.json",
+      "sha256": "c9ae868a4aeeb4e18eff352882a4704fe2c902d994e7a09f3d13eb68f58998e1",
+      "size_bytes": 13995,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_0.89.npz",
+      "sha256": "c4ad4b103fc29429ac47f95c31d1e2076a6384e1de7a30c1d4044e5eb149acff",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_0.97.npz",
+      "sha256": "a78f330255371a35eefd3c908b85d555a7e7afaf4c9e566f2ac4b5c780593642",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.05.npz",
+      "sha256": "79dbda0c668e3bda974a2e771524d7bfebfdcd0da7f0cb298d49d47a1afac8cf",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.13.npz",
+      "sha256": "6ca54f2c01f05123624baca51a1c95e94d0501619b07969bf3d93fa8c30e19c7",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.21.npz",
+      "sha256": "2d78173b2ac5e94d49704c41636c86c0cbc462cb83b3531b6123ca2f8f068033",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.29.npz",
+      "sha256": "3a8f9e7cf2118db248c67c610483f192f52edb522cce39add0ba90c66a80cee8",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.37.npz",
+      "sha256": "cd354ad2e4e189c66f65d9be13f39bf24af053e87205c197dad8c633c531bd85",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.45.npz",
+      "sha256": "3646332a958052f6aa65b4293c1cbb337676d34e1ec09a8194c4c06aca43c7cb",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.53.npz",
+      "sha256": "1e489119c59ebd57a06adf14fc745f4930744f04f7c41140681d46dbb4304200",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.60.npz",
+      "sha256": "b0da2183fd4211e65a5e8c19f04ed1993b39a1a25d3ddf5d6a28e0ddbef6d08c",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.68.npz",
+      "sha256": "daf2dde71128a43b1118029961ad2c8ca99718bb22729d41519a90c8828e00bc",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.76.npz",
+      "sha256": "3880537cde958aea354db5e9fa52058195fef2f17628ecbe79fa0f62e78e13f0",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.84.npz",
+      "sha256": "f17e8f391e89c85831e6ade940405f26aa567b9eea849345045f6a08402a2acb",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_1.92.npz",
+      "sha256": "337df0a09b16966b5bbb4d20d290a4bd84995da8dda18fc38cec0bb8c1832600",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.00.npz",
+      "sha256": "1015b895def87f31e57ed161209b77c3dc212f8c0a36a275bac2b3b3cc3435a2",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.08.npz",
+      "sha256": "558246ea3e32e1dfb72f95009dabe377929a53766c7822f27932c269fea876b4",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.16.npz",
+      "sha256": "28d6bfdc767025a78988e8625efc894eae7e369b63d6b049124851c578aa9c8c",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.24.npz",
+      "sha256": "6a1cd1e41de3cc2fd48813e2ccc7b97040a0221295ed290d8eec9599df02701c",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.31.npz",
+      "sha256": "1c926cc42b74784eab573d2bc3dcdbf8e9442733347d945604a6671212134807",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.39.npz",
+      "sha256": "5e81d612ae372b07a81ca950cbbc2603cd29af491b362480bf3100e3812e2d9c",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.47.npz",
+      "sha256": "7441a0c6599c8e02b430520d7a2cd52db4a098d47dd89a8f896e9fed510a7385",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.55.npz",
+      "sha256": "14c18b2f4e7d1c83b606db75ad9f7e5713195711d71969a3581867b7d9de899b",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.63.npz",
+      "sha256": "5eb2de839361f84da70b040d24f89a69fe39c349d07357b454ed4658978ddc7f",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.71.npz",
+      "sha256": "250dc0dd36e9b879c7f887b926badee3a97e3f6185331d86bbf1b6f734db6c1a",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/Figure1/temp_wave_2.79.npz",
+      "sha256": "89cb1b8002b2586e6e71b67f94a4f156a773ad03350c4e2c2f28f617b207eb8f",
+      "size_bytes": 2592998,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/spec_lambin_25.npz",
+      "sha256": "e28c224a428a2a9a61fcf26e334a205d39f77d1a42a58e9b697853f1674d73de",
+      "size_bytes": 1110984,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/theresa/inputs/niriss-firstorder.txt",
+      "sha256": "176310e0bf75737d01d1faebc8fb85f4b6a9a8b03112fc63b24d67619cfb87c5",
+      "size_bytes": 250050,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/theresa/inputs/phoenix-spectrum.txt",
+      "sha256": "47df3ae25c226fc37a2c8f3cb7515a7674730db5d1183dc706f32fb7a78f0be0",
+      "size_bytes": 97456400,
+      "state": "benchmark_ready"
+    },
+    {
+      "path": "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/theresa/inputs/spec_lambin_25.npz",
+      "sha256": "88ce3c31753541ee2e4a7e5cb78fb6a2f2992cf415fd5b2ed9a71f1e4de0c6c1",
+      "size_bytes": 1110542,
+      "state": "benchmark_ready"
+    }
+  ],
+  "important_limits": [
+    "Only the WASP-121b NIRSpec NRS1, NRS2, and MIRI broadband white curves are current production inputs.",
+    "WASP-121b NIRISS, HST, TESS, and SMARTS products remain audit-only for the reasons in docs/wasp121b_observation_suite.md.",
+    "The prepared spectral products require white-light validation and injection recovery before scientific map fits.",
+    "Large posterior result folders are deliberately excluded."
+  ],
+  "repository": "https://github.com/astrojaket/robert-mapping",
+  "schema_version": 1,
+  "sources": {
+    "WASP-121b HST/WFC3 G141": "https://doi.org/10.1038/s41550-021-01592-w",
+    "WASP-121b JWST/MIRI LRS": "https://zenodo.org/records/20767846",
+    "WASP-121b JWST/NIRSpec G395H": "https://zenodo.org/records/20651891",
+    "WASP-18b JWST/NIRISS SOSS": "https://doi.org/10.5281/zenodo.14751570"
+  },
+  "total_uncompressed_bytes": 466877090
+}

@@ -7,43 +7,63 @@ import json
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from robert_mapping.benchmark.wasp18b import (
     load_wasp18b_25bin,
     run_wasp18b_benchmark,
 )
+from robert_mapping.physics import secondary_eclipse_design_matrix
 
 
-INPUT = (
-    Path(__file__).resolve().parents[1]
-    / "literature_data"
-    / "WASP-18b"
-    / "JWST-NIRISS-SOSS"
-    / "source"
-    / "WASP-18b 3D Mapping Archive"
-    / "theresa"
-    / "inputs"
-    / "spec_lambin_25.npz"
-)
+@pytest.fixture()
+def input_path(tmp_path: Path) -> Path:
+    """Write a small ThERESA-format input with no external data dependency."""
+
+    period = 0.941452382
+    transit_time = 2459802.4078798564
+    time = transit_time + np.linspace(0.05, 0.95, 180) * period
+    wavelength = np.linspace(0.8937745957740919, 2.7875921576025764, 25)
+    uniform_design = secondary_eclipse_design_matrix(
+        time,
+        period,
+        3.48023,
+        84.35320,
+        0.09783,
+        0,
+        transit_time,
+        theta0=np.pi,
+        rotation_period=period,
+        subobserver_lat=np.deg2rad(5.64680),
+        angle_unit="deg",
+    )[:, 0]
+    scale = np.linspace(900.0, 1700.0, wavelength.size)
+    signal_ppm = scale[:, None] * uniform_design[None, :]
+    error_ppm = np.full_like(signal_ppm, 100.0)
+    path = tmp_path / "spec_lambin_25.npz"
+    np.savez(path, arr_0=time, arr_1=wavelength, arr_2=signal_ppm, arr_3=error_ppm)
+    return path
 
 
-def test_load_published_wasp18b_25bin_input() -> None:
-    data = load_wasp18b_25bin(INPUT)
+def test_load_theresa_wasp18b_25bin_input(input_path: Path) -> None:
+    data = load_wasp18b_25bin(input_path)
 
-    assert data.n_observations == 2719
+    assert data.n_observations == 180
     assert data.n_bins == 25
-    assert data.flux.shape == (2719, 25)
-    assert data.flux_err.shape == (2719, 25)
+    assert data.flux.shape == (180, 25)
+    assert data.flux_err.shape == (180, 25)
     assert np.all(np.isfinite(data.flux))
     assert np.all(data.flux_err > 0.0)
     assert data.wavelength_um[0] == np.float64(0.8937745957740919)
     assert data.wavelength_um[-1] == np.float64(2.7875921576025764)
 
 
-def test_wasp18b_benchmark_writes_summary_profiles_and_plot(tmp_path: Path) -> None:
+def test_wasp18b_benchmark_writes_summary_profiles_and_plot(
+    tmp_path: Path, input_path: Path
+) -> None:
     report = run_wasp18b_benchmark(
-        INPUT,
-        tmp_path,
+        input_path,
+        tmp_path / "results",
         bin_indices=(0, 12, 24),
         quadrature_radial=4,
         quadrature_azimuth=16,
@@ -52,7 +72,7 @@ def test_wasp18b_benchmark_writes_summary_profiles_and_plot(tmp_path: Path) -> N
     )
 
     assert report.status == "complete"
-    assert report.n_observations == 2719
+    assert report.n_observations == 180
     assert report.n_bins == 25
     assert len(report.bins) == 3
     assert all(np.isfinite(item.delta_bic_mapped_preference) for item in report.bins)
@@ -84,4 +104,4 @@ def test_wasp18b_benchmark_writes_summary_profiles_and_plot(tmp_path: Path) -> N
         assert {int(row["bin_index"]) for row in profile_rows} == {0, 12, 24}
 
     saved = np.load(report.files["mapped_predictions_npz"], allow_pickle=False)
-    assert saved["mapped_prediction_ppm"].shape == (3, 2719)
+    assert saved["mapped_prediction_ppm"].shape == (3, 180)
