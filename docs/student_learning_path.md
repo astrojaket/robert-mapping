@@ -33,6 +33,16 @@ robert-mapping doctor
 
 The profile files limit JAX, BLAS, and NumPy to three CPU threads.
 
+Install the research data bundle in the root of the clone:
+
+```bash
+tar -xzf /path/to/robert-mapping-student-data-2026-08-31.tar.gz -C .
+python tools/verify_student_data_bundle.py student_data_bundle/manifest.json
+```
+
+The verifier checks every file against its SHA-256 checksum. The bundle has
+source and prepared data, but no posterior results and no simulations.
+
 ## 2. First benchmark: WASP-43b
 
 This target checks the Hammond et al. (2024) method. The required white-light
