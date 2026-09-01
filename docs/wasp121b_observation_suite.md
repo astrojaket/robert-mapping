@@ -27,10 +27,13 @@ draws per chain. Uniform-map controls use 3 chains and 1,500 warm-up plus
 conda run -n eclipse-mapping python tools/report_wasp121b_study.py
 ```
 
-The paper-matched NIRSpec residuals have time correlation. Two additional OU
-noise sensitivity fits therefore test this assumption. Their hot-spot offsets
+The paper-matched NIRSpec residuals have time correlation: nearby residuals
+can have similar errors. Two additional time-correlated-noise sensitivity
+fits therefore test this assumption. The filenames use `ou` for the
+Ornstein–Uhlenbeck form of this model. Their hot-spot offsets
 are +2.94 (-0.59/+0.57) degrees for NRS1 and +3.03 (-0.77/+0.89) degrees for
-NRS2. The OU innovations are close to white. The wider intervals show why the
+NRS2. After the fitted time correlation is removed, the remaining residuals
+are close to independent white noise. The wider intervals show why the
 paper-matched small formal errors must not be used as the only uncertainty
 statement.
 
@@ -102,7 +105,8 @@ instrument has a different nuisance model:
 - NIRSpec: the paper-matched main fit uses a detector-specific linear time
   baseline and independent white jitter. The source keeps detector x/y jitter
   for audit, but the published extraction alignment largely removed those
-  correlations. An OU sensitivity fit checks the residual time correlation.
+  correlations. A time-correlated-noise sensitivity fit checks whether nearby
+  residuals remain similar.
 - NIRISS: order-specific baseline, jitter terms when available, common-mode
   and stellar-variability checks, time-correlated noise, and error scale.
 - MIRI: visit baseline, time-dependent ramp, detector/background/PSF terms when

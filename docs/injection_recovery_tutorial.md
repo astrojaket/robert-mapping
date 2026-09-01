@@ -6,6 +6,8 @@ The first run is small. It uses one CPU. It does not run NUTS.
 
 If YAML is new to you, first read
 [`From the Hammond Python scripts to YAML`](yaml_from_hammond_python.md).
+Use the [`student glossary`](student_glossary.md) for any term that is not
+clear.
 
 ## What is an injection and recovery test?
 
@@ -107,6 +109,10 @@ The default detection rule is:
 ```text
 Delta BIC = BIC(map) - BIC(uniform) < -6
 ```
+
+BIC means Bayesian Information Criterion. It balances fit quality against the
+number of fitted values. Lower is better, so a negative Delta BIC favours the
+map.
 
 Use the same rule for null and injected trials.
 

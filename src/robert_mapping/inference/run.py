@@ -124,7 +124,7 @@ def _noise_diagnostics(
     run: NumpyroRun,
     config: MappingConfig,
 ) -> dict[str, Any]:
-    """Summarize sampled OU hyperparameters and their chain diagnostics."""
+    """Summarize sampled time-correlated-noise values and chain checks."""
 
     noise_model = str(config.model.noise_model).lower()
     if noise_model == "independent":
@@ -181,7 +181,7 @@ def _add_noise_samples(
     payload: dict[str, Any],
     run: NumpyroRun,
 ) -> None:
-    """Add sampled OU parameters to the portable samples archive."""
+    """Add sampled time-correlated-noise values to the samples archive."""
 
     for name in ("ou_amplitude", "ou_timescale", "jitter", "white_jitter"):
         if name in run.samples:
@@ -377,7 +377,8 @@ def _linear_fit(
     if str(config.model.noise_model).lower() not in {"white", "independent"}:
         raise ValueError(
             "The exact map solver does not support correlated noise; use "
-            "inference.sampler: nuts for noise_model: ou."
+            "inference.sampler: nuts for time-correlated noise "
+            "(noise_model: ou)."
         )
     if bundle.systematics_design.shape[1]:
         raise ValueError(

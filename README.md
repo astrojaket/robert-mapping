@@ -149,6 +149,11 @@ If you used the old Hammond Python scripts, read
 It maps each old Python block to its new YAML section and gives a safe first
 editing exercise.
 
+No student must guess an acronym. Use the
+[`student glossary`](docs/student_glossary.md) for short definitions of BIC,
+ESS, JAX, NUTS, posterior, prior, R-hat, systematics, time-correlated noise,
+and other terms.
+
 For the WASP-121b stage, open
 [`notebooks/wasp121b_student_study.ipynb`](notebooks/wasp121b_student_study.ipynb).
 It explains the science goal, data audit, time systems, systematics, white-light
@@ -263,9 +268,14 @@ model:
   student_t_nu: 4
 ```
 
-For raw curves with time-correlated residuals, use the O(n) irregular-cadence
-Ornstein-Uhlenbeck (OU) innovations likelihood. It samples the correlated
-amplitude and white jitter in ppm, and the OU timescale in seconds:
+Some residual errors have memory: nearby measurements tend to have similar
+errors. This is **time-correlated noise**. The YAML value `noise_model: ou`
+selects one form called an Ornstein–Uhlenbeck model. The technical name is not
+needed to run it. The calculation works with uneven measurement times and its
+run time grows in direct proportion to the number of data points.
+
+The amplitude is the strength of the time-correlated error. The timescale is
+how quickly its memory fades. Jitter is remaining independent error:
 
 ```yaml
 model:
@@ -277,14 +287,10 @@ model:
   jitter_prior_scale_ppm: 100.0
 ```
 
-The input time array must be in non-decreasing order when `noise_model: ou`
-is used. The fit engine passes the configured times to the JAX Kalman
-innovations recursion. The OU parameters are saved in `samples.npz` and their
-posterior means, standard deviations, R-hat, and effective sample size are
-written to `fit_summary.json`. The Student-t option uses Student-t innovation
-density with the same Kalman prediction variances, so robust outlier handling
-and correlated noise can be combined without building a dense covariance
-matrix.
+The input time array must go from early to late when `noise_model: ou` is
+used. The time-correlated-noise values are saved in `samples.npz`. Their
+summary values and sampler checks are written to `fit_summary.json`. The
+Student-t option lets this model reduce the effect of isolated outliers.
 
 ### Select a raw-light-curve systematics model
 
@@ -365,12 +371,12 @@ robert-mapping recover examples/recovery_wasp178b.yml
 The HAT-P-32b check makes a 60 ppm synthetic eclipse with a +10 degree
 eastward hotspot. The WASP-178b check uses the real NRS1 white light curve.
 It runs eight null residual shifts and eight shifts for each injection at
--27, 0, and +27 degrees. It uses fixed OU noise values, a quadratic baseline,
-and a 0.75 hour ramp.
+-27, 0, and +27 degrees. It uses fixed time-correlated-noise values, a
+quadratic baseline, and a 0.75 hour ramp.
 
 The WASP-178b source file is not in the student bundle. That target-specific
-command needs `data/WASP-178b_NRS1_white_light.csv` from the audited local
-reduction. It is not part of the beginner learning path.
+command needs `examples/data/WASP-178b_NRS1_white_light.csv` from the audited
+local reduction. It is not part of the beginner learning path.
 
 Generated recovery values are not stored in Git. Each result records its
 seed, resolved YAML file, and current output. Use those saved files when you

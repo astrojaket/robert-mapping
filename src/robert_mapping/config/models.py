@@ -227,9 +227,10 @@ class ModelConfig:
     likelihood: str = "gaussian"
     student_t_nu: float = 4.0
     # ``white`` uses the reported per-point uncertainties independently.
-    # ``ou`` adds a sampled Ornstein-Uhlenbeck residual process.  The OU
-    # settings below are prior scales, expressed in units that are easy to
-    # read in a light-curve configuration.
+    # ``ou`` adds time-correlated residual noise: nearby residual errors can
+    # be similar, and this similarity fades with time. The mathematical name
+    # is an Ornstein-Uhlenbeck process. The settings below are prior scales in
+    # units that are easy to read in a light-curve configuration.
     noise_model: str = "white"
     ou_amplitude_prior_scale_ppm: float = 100.0
     ou_timescale_prior_median_seconds: float = 900.0
@@ -802,7 +803,8 @@ def mapping_config_from_dict(
         raise _error(
             "model",
             "fit_white_jitter cannot be combined with noise_model: ou; "
-            "the OU model already samples white jitter.",
+            "the time-correlated-noise model already samples independent "
+            "white jitter.",
         )
 
     systematics = _section(root, "systematics")

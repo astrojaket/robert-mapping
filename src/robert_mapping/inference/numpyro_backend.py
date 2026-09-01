@@ -59,12 +59,12 @@ def _validated_noise_inputs(
     ou_timescale_prior_sigma_ln: float,
     jitter_prior_scale: float,
 ) -> NDArray[np.float64] | None:
-    """Validate the optional correlated-noise inputs.
+    """Validate the optional time-correlated-noise inputs.
 
-    The OU recursion is causal, so observations must be supplied in
-    increasing time order.  ``time_seconds`` is required only for the OU
-    model.  Prior scales use the same flux units as ``observed`` and seconds
-    for the OU timescale.
+    The calculation is causal, so observations must be supplied in increasing
+    time order. ``time_seconds`` is required only for the ``ou`` model. Prior
+    scales use the same flux units as ``observed`` and seconds for the time
+    over which the correlation fades.
     """
 
     model = str(noise_model).lower()
@@ -90,7 +90,10 @@ def _validated_noise_inputs(
     if not np.all(np.isfinite(times)):
         raise ValueError("time_seconds must contain only finite values")
     if model == "ou" and times.size > 1 and np.any(np.diff(times) < 0.0):
-        raise ValueError("time_seconds must be in non-decreasing order for OU noise")
+        raise ValueError(
+            "time_seconds must go from early to late for time-correlated "
+            "noise (noise_model: ou)"
+        )
     return times
 
 
@@ -108,14 +111,15 @@ def _ou_kalman_log_likelihood(
     jnp: Any,
     dist: Any,
 ) -> Any:
-    """Return an OU marginal log likelihood with an O(n) innovations scan.
+    """Return a time-correlated-noise likelihood with a linear-time scan.
 
     The latent process is stationary at the first observation and follows
     ``x[i] = exp(-dt / timescale) * x[i-1] + eta[i]``.  The process variance
     is ``amplitude**2 * (1 - exp(-2*dt/timescale))``.  The scan therefore
     supports irregular cadence without building an n-by-n covariance matrix.
 
-    For a Gaussian likelihood this is the exact OU marginal likelihood.  For
+    For a Gaussian likelihood this is the exact Ornstein-Uhlenbeck marginal
+    likelihood. For
     ``student_t`` the same Kalman prediction variances are used with Student-t
     innovation densities.  This preserves the robust likelihood option while
     keeping the recursion linear in the number of observations.
@@ -217,9 +221,10 @@ def sample_positive_map(
 ) -> NumpyroRun:
     """Sample positive map pixels for a precomputed light-curve operator.
 
-    Set ``noise_model="ou"`` and pass ``time_seconds`` to sample a
-    stationary OU residual process.  The three prior scales are in flux
-    units, except for the OU timescale, which is in seconds.
+    Set ``noise_model="ou"`` and pass ``time_seconds`` to sample stationary
+    time-correlated residual noise. Nearby errors can be similar, and this
+    similarity fades with time. The three prior scales are in flux units,
+    except for the correlation timescale, which is in seconds.
     """
 
     design, y, error = _validated_inputs(design_matrix, observed, sigma)
@@ -840,8 +845,9 @@ def sample_harmonic_map(
     start at the finite MAP estimate, with optional small latent jitter.
     Deterministic physical ``coefficients``, ``flux``, and
     ``systematics_model`` values are returned in :class:`NumpyroRun` for
-    downstream diagnostics.  Set ``noise_model="ou"`` and pass
-    ``time_seconds`` to sample an irregular-cadence OU residual process.
+    downstream diagnostics. Set ``noise_model="ou"`` and pass
+    ``time_seconds`` to sample time-correlated residual noise with uneven
+    measurement times.
     """
 
     design, y, error = _validated_inputs(design_matrix, observed, sigma)

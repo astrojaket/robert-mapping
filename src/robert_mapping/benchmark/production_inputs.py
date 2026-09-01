@@ -60,7 +60,7 @@ def prepare_wasp178b_fixed_detrending(
         "n_observations": int(corrected.size),
         "interpretation": (
             "Fixed Hammond-style detrending. This is separate from the "
-            "flexible OU/BIC analysis."
+            "flexible time-correlated-noise and BIC analysis."
         ),
     }
     (output / "input_provenance.json").write_text(

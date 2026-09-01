@@ -6,6 +6,9 @@ This guide explains how a Hammond-style Python script becomes a
 Use it with [`examples/hammond_wasp43b.yml`](../examples/hammond_wasp43b.yml).
 That file is the closest one-to-one teaching example.
 
+Use the [`student glossary`](student_glossary.md) when a technical word is not
+clear. This guide defines a term when it first affects a choice.
+
 ## The main change
 
 The old script mixed three tasks in one file:
@@ -284,8 +287,10 @@ This is where the old script selected `light_delay=True`, exposure averaging,
 and uncertainty scaling.
 
 Use `student_t` for isolated outliers. Use `noise_model: ou` only for an
-audited correlated-noise sensitivity test. Do not select a noise model only
-because it gives a preferred map.
+audited time-correlated-noise sensitivity test. `ou` is the code value for an
+Ornstein–Uhlenbeck model: nearby residuals can be similar, and this similarity
+fades with time. Do not select a noise model only because it gives a preferred
+map.
 
 The `model.fit_ramp` key is used by the simplified recovery command. Its
 baseline order is `recovery.baseline_order`; `model.fit_baseline` does not

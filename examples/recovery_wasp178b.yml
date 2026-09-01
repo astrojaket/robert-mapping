@@ -3,7 +3,7 @@ schema_version: 1
 project:
   name: wasp178b-fast-rejection-recovery
   seed: 20260818
-  description: Small comparison with the prior WASP-178b OU/BIC calibration
+  description: Small comparison with the prior time-correlated-noise and BIC calibration
 
 data:
   kind: files

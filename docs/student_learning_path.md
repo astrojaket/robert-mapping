@@ -38,6 +38,9 @@ If you used the old Hammond Python scripts, read
 benchmark. It explains how the old data, `starry`, systematics, and
 `pm.sample(...)` blocks map to the YAML sections.
 
+Use the [`student glossary`](student_glossary.md) when a technical word is not
+clear. The guides must not assume that you know an acronym.
+
 Fetch the Git LFS data bundle, then install it in the root of the clone:
 
 ```bash
@@ -188,8 +191,10 @@ robert-mapping fit examples/study_wasp121b_miri_lrs_degree1.yml
 python tools/report_wasp121b_study.py
 ```
 
-Next, run the uniform controls and the NIRSpec OU-noise sensitivity files.
-Compare map evidence separately from the conditional hot-spot longitude.
+Next, run the uniform controls and the NIRSpec time-correlated-noise
+sensitivity files. Their filenames contain `ou` because that is the code value
+for this noise model. Compare map evidence separately from the conditional
+hot-spot longitude.
 
 Read [`wasp121b_observation_suite.md`](wasp121b_observation_suite.md) before
 you add another instrument. Every visit and instrument must have its own

@@ -101,7 +101,7 @@ def _ou_standardized_innovations(
     timescale: float,
     jitter: float,
 ) -> np.ndarray:
-    """Return the normalized innovations for the saved OU mean parameters."""
+    """Return residuals after the fitted time correlation is removed."""
 
     time_seconds = (np.asarray(time, dtype=float) - float(time[0])) * 86400.0
     dt = np.concatenate((np.diff(time_seconds), np.zeros(1)))
@@ -219,7 +219,7 @@ def _plot_overview(runs: list[dict[str, Any]], output: Path) -> None:
         sensitivity = run.get("ou_sensitivity")
         if sensitivity is not None:
             ou_hot = sensitivity["hotspot_offset_degrees_east"]
-            axis.errorbar(x, ou_hot["median"], yerr=[[ou_hot["median"] - ou_hot["q16"]], [ou_hot["q84"] - ou_hot["median"]]], fmt="s", color="#b19cd9", markeredgecolor=DARK_PURPLE, capsize=3, label="OU sensitivity" if run is runs[0] else None)
+            axis.errorbar(x, ou_hot["median"], yerr=[[ou_hot["median"] - ou_hot["q16"]], [ou_hot["q84"] - ou_hot["median"]]], fmt="s", color="#b19cd9", markeredgecolor=DARK_PURPLE, capsize=3, label="time-correlated noise" if run is runs[0] else None)
     axis.axhline(0.0, color="0.4", linestyle="--", linewidth=0.9)
     axis.set(xlabel="Effective wavelength (micron)", ylabel="Hot-spot offset (degrees east)", title="Longitude offsets")
     axis.legend(frameon=False)
@@ -278,7 +278,7 @@ def _plot_residuals(runs: list[dict[str, Any]], output: Path) -> None:
         lags = np.arange(arrays["acf"].size)
         axis.vlines(lags[1:], 0.0, arrays["acf"][1:], color=PURPLE, linewidth=1.1)
         if "ou_innovation_acf" in arrays:
-            axis.plot(lags[1:], arrays["ou_innovation_acf"][1:], color=DARK_PURPLE, linewidth=1.1, label="OU innovations")
+            axis.plot(lags[1:], arrays["ou_innovation_acf"][1:], color=DARK_PURPLE, linewidth=1.1, label="after time-correlation removal")
         limit = 1.96 / np.sqrt(run["n_observations"])
         axis.axhspan(-limit, limit, color=PURPLE, alpha=0.15)
         axis.axhline(0.0, color="0.3", linewidth=0.8)

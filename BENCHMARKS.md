@@ -37,9 +37,12 @@ latitude structure must also be treated as conditional.
 ## Raw full-phase test
 
 The raw WASP-43b test jointly fits the degree-2 map, a multiplicative ramp,
-an OU process, and extra jitter. It has 6,000 draws, no divergences, maximum
-map R-hat 1.0005, and maximum OU-noise R-hat 1.0006. It recovers the injected
-ramp as 0.000987 versus 0.001000 and the hotspot at +30 deg east.
+time-correlated residual noise, and extra independent noise. Nearby residual
+errors can be similar in the time-correlated model, and this similarity fades
+with time. The YAML value for this model is `noise_model: ou`. The run has
+6,000 draws, no divergences, maximum map R-hat 1.0005, and maximum
+time-correlated-noise R-hat 1.0006. It recovers the injected ramp as 0.000987
+versus 0.001000 and the hotspot at +30 deg east.
 
 ## Recovery matrix
 

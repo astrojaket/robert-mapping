@@ -40,7 +40,8 @@ model:
   null_model: fourier
   mapped_model: spherical_harmonic
   likelihood: gaussian
-  # Optional O(n) correlated-noise model for irregular-cadence raw data.
+  # Optional time-correlated noise for uneven measurement times. `ou` selects
+  # an Ornstein-Uhlenbeck model: nearby residuals can have similar errors.
   noise_model: ou
   ou_amplitude_prior_scale_ppm: 100.0
   ou_timescale_prior_median_seconds: 900.0

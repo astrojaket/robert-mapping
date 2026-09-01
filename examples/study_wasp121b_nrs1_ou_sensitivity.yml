@@ -3,7 +3,7 @@ schema_version: 1
 project:
   name: wasp121b-nirspec-nrs1-ou-sensitivity
   seed: 20260911
-  description: NRS1 full-phase map with an OU residual-noise sensitivity model
+  description: NRS1 full-phase map with a time-correlated-noise sensitivity model
 
 data:
   file: ../literature_data/WASP-121b/JWST-NIRSpec-G395H/prepared/white_nrs1.npz
@@ -39,6 +39,8 @@ model:
   mapped_model: spherical_harmonic
   fourier_degree: 1
   likelihood: gaussian
+  # `ou` selects Ornstein-Uhlenbeck noise: nearby residual errors can be
+  # similar, and that similarity fades with time.
   noise_model: ou
   ou_amplitude_prior_scale_ppm: 200.0
   ou_timescale_prior_median_seconds: 900.0

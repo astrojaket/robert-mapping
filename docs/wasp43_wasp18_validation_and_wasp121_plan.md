@@ -56,7 +56,7 @@ Important limits:
 - The temperature is a plotting conversion for the 5.0-10.5 micron band and
   a 4,300 K blackbody star. It is not an atmospheric retrieval.
 
-### 1.2 Raw systematics and OU recovery check
+### 1.2 Raw systematics and time-correlated-noise recovery check
 
 Files:
 
@@ -65,8 +65,10 @@ Files:
 - [run configuration](../results/validation_wasp43b_raw_ou_v2/run_configuration.json)
 
 This is a frozen full-phase recovery input. It is not the Hammond observed
-light curve. It tests the raw-light-curve path, a multiplicative ramp, and the
-O(n) OU noise likelihood.
+light curve. It tests the raw-light-curve path, a multiplicative ramp, and a
+time-correlated-noise model. The YAML value `noise_model: ou` selects the
+Ornstein–Uhlenbeck form. It lets nearby residual errors be similar, with that
+similarity fading over time.
 
 | Quantity | Result |
 |---|---:|
@@ -80,8 +82,8 @@ O(n) OU noise likelihood.
 | Injected longitude | +30 deg east |
 | Recovered longitude, q16 / median / q84 | +27 / +30 / +30 deg east |
 | Recovered ramp coefficient | 0.000987; injected value was 0.001000 |
-| OU amplitude | 7.19 ppm |
-| OU time-scale | 1,439 s |
+| Time-correlated-noise strength | 7.19 ppm |
+| Time for the correlation to fade | 1,439 s |
 | Additional jitter | 9.23 ppm |
 
 The longitude and ramp recovery pass. Latitude remains prior-dominated: the

@@ -113,7 +113,7 @@ def test_ou_inputs_require_sorted_times_and_positive_priors() -> None:
             noise_model="ou",
             progress_bar=False,
         )
-    with pytest.raises(ValueError, match="non-decreasing"):
+    with pytest.raises(ValueError, match="early to late"):
         backend.sample_harmonic_map(
             np.ones((3, 1)),
             np.ones(3),

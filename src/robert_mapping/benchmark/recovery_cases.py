@@ -518,7 +518,7 @@ egress.
 
 The small run gives the same broad result: no null trial gives a hotspot
 detection, and most injected longitudes are inside their 68% recovery
-intervals. This OU/BIC result is separate from the fixed-timing Hammond
+intervals. This time-correlated-noise and BIC result is separate from the fixed-timing Hammond
 cross-validation result.
 """
     (output / "comparison_report.md").write_text(text, encoding="utf-8")
@@ -727,7 +727,7 @@ def _wasp178b(config) -> RecoveryReport:
         "prior_conditional_longitude_median_degrees": 14.4546,
         "prior_conditional_q16_degrees": -1.4211,
         "prior_conditional_q84_degrees": 33.8806,
-        "interpretation": "The flexible OU/BIC analysis preferred the uniform model.",
+        "interpretation": "The flexible time-correlated-noise and BIC analysis preferred the uniform model.",
         "separate_hammond_cv_delta_elpd": 111.5432,
         "separate_hammond_cv_note": "Fixed timing/detrending Hammond CV is a different model and is not this null calibration.",
     }
@@ -746,7 +746,7 @@ def _wasp178b(config) -> RecoveryReport:
         trials=tuple(trials),
         comparison=comparison,
         notes=(
-            "Small cyclic-residual calibration with fixed OU hyperparameters.",
+            "Small cyclic-residual calibration with fixed time-correlated-noise settings.",
             "Positive uniform and Gaussian map amplitudes are fitted by active sets.",
             "Mapping evidence and conditional longitude are reported separately.",
         ),
