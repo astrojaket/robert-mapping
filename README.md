@@ -1,11 +1,16 @@
 # robert-mapping
 
-`robert-mapping` is a standalone eclipse-mapping package for the Hammond et
-al. (2024) workflow. It uses a readable YAML file and a small command-line
-interface. The name is temporary: the package is intended to fold into the
-local ROBERT framework later.
+`robert-mapping` is an independent eclipse-mapping Python package for the
+Hammond et al. (2024) workflow. It contains the eclipse-mapping physics,
+analysis workflow, configuration system, tests, and reports. It uses standard
+scientific Python tools such as NumPy, JAX, NumPyro, SciPy, and Matplotlib for
+numerical calculations, sampling, and plots.
 
-The package does not import `starry`, PyMC3, Theano, or Docker. A verified
+The package uses a readable YAML file and a small command-line interface. The
+name is temporary: the package is intended to fold into the local ROBERT
+framework later.
+
+The package does not require `starry`, PyMC3, Theano, or Docker. A verified
 student data bundle is stored with Git LFS. Large posterior result directories
 stay outside Git.
 
@@ -354,29 +359,12 @@ cover harmonic degrees 0, 1, 2, and 4, inclined viewing, finite exposure, and
 light-travel delay. The frozen eccentric case stays blocked until the orbit
 engine supports eccentricity.
 
-## Fast recovery and rejection checks
+## Injection and recovery checks
 
 New users should first follow the
 [`injection and recovery tutorial`](docs/injection_recovery_tutorial.md). The
 tutorial includes a small WASP-121b example and a copy-and-edit template for a
 different planet.
-
-Two small checks compare the new physics with the earlier Codex tasks:
-
-```bash
-robert-mapping recover examples/recovery_hatp32.yml
-robert-mapping recover examples/recovery_wasp178b.yml
-```
-
-The HAT-P-32b check makes a 60 ppm synthetic eclipse with a +10 degree
-eastward hotspot. The WASP-178b check uses the real NRS1 white light curve.
-It runs eight null residual shifts and eight shifts for each injection at
--27, 0, and +27 degrees. It uses fixed time-correlated-noise values, a
-quadratic baseline, and a 0.75 hour ramp.
-
-The WASP-178b source file is not in the student bundle. That target-specific
-command needs `examples/data/WASP-178b_NRS1_white_light.csv` from the audited
-local reduction. It is not part of the beginner learning path.
 
 Generated recovery values are not stored in Git. Each result records its
 seed, resolved YAML file, and current output. Use those saved files when you
@@ -391,8 +379,7 @@ different results:
 Do not use a conditional longitude as evidence for a hotspot when the uniform
 model is preferred. Each run writes `recovery_summary.json`,
 `recovery_trials.csv`, `comparison_report.md`, `recovery_summary.png`, and
-`recovery_summary.pdf`. The HAT-P-32b run also saves its synthetic light curve.
-The best-fit marks use `mediumpurple` by default.
+`recovery_summary.pdf`. The best-fit marks use `mediumpurple` by default.
 
 ## Configuration in one minute
 
@@ -500,8 +487,3 @@ Green's recurrences. The orbit is circular. The strict 16-pixel Hammond case
 uses the frozen `starry` Mollweide transform. Other unsupported pixel counts
 use an equal-area Fibonacci fallback. Increase the quadrature resolution and
 the sample count before a final analysis.
-
-For the exact WASP-178b PHOENIX temperature conversion, set
-`ROBERT_MAPPING_WASP178_PHOENIX` and `ROBERT_MAPPING_WASP178_SPECTRUM` to the
-local NPZ and R=100 spectrum files. If they are not set, the report uses a
-portable 9350 K blackbody fallback and records that choice in its JSON output.
