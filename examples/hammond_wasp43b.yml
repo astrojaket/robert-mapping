@@ -3,8 +3,9 @@ schema_version: 1
 # Strict, small-sampling reproduction of Hammond et al. (2024), WASP-43b.
 # This profile uses the 8,424 valid points in the released Eureka white light
 # curve, including the detector-position and PSF-width regressors.
-# orbit at Hammond's reported map-fit medians so that the first corrected run
-# stays fast. See docs/hammond2024_audit.md for the remaining data limitation.
+# The orbit is fixed at Hammond's reported map-fit medians so that the first
+# corrected run stays fast. See docs/hammond2024_audit.md for the remaining
+# data limitation.
 project:
   name: hammond-2024-wasp43b-strict
   seed: 20260824

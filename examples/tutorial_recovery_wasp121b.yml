@@ -1,0 +1,89 @@
+schema_version: 1
+
+# Small teaching example for a new planet. This is a fast sampler-free test.
+# It does not run the production NUTS posterior.
+project:
+  name: wasp121b-teaching-recovery
+  seed: 20260901
+  description: First WASP-121b longitude injection and eclipse-count check
+
+data:
+  kind: synthetic
+  time_unit: day
+  # This is metadata for the present synthetic_matrix command. The command
+  # makes its own seven-hour time grid and does not integrate exposures.
+  exposure_seconds: 38.8
+
+system:
+  period_days: 1.27492504
+  transit_time: 2459867.64262
+  a_over_rstar: 3.79804
+  radius_ratio: 0.122551
+  inclination_degrees: 88.09
+  planet_flux_ratio: 0.002030
+  eccentricity: 0.0
+
+map:
+  representation: harmonics
+  harmonic_degree: 2
+  positive: true
+
+model:
+  null_model: uniform_disk
+  mapped_model: eclipse_map
+  # The recovery baseline is controlled by recovery.baseline_order below.
+  fit_baseline: false
+  fit_ramp: false
+
+inference:
+  # The recovery command uses a profile grid. It does not use these sampler
+  # counts, but explicit small values make that limit visible to the student.
+  chains: 1
+  warmup: 1
+  draws: 1
+
+compute:
+  profile: local
+  jax_platform: cpu
+  max_cpus: 1
+  threads: 1
+
+recovery:
+  enabled: true
+  # Use synthetic_matrix for a new planet. The named hatp32 and wasp178b
+  # cases contain target-specific legacy comparisons.
+  case: synthetic_matrix
+
+  # Positive longitude is east, in the direction of planetary rotation.
+  injected_longitudes_degrees: [-30.0, 0.0, 30.0]
+  injected_latitudes_degrees: [0.0]
+  hotspot_width_degrees: 40.0
+  hotspot_fraction: 0.8
+
+  # Start with a small matrix. Add harder noise levels and more repeats only
+  # after this run works.
+  noise_ppm: 50.0
+  noise_levels_ppm: [50.0]
+  eclipse_counts: [1, 2]
+  points_per_eclipse: 81
+  trials_per_case: 1
+
+  # Recovery grid. The injections above lie exactly on this first grid.
+  longitude_grid_min_degrees: -90.0
+  longitude_grid_max_degrees: 90.0
+  longitude_grid_step_degrees: 15.0
+  latitude_grid_degrees: [0.0]
+  width_grid_degrees: [40.0]
+  timing_grid_seconds: [0.0]
+
+  # Delta BIC is BIC(map) - BIC(uniform). More negative favours the map.
+  detection_delta_bic: -6.0
+  baseline_order: 0
+  correlated_noise: false
+
+output:
+  directory: ../results/tutorial_recovery_wasp121b
+  # Use a new output directory for a later run. Do not replace an old result.
+  overwrite: false
+  save_report: true
+  best_fit_color: mediumpurple

@@ -9,7 +9,7 @@ Use one job at a time. Use no more than three CPU threads.
 Clone the repository and enter it:
 
 ```bash
-git clone git@github.com:astrojaket/robert-mapping.git
+git clone https://github.com/astrojaket/robert-mapping.git
 cd robert-mapping
 ```
 
@@ -33,6 +33,11 @@ robert-mapping doctor
 
 The profile files limit JAX, BLAS, and NumPy to three CPU threads.
 
+If you used the old Hammond Python scripts, read
+[`yaml_from_hammond_python.md`](yaml_from_hammond_python.md) before the first
+benchmark. It explains how the old data, `starry`, systematics, and
+`pm.sample(...)` blocks map to the YAML sections.
+
 Fetch the Git LFS data bundle, then install it in the root of the clone:
 
 ```bash
@@ -44,6 +49,17 @@ python tools/verify_student_data_bundle.py student_data_bundle/manifest.json
 
 The verifier checks every file against its SHA-256 checksum. The bundle has
 source and prepared data, but no posterior results and no simulations.
+
+If Git LFS is unavailable, use the direct public download:
+
+```bash
+mkdir -p dist
+curl -L \
+  -o dist/robert-mapping-student-data-2026-08-31.tar.gz \
+  https://github.com/astrojaket/robert-mapping/raw/refs/heads/main/dist/robert-mapping-student-data-2026-08-31.tar.gz
+tar -xzf dist/robert-mapping-student-data-2026-08-31.tar.gz -C .
+python tools/verify_student_data_bundle.py student_data_bundle/manifest.json
+```
 
 ## 2. First benchmark: WASP-43b
 
@@ -85,30 +101,20 @@ robert-mapping starry-matrix
 Gate 1 is complete when the fit has no divergences, acceptable R-hat and ESS,
 and a longitude that is broadly consistent with Hammond et al. (2024).
 
+Before the WASP-18b stage, complete the beginner
+[injection and recovery tutorial](injection_recovery_tutorial.md). It explains
+how to translate the old Hammond/`starry` recovery steps into a YAML file for
+a different planet.
+
 ## 3. Second benchmark: WASP-18b
 
-Download the public archive from Zenodo record
-[`14751570`](https://zenodo.org/records/14751570). Save the archive as:
+The verified student bundle contains the source files, the 25 prepared bins,
+the published comparison maps, the stellar spectrum, and the NIRISS response.
+No separate download or preparation is needed for the learning benchmark.
 
-```text
-literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b-3D-Mapping-Archive.tar.gz
-```
-
-Extract it:
-
-```bash
-tar -xzf \
-  "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b-3D-Mapping-Archive.tar.gz" \
-  -C "literature_data/WASP-18b/JWST-NIRISS-SOSS/source"
-```
-
-Prepare the 25 wavelength bins:
-
-```bash
-python tools/prepare_wasp18b_validation.py \
-  --source "literature_data/WASP-18b/JWST-NIRISS-SOSS/source/WASP-18b 3D Mapping Archive/eigenspectra/spec_lambin_25.npz" \
-  --output-dir literature_data/WASP-18b/JWST-NIRISS-SOSS/prepared/25bin
-```
+The original full author archive is available from Zenodo record
+[`14751570`](https://zenodo.org/records/14751570). It is not needed unless you
+want to rebuild or audit products that are outside this learning workflow.
 
 Run three representative bins first:
 
@@ -145,10 +151,10 @@ good sampler diagnostics.
 
 ## 4. Main study: WASP-121b
 
-Large source data and result files are not stored in Git. Before this stage,
-the supervisor must give the student the local `literature_data/WASP-121b/`
-data bundle, or the student must download and prepare the public releases.
-Do not copy a `results/` directory as a replacement for source data.
+The Git LFS student bundle installs the available source and prepared files in
+the paths used by the notebook and production YAML files. It does not install
+posterior results. Do not copy a `results/` directory as a replacement for
+source data.
 
 Start with:
 
@@ -202,4 +208,4 @@ model.
 4. Report map evidence separately from a longitude conditional on the map.
 5. Treat latitude as weak unless a recovery test shows that the data identify it.
 6. Keep instrument systematics separate in a combined fit.
-7. Commit code and small metadata. Keep large source data and results outside Git.
+7. Use the approved Git LFS bundle for shared source data. Keep posterior results outside Git.
