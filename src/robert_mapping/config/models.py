@@ -606,7 +606,7 @@ def mapping_config_from_dict(
         period_days=_number(system.get("period_days", SystemConfig.period_days), "system.period_days", minimum=0.0),
         transit_time=_number(system.get("transit_time", SystemConfig.transit_time), "system.transit_time"),
         a_over_rstar=_number(system.get("a_over_rstar", SystemConfig.a_over_rstar), "system.a_over_rstar", minimum=0.0),
-        radius_ratio=_number(system.get("radius_ratio", SystemConfig.radius_ratio), "system.radius_ratio", minimum=0.0, maximum=1.0),
+        radius_ratio=_number(system.get("radius_ratio", SystemConfig.radius_ratio), "system.radius_ratio", maximum=1.0),
         inclination_degrees=_number(system.get("inclination_degrees", SystemConfig.inclination_degrees), "system.inclination_degrees", minimum=0.0, maximum=180.0),
         planet_flux_ratio=_number(system.get("planet_flux_ratio", SystemConfig.planet_flux_ratio), "system.planet_flux_ratio", minimum=0.0),
         limb_darkening_u1=_number(system.get("limb_darkening_u1", SystemConfig.limb_darkening_u1), "system.limb_darkening_u1"),
@@ -628,6 +628,8 @@ def mapping_config_from_dict(
         raise _error("system.period_days", "must be greater than zero.")
     if system_obj.a_over_rstar == 0:
         raise _error("system.a_over_rstar", "must be greater than zero.")
+    if system_obj.radius_ratio <= 0:
+        raise _error("system.radius_ratio", "must be greater than zero.")
     if system_obj.eccentricity != 0.0:
         raise _error(
             "system.eccentricity",
@@ -805,6 +807,16 @@ def mapping_config_from_dict(
             "fit_white_jitter cannot be combined with noise_model: ou; "
             "the time-correlated-noise model already samples independent "
             "white jitter.",
+        )
+    if model_obj.fit_orbit:
+        raise _error(
+            "model.fit_orbit",
+            "fitted orbital parameters are not implemented yet; use false.",
+        )
+    if model_obj.fit_limb_darkening:
+        raise _error(
+            "model.fit_limb_darkening",
+            "fitted limb-darkening parameters are not implemented yet; use false.",
         )
 
     systematics = _section(root, "systematics")

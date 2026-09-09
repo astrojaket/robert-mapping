@@ -111,6 +111,10 @@ a different planet.
 
 ## 3. Second benchmark: WASP-18b
 
+Use this stage before wavelength-dependent mapping. For the first WASP-121b
+white-light study, go to section 4 after the WASP-43b check and the injection
+and recovery tutorial. Return here before starting spectral maps.
+
 The verified student bundle contains the source files, the 25 prepared bins,
 the published comparison maps, the stellar spectrum, and the NIRISS response.
 No separate download or preparation is needed for the learning benchmark.
@@ -188,13 +192,21 @@ Run one fit at a time:
 robert-mapping fit examples/study_wasp121b_nrs1_production.yml
 robert-mapping fit examples/study_wasp121b_nrs2_production.yml
 robert-mapping fit examples/study_wasp121b_miri_lrs_degree1.yml
-python tools/report_wasp121b_study.py
+robert-mapping fit examples/study_wasp121b_nrs1_uniform.yml
+robert-mapping fit examples/study_wasp121b_nrs2_uniform.yml
+robert-mapping fit examples/study_wasp121b_miri_lrs_uniform.yml
+robert-mapping fit examples/study_wasp121b_nrs1_ou_sensitivity.yml
+robert-mapping fit examples/study_wasp121b_nrs2_ou_sensitivity.yml
 ```
 
-Next, run the uniform controls and the NIRSpec time-correlated-noise
-sensitivity files. Their filenames contain `ou` because that is the code value
-for this noise model. Compare map evidence separately from the conditional
-hot-spot longitude.
+Then rebuild the combined report. It reads the three mapped fits, three uniform
+controls, and two NIRSpec time-correlated-noise sensitivity fits above. Their
+filenames contain `ou` because that is the code value for this noise model.
+Compare map evidence separately from the conditional hot-spot longitude.
+
+```bash
+python tools/report_wasp121b_study.py
+```
 
 Read [`wasp121b_observation_suite.md`](wasp121b_observation_suite.md) before
 you add another instrument. Every visit and instrument must have its own

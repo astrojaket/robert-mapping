@@ -27,6 +27,26 @@ def test_nonzero_eccentricity_is_rejected_until_physics_is_implemented() -> None
         mapping_config_from_dict({"system": {"eccentricity": 0.1}})
 
 
+@pytest.mark.parametrize("value", [0.0, -0.1])
+def test_nonpositive_radius_ratio_is_rejected(value: float) -> None:
+    with pytest.raises(ConfigError, match="system.radius_ratio: must be greater than zero"):
+        mapping_config_from_dict({"system": {"radius_ratio": value}})
+
+
+@pytest.mark.parametrize(
+    ("setting", "message"),
+    [
+        ("fit_orbit", "fitted orbital parameters are not implemented"),
+        ("fit_limb_darkening", "fitted limb-darkening parameters are not implemented"),
+    ],
+)
+def test_unsupported_fitted_model_switches_are_rejected(
+    setting: str, message: str
+) -> None:
+    with pytest.raises(ConfigError, match=message):
+        mapping_config_from_dict({"model": {setting: True}})
+
+
 def test_hammond_prior_and_systematics_settings_parse() -> None:
     config = mapping_config_from_dict(
         {

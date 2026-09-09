@@ -33,7 +33,6 @@ RUNS = {
         "published_reanalysis": {"median": 2.95, "lower": 2.83, "upper": 3.06, "citation": "Evans-Soma et al. (2025)"},
         "ou_sensitivity": ROOT / "results" / "wasp121b_nrs1_ou_sensitivity",
         "delta_parameters": 2,
-        "map_is_physical": False,
     },
     "NRS2": {
         "mapped": ROOT / "results" / "wasp121b_nrs2_production",
@@ -45,7 +44,6 @@ RUNS = {
         "published_reanalysis": {"median": 2.39, "lower": 2.26, "upper": 2.51, "citation": "Evans-Soma et al. (2025)"},
         "ou_sensitivity": ROOT / "results" / "wasp121b_nrs2_ou_sensitivity",
         "delta_parameters": 2,
-        "map_is_physical": False,
     },
     "MIRI": {
         "mapped": ROOT / "results" / "wasp121b_miri_lrs_degree1_production",
@@ -55,7 +53,6 @@ RUNS = {
         "bandpass": "5.00-12.00 micron",
         "published": {"median": 4.8, "lower": 2.0, "upper": 7.5, "citation": "MIRI phase-curve paper (2026)"},
         "delta_parameters": 3,
-        "map_is_physical": True,
     },
 }
 
@@ -79,6 +76,68 @@ def _effective_sigma(fit: dict[str, Any], flux_error: np.ndarray) -> np.ndarray:
         return np.sqrt(flux_error**2 + float(jitter) ** 2)
     scale = float(fit.get("error_scale_mean", 1.0))
     return flux_error * scale
+
+
+def _map_physicality(positivity: Any) -> tuple[bool, str | None]:
+    """Derive physical-map status from the production positivity diagnostic.
+
+    A physical map summary requires an available positivity-conditioned summary
+    with at least one accepted draw. Missing, malformed, or incomplete
+    diagnostics are treated as unverified so that a report cannot infer
+    physicality from a historical run label.
+    """
+
+    if not isinstance(positivity, dict):
+        return False, (
+            "The map positivity diagnostic is missing. Use its longitude profile "
+            "as a contrast diagnostic, not as a physical temperature map."
+        )
+
+    status = positivity.get("status")
+    accepted_draws = positivity.get("accepted_draws")
+    total_draws = positivity.get("total_draws")
+    accepted_fraction = positivity.get("accepted_fraction")
+    values = (accepted_draws, total_draws, accepted_fraction)
+    if not all(isinstance(value, (int, float)) and np.isfinite(value) for value in values):
+        return False, (
+            "The map positivity diagnostic is incomplete. Use its longitude "
+            "profile as a contrast diagnostic, not as a physical temperature map."
+        )
+
+    accepted_draws = float(accepted_draws)
+    total_draws = float(total_draws)
+    accepted_fraction = float(accepted_fraction)
+    valid_counts = (
+        accepted_draws > 0.0
+        and total_draws > 0.0
+        and accepted_draws <= total_draws
+        and 0.0 < accepted_fraction <= 1.0
+    )
+    if status == "available" and valid_counts:
+        if accepted_fraction < 1.0:
+            return True, (
+                "The physical-map summary is conditional on "
+                f"{accepted_draws:.0f} of {total_draws:.0f} posterior draws "
+                f"({accepted_fraction:.1%}) passing the full-grid positivity "
+                "diagnostic. The original posterior remains the primary result."
+            )
+        return True, None
+    if status == "no_accepted_draws" or accepted_draws == 0.0 or accepted_fraction == 0.0:
+        return False, (
+            "No globally non-negative posterior draws were accepted by the map "
+            "positivity diagnostic. Use its longitude profile as a contrast "
+            "diagnostic, not as a physical temperature map."
+        )
+    if status == "insufficient_draws":
+        return False, (
+            "The map positivity diagnostic has too few accepted posterior draws "
+            "for a physical map summary. Use its longitude profile as a contrast "
+            "diagnostic, not as a physical temperature map."
+        )
+    return False, (
+        "The map positivity diagnostic did not establish a physical map. Use its "
+        "longitude profile as a contrast diagnostic, not as a physical temperature map."
+    )
 
 
 def _acf(values: np.ndarray, maximum_lag: int = 50) -> np.ndarray:
@@ -142,7 +201,15 @@ def _load_run(name: str, settings: dict[str, Any]) -> dict[str, Any]:
     uniform_ll = _normal_log_likelihood(uniform_residual, _effective_sigma(uniform_fit, flux_error))
     delta_bic = -2.0 * (mapped_ll - uniform_ll) + float(settings["delta_parameters"]) * np.log(time.size)
     hotspot = report["hotspot_longitude_degrees_east"]
-    positivity = report.get("positivity_conditioned", {})
+    positivity = report.get("positivity_conditioned")
+    map_is_physical, map_warning = _map_physicality(positivity)
+    positive_draw_fraction = (
+        positivity.get("accepted_fraction")
+        if isinstance(positivity, dict)
+        else None
+    )
+    if not isinstance(positive_draw_fraction, (int, float)) or not np.isfinite(positive_draw_fraction):
+        positive_draw_fraction = None
     result = {
         "name": name,
         "bandpass": settings["bandpass"],
@@ -159,9 +226,11 @@ def _load_run(name: str, settings: dict[str, Any]) -> dict[str, Any]:
         "maximum_rhat": float(mapped_fit["maximum_rhat"]),
         "minimum_ess": float(mapped_fit["minimum_effective_sample_size"]),
         "posterior_draws": int(mapped_fit["n_samples"]),
-        "positive_draw_fraction": float(positivity.get("accepted_fraction", 0.0)),
-        "map_is_physical": bool(settings["map_is_physical"]),
-        "map_warning": None if settings["map_is_physical"] else "The direct-harmonic map has no globally non-negative posterior draws. Use its longitude profile as a contrast diagnostic, not as a physical temperature map.",
+        "positive_draw_fraction": (
+            float(positive_draw_fraction) if positive_draw_fraction is not None else None
+        ),
+        "map_is_physical": map_is_physical,
+        "map_warning": map_warning,
         "lag1_residual_correlation": float(_acf(mapped_residual, 1)[1]),
         "source_files": {"mapped": str(mapped), "uniform": str(uniform), "data": str(data_path)},
     }
@@ -204,7 +273,6 @@ def _load_run(name: str, settings: dict[str, Any]) -> dict[str, Any]:
 
 def _plot_overview(runs: list[dict[str, Any]], output: Path) -> None:
     figure, axes = plt.subplots(2, 2, figsize=(11.5, 8.0), constrained_layout=True)
-    wavelengths = np.array([run["effective_wavelength_micron"] for run in runs])
 
     axis = axes[0, 0]
     for run in runs:
@@ -246,7 +314,20 @@ def _plot_overview(runs: list[dict[str, Any]], output: Path) -> None:
 
     axis = axes[1, 1]
     axis.axis("off")
-    rows = [[run["name"], f'{run["divergences"]}', f'{run["maximum_rhat"]:.4f}', f'{run["minimum_ess"]:.0f}', f'{run["positive_draw_fraction"]:.3f}'] for run in runs]
+    rows = [
+        [
+            run["name"],
+            f'{run["divergences"]}',
+            f'{run["maximum_rhat"]:.4f}',
+            f'{run["minimum_ess"]:.0f}',
+            (
+                f'{run["positive_draw_fraction"]:.3f}'
+                if run["positive_draw_fraction"] is not None
+                else "unknown"
+            ),
+        ]
+        for run in runs
+    ]
     table = axis.table(cellText=rows, colLabels=["Data", "Div.", "R-hat", "min ESS", "positive"], cellLoc="center", loc="center")
     table.auto_set_font_size(False)
     table.set_fontsize(9)
@@ -310,7 +391,11 @@ def _plot_map_montage(runs: list[dict[str, Any]], output: Path) -> None:
             if row == 0:
                 axis.set_title(title)
             if column == 0:
-                status = "physical positive map" if run["map_is_physical"] else "harmonic contrast diagnostic"
+                status = (
+                    f'positivity: {run["positive_draw_fraction"]:.1%} of draws'
+                    if run["map_is_physical"]
+                    else "contrast diagnostic"
+                )
                 axis.text(-0.04, 0.5, f'{run["name"]}\n{status}', transform=axis.transAxes, rotation=90, ha="right", va="center", fontsize=10)
     figure.suptitle("WASP-121b maps and longitude profiles", fontsize=14)
     figure.savefig(output / "wasp121b_map_montage.png", dpi=180)

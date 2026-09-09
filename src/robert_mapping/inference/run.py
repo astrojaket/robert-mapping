@@ -374,6 +374,11 @@ def _linear_fit(
 ) -> tuple[LinearGaussianPosterior, NDArray[np.float64], dict[str, Any]]:
     """Run the exact Gaussian harmonic fit."""
 
+    if str(config.model.likelihood).lower() != "gaussian":
+        raise ValueError(
+            "The exact map solver only supports a Gaussian likelihood; use "
+            "inference.sampler: nuts for a Student-t likelihood."
+        )
     if str(config.model.noise_model).lower() not in {"white", "independent"}:
         raise ValueError(
             "The exact map solver does not support correlated noise; use "

@@ -1,101 +1,52 @@
 # robert-mapping
 
-`robert-mapping` is an independent eclipse-mapping Python package for the
-Hammond et al. (2024) workflow. It contains the eclipse-mapping physics,
-analysis workflow, configuration system, tests, and reports. It uses standard
-scientific Python tools such as NumPy, JAX, NumPyro, SciPy, and Matplotlib for
-numerical calculations, sampling, and plots.
+`robert-mapping` fits eclipse and phase-curve data with spherical-harmonic
+maps. It contains the map physics, NumPyro inference, data preparation,
+reference checks, and reports. It has no runtime dependency on `starry`,
+PyMC3, Theano, or Docker.
 
-The package uses a readable YAML file and a small command-line interface. The
-name is temporary: the package is intended to fold into the local ROBERT
-framework later.
+The current student task is **WASP-121b white-light analysis**. Start with
+NIRSpec NRS1 and NRS2, then MIRI/LRS. The other instruments and spectral maps
+need further checks. See the [handoff audit](docs/student_handoff_audit.md)
+for the review findings and the next steps.
 
-The package does not require `starry`, PyMC3, Theano, or Docker. A verified
-student data bundle is stored with Git LFS. Large posterior result directories
-stay outside Git.
+## Install and check
 
-## Student quick start
-
-The intended learning order is:
-
-1. Reproduce the WASP-43b Hammond et al. (2024) benchmark.
-2. Check wavelength-dependent WASP-18b maps.
-3. Run the staged WASP-121b multi-instrument study.
-
-Clone the repository:
+Clone the repository and enter it:
 
 ```bash
 git clone https://github.com/astrojaket/robert-mapping.git
 cd robert-mapping
 ```
 
-SSH is optional for contributors who already have a GitHub key:
+Create the environment for your machine:
 
 ```bash
-git clone git@github.com:astrojaket/robert-mapping.git
-cd robert-mapping
-```
-
-Create the `eclipse-mapping` Conda environment for the machine you will use:
-
-```bash
-# Apple Silicon laptop
+# Apple Silicon
 conda env create --file environment-osx-arm64.yml
-
-# Use this file instead on Glamdring and Linux SLURM nodes:
-# conda env create --file environment-linux-64-cpu.yml
-
+# Linux: use environment-linux-64-cpu.yml instead.
 conda activate eclipse-mapping
+source profiles/laptop.env
+# Linux: source profiles/glamdring.env instead.
 ```
 
-The platform files contain the same package set. The separate files prevent
-Conda from installing an Apple Silicon build on Linux or a Linux build on the
-laptop. Both files install Git LFS and the editable `robert-mapping` package.
+Run one analysis at a time. Load the profile before Python starts. See
+[compute profiles](profiles/README.md) for SLURM and environment locking.
+The environment files are dependency specifications, not exact version locks.
 
-Load the matching three-CPU profile:
-
-```bash
-source profiles/laptop.env       # Apple Silicon laptop
-# source profiles/glamdring.env  # Glamdring or Linux SLURM login node
-```
-
-Fetch and verify the student data:
+Fetch, extract, and verify the student data from the repository root:
 
 ```bash
 git lfs install --local
 git lfs pull
 tar -xzf dist/robert-mapping-student-data-2026-08-31.tar.gz -C .
-python tools/verify_student_data_bundle.py \
-  student_data_bundle/manifest.json
+python tools/verify_student_data_bundle.py student_data_bundle/manifest.json
 ```
 
-If Git LFS is unavailable, download the public bundle directly after cloning:
-
-```bash
-mkdir -p dist
-curl -L \
-  -o dist/robert-mapping-student-data-2026-08-31.tar.gz \
-  https://github.com/astrojaket/robert-mapping/raw/refs/heads/main/dist/robert-mapping-student-data-2026-08-31.tar.gz
-tar -xzf dist/robert-mapping-student-data-2026-08-31.tar.gz -C .
-python tools/verify_student_data_bundle.py \
-  student_data_bundle/manifest.json
-```
-
-The downloaded archive must be about 138 MiB. A file that is only a few
-hundred bytes is an LFS pointer; run `git lfs pull` or use the direct command
-above.
-
-Expected verification result:
-
-```text
-Verified 249 files (466877090 bytes).
-```
-
-The compressed bundle is 144,488,387 bytes. Its SHA-256 value is:
-
-```text
-82aa1adcbd77cca62a9f68513f0b49963252c5b25d5fe23f920021f84259d246
-```
+The expected result is `Verified 249 files (466877090 bytes).` The archive
+checksum is stored beside the archive in `dist/`. The bundle has source and
+prepared data; it has no posterior results. WASP-43b reference inputs are
+stored directly in `data/`.
 
 Run the first checks:
 
@@ -103,387 +54,77 @@ Run the first checks:
 robert-mapping doctor
 robert-mapping validate examples/hammond_wasp43b.yml
 robert-mapping fit examples/hammond_wasp43b.yml --dry-run
+robert-mapping starry-matrix
 ```
 
-See [profiles/README.md](profiles/README.md) for the three-CPU profiles and
-the SLURM batch template. Run only one student analysis at a time.
+Follow the [student learning path](docs/student_learning_path.md) for the
+benchmark fits and all WASP-121b runs needed by the combined report.
 
-### What is in the data bundle?
+## Student route
 
-The bundle contains:
+1. Check the WASP-43b reference fit and the frozen `starry` operators.
+2. Complete the [injection and recovery tutorial](docs/injection_recovery_tutorial.md).
+3. Open [the WASP-121b notebook](notebooks/wasp121b_student_study.ipynb).
+   Keep inference disabled on the first pass.
+4. Run the WASP-121b white-light fits, uniform controls, and noise checks.
+5. Review the results with the supervisor.
+6. Use WASP-18b as a method check before starting wavelength-dependent maps.
 
-- the WASP-18b inputs, 25 prepared wavelength bins, published comparison
-  maps, stellar spectrum, and NIRISS response;
-- the available WASP-121b NIRSpec, MIRI, HST, NIRISS, TESS, and SMARTS source
-  or prepared products;
-- a machine-readable manifest with a state and SHA-256 checksum for every
-  file.
+| Guide | Purpose |
+|---|---|
+| [Learning path](docs/student_learning_path.md) | Commands in run order |
+| [Observation suite](docs/wasp121b_observation_suite.md) | Data provenance, time systems, and instrument limits |
+| [Suite manifest](literature_data/wasp121b_suite.yml) | Machine-readable scientific status |
+| [YAML guide](docs/yaml_from_hammond_python.md) | Settings and conversion from old Python scripts |
+| [Glossary](docs/student_glossary.md) | Terms used in the code and reports |
+| [Hammond audit](docs/hammond2024_audit.md) | Reference-fit assumptions and limits |
+| [Benchmarks](BENCHMARKS.md) | Historical local check results |
 
-The strict WASP-43b white-light inputs are small and are stored directly in
-`data/`, not in the bundle. The bundle contains no simulations and no
-posterior result directories.
+## Model limits
 
-Presence does not mean production-ready. At present, the production-ready
-WASP-121b white-light inputs are NIRSpec NRS1, NIRSpec NRS2, and MIRI/LRS
-broadband. NIRISS, HST, TESS, SMARTS, and the spectral products retain the
-audit limits in
-[`docs/wasp121b_observation_suite.md`](docs/wasp121b_observation_suite.md).
+The orbit is circular and its parameters are fixed during inference. The
+forward model includes stellar transit, thermal phase variation, and eclipse.
+It uses numerical disc quadrature. Check that results are stable at higher
+quadrature resolution before scientific use.
 
-## Basic configuration
+Positive map anchors do not guarantee a positive surface between anchors.
+Check the dense-grid positivity result for the posterior. The historical
+NIRSpec direct-harmonic runs are longitude-contrast diagnostics; they do not
+support physical temperature maps. The historical MIRI result has a high
+positive-draw fraction, but weak latitude information. Recheck these results
+for each new fit.
 
-Create and inspect a configuration:
+The reported study BIC is an approximation at posterior-mean noise values.
+Treat it as a screening check. A longitude conditional on a mapped model is
+not evidence that the data require a map. Test recovery and sensitivity to
+noise, systematics, orbit assumptions, and map priors.
+
+## Commands
+
+Use `robert-mapping --help` and each command's `--help` for full options.
 
 ```bash
 robert-mapping init config.yml
 robert-mapping validate config.yml
+robert-mapping fit config.yml --dry-run
+robert-mapping fit config.yml --output-dir results/my-run
+robert-mapping report config.yml
+robert-mapping recover examples/tutorial_recovery_wasp121b.yml --dry-run
+robert-mapping select-systematics examples/select_systematics.yml --dry-run
 ```
 
-## Student learning path
-
-For the full learning order, start with
-[`docs/student_learning_path.md`](docs/student_learning_path.md). It begins
-with WASP-43b and WASP-18b validation before the WASP-121b study.
-
-The beginner injection–recovery guide is
-[`docs/injection_recovery_tutorial.md`](docs/injection_recovery_tutorial.md).
-It shows how to move from the Hammond/`starry` workflow to a small recovery
-matrix for any circular-orbit planet.
-
-If you used the old Hammond Python scripts, read
-[`docs/yaml_from_hammond_python.md`](docs/yaml_from_hammond_python.md) first.
-It maps each old Python block to its new YAML section and gives a safe first
-editing exercise.
-
-No student must guess an acronym. Use the
-[`student glossary`](docs/student_glossary.md) for short definitions of BIC,
-ESS, JAX, NUTS, posterior, prior, R-hat, systematics, time-correlated noise,
-and other terms.
-
-For the WASP-121b stage, open
-[`notebooks/wasp121b_student_study.ipynb`](notebooks/wasp121b_student_study.ipynb).
-It explains the science goal, data audit, time systems, systematics, white-light
-plots, phase coverage, spectral batches, map plots, temperature conversion,
-and validation tests. It uses at most three CPU threads. Inference and recovery
-tests are off by default.
-
-The full observation inventory is in
-[`literature_data/wasp121b_suite.yml`](literature_data/wasp121b_suite.yml).
-The extracted data bundle has a separate
-`student_data_bundle/manifest.json` file. The suite YAML records scientific
-status. The bundle manifest records installed files and checksums.
-Read [`docs/wasp121b_observation_suite.md`](docs/wasp121b_observation_suite.md)
-before you add a new instrument or planet.
-
-Current WASP-121b status:
-
-- NIRSpec NRS1, NIRSpec NRS2, and MIRI/LRS broadband are ready for
-  white-light fits.
-- The NIRSpec direct-harmonic results are longitude-contrast diagnostics.
-  They have no globally non-negative posterior draws, so they are not
-  physical temperature maps.
-- The positive MIRI degree-1 broadband map is usable, but one eclipse gives
-  weak latitude information.
-- NIRISS, HST, TESS, SMARTS, and Spitzer remain blocked or audit-only for the
-  reasons in the observation-suite guide.
-- Wavelength-resolved maps remain deferred until the binning, white-light
-  validation, and injection-recovery checks pass.
-
-The Hammond example uses the NumPy arrays already in this repository:
-
-```bash
-robert-mapping validate examples/hammond_wasp43b.yml
-robert-mapping fit examples/hammond_wasp43b.yml --dry-run
-robert-mapping benchmark hammond examples/hammond_wasp43b.yml --dry-run
-```
-
-`examples/hammond_wasp43b.yml` is the strict small-sampling paper profile. It
-uses the 8,424 valid points from the released full phase curve, correct Kipping limb darkening,
-the 16-pixel LogNormal prior, light delay, exposure integration, a fitted
-error scale, exact detector regressors, and the Hammond systematics product. See
-[`docs/hammond2024_audit.md`](docs/hammond2024_audit.md) for the exact audit
-and the two remaining limits.
-
-The strict committed profile uses two chains, 1,000 warmup steps, and 1,000
-saved draws per chain. It is a broad reproduction and teaching benchmark, not
-a final high-sampling publication run.
-
-Set `inference.sampler` to:
-
-- `nuts` for the positive-map NumPyro fit.
-- `map` for a fast exact Gaussian harmonic fit.
-- `none` for the same deterministic check in automated workflows.
-
-The fit includes the quadratic-limb-darkened stellar transit, the thermal
-phase curve, and the secondary eclipse. It saves coefficients, model flux,
-residuals, covariance or posterior samples, and a JSON summary.
-
-The input time array controls the observing coverage. It can contain a full
-phase curve, one eclipse, or any number of separated transits and eclipses.
-There is no event-count setting or hard event limit.
-
-The default `map.representation: harmonics` samples one positive value at each
-of `(degree + 1)^2` rank-revealing anchors. This removes the exact null
-directions of an overcomplete pixel grid. Use `representation: pixels` only
-for a legacy starry/PyMC3 parameterization comparison. Positive anchors do not
-guarantee that a truncated harmonic surface is positive between anchors, so
-the report records a separate dense-grid positivity diagnostic.
-
-Use `map.representation: direct_harmonics` when raw systematics must be fitted
-jointly and the positive-anchor transform remains too curved. It samples the
-same `(degree + 1)^2` physical coefficients without redundant coordinates.
-The NUTS state uses a local posterior-whitening transform. This removes strong
-map-systematics correlations but keeps the configured physical Normal priors
-unchanged.
-Set `map.positive: false`; dense-grid positivity remains an explicit report
-diagnostic.
-
-For a corrected light curve, keep the default:
-
-```yaml
-systematics:
-  mode: corrected
-```
-
-For raw flux, fit the systematics jointly with the map:
-
-```yaml
-systematics:
-  mode: multiplicative       # or additive
-  fit_offset: false          # recommended for normalized relative flux
-  polynomial_order: 2
-  exponential_ramp: true
-  ramp_timescale_hours: 0.75
-  regressor_columns: [airmass, trace_x]
-  segment_column: visit
-  standardize_regressors: true
-  standardize_time: true     # false keeps days from the midpoint
-  multiplicative_composition: linearized  # product for L*R*Y*S_Y
-  coefficient_prior_sigma: 0.01
-```
-
-Named regressors and the optional segment column must be in a combined CSV,
-TSV, TXT, or NPZ input. Each segment gets its own offset and ramp reset. The
-resolved configuration and fit summary record the nuisance coefficient names.
-
-Raw curves can also use a robust likelihood for isolated outliers:
-
-```yaml
-model:
-  likelihood: student_t
-  student_t_nu: 4
-```
-
-Some residual errors have memory: nearby measurements tend to have similar
-errors. This is **time-correlated noise**. The YAML value `noise_model: ou`
-selects one form called an Ornstein–Uhlenbeck model. The technical name is not
-needed to run it. The calculation works with uneven measurement times and its
-run time grows in direct proportion to the number of data points.
-
-The amplitude is the strength of the time-correlated error. The timescale is
-how quickly its memory fades. Jitter is remaining independent error:
-
-```yaml
-model:
-  likelihood: gaussian       # student_t is also supported
-  noise_model: ou
-  ou_amplitude_prior_scale_ppm: 100.0
-  ou_timescale_prior_median_seconds: 900.0
-  ou_timescale_prior_sigma_ln: 1.0
-  jitter_prior_scale_ppm: 100.0
-```
-
-The input time array must go from early to late when `noise_model: ou` is
-used. The time-correlated-noise values are saved in `samples.npz`. Their
-summary values and sampler checks are written to `fit_summary.json`. The
-Student-t option lets this model reduce the effect of isolated outliers.
-
-### Select a raw-light-curve systematics model
-
-Before a joint map fit, compare a small candidate set with the deterministic
-selector. It uses weighted least squares and one CPU. It does not run NUTS.
-The candidates are supplied in the YAML file, so the comparison is easy to
-audit and repeat:
-
-```bash
-robert-mapping select-systematics examples/select_systematics.yml
-```
-
-Use `metric: bic` to choose the smallest information criterion, or
-`metric: held_out_elpd` to fit the earlier time points and score the final
-time block. The output contains `systematics_selection.json` and a CSV table
-with the candidate designs and scores.
-
-Every candidate includes a global baseline. Set `fit_offset: true` when a
-candidate also needs per-segment offsets. Regressor and segment columns must
-be present in the input CSV or NPZ file. A corrected candidate must not have
-nuisance terms.
-
-This step selects nuisance treatment only. Its report deliberately leaves
-map-detection evidence and conditional hotspot location empty. Select the
-systematics model first, then run the joint map fit and report map evidence
-and hotspot location as separate quantities.
-
-If additive and multiplicative candidates use the same regressors, they can
-tie in this nuisance-only comparison because a constant baseline is used. The
-joint map fit is needed to distinguish their physical coefficient units when
-the astrophysical model varies with time.
-
-## Hammond 2024 quick benchmark
-
-Run the benchmark with:
-
-```bash
-robert-mapping benchmark hammond examples/hammond_wasp43b.yml \
-  --output-dir results/hammond2024-quick
-```
-
-The quick benchmark uses 340 points and fast Gaussian inference. It checks
-the direction of the results in Hammond et al. (2024). It does not try to
-match the published values exactly.
-
-The benchmark checks cross-validation, AIC, BIC, entropy weights, and a
-positive-map injection. It writes the dated results to
-`results/hammond2024-quick/hammond2024_benchmark.json`,
-`hammond2024_injection.npz`, and `hammond2024_benchmark.png`. These generated
-results are not stored in Git. Run the command to make a result for the
-current commit and environment.
-
-Run the frozen one-to-one starry v1.0.0 port check with:
-
-```bash
-robert-mapping starry-matrix
-```
-
-This command does not import starry. Seven circular-orbit cases pass. They
-cover harmonic degrees 0, 1, 2, and 4, inclined viewing, finite exposure, and
-light-travel delay. The frozen eccentric case stays blocked until the orbit
-engine supports eccentricity.
-
-## Injection and recovery checks
-
-New users should first follow the
-[`injection and recovery tutorial`](docs/injection_recovery_tutorial.md). The
-tutorial includes a small WASP-121b example and a copy-and-edit template for a
-different planet.
-
-Generated recovery values are not stored in Git. Each result records its
-seed, resolved YAML file, and current output. Use those saved files when you
-compare a run with a historical local result.
-
-These are profile-grid checks. They do not draw NUTS samples. They report two
-different results:
-
-- `delta_bic` tests whether the mapped model is preferred over a uniform map.
-- The longitude interval is conditional on the mapped model.
-
-Do not use a conditional longitude as evidence for a hotspot when the uniform
-model is preferred. Each run writes `recovery_summary.json`,
-`recovery_trials.csv`, `comparison_report.md`, `recovery_summary.png`, and
-`recovery_summary.pdf`. The best-fit marks use `mediumpurple` by default.
-
-## Configuration in one minute
-
-The common settings are at the top of the YAML file:
-
-```yaml
-schema_version: 1
-
-project:
-  name: my-eclipse-map
-  seed: 42
-
-data:
-  time: data/time.npy
-  flux: data/flux.npy
-  flux_err: data/flux_err.npy
-  time_unit: day
-  exposure_seconds: 10.04
-
-system:
-  period_days: 0.813474
-  transit_time: 55934.292283
-  a_over_rstar: 4.859
-  radius_ratio: 0.15839
-  inclination_degrees: 82.106
-
-map:
-  representation: harmonics
-  harmonic_degree: 2
-  n_pixels: 16
-  pixel_log_sigma: 0.75
-  positive: true
-  regularization: cross_validate
-
-inference:
-  sampler: nuts
-  chains: 2
-  warmup: 150
-  draws: 150
-
-compute:
-  profile: auto
-  jax_platform: cpu
-  max_cpus: 3
-  threads: 3
-
-output:
-  directory: results/my-eclipse-map
-  best_fit_color: mediumpurple
-```
-
-Paths are relative to the YAML file. Validation rejects misspelled settings,
-duplicate YAML keys, invalid ranges, and mixed single-file/separate-array
-inputs. Use `--write-resolved` to save a copy with absolute paths.
-
-## Commands
-
-```text
-robert-mapping init [PATH] [--template hammond|minimal]
-robert-mapping validate CONFIG [--write-resolved]
-robert-mapping fit CONFIG [--dry-run] [--output-dir PATH]
-robert-mapping select-systematics CONFIG [--metric bic|held_out_elpd] [--dry-run]
-robert-mapping benchmark CONFIG [--dry-run]
-robert-mapping benchmark hammond CONFIG [--dry-run]
-robert-mapping benchmark-wasp18b [--data PATH] [--quick] [--no-plots]
-robert-mapping frozen-reference [REFERENCE_DIR] [--output-dir PATH]
-robert-mapping starry-matrix [--reference-dir PATH] [--output-dir PATH]
-robert-mapping recover CONFIG [--dry-run] [--output-dir PATH]
-robert-mapping report CONFIG
-robert-mapping doctor [CONFIG]
-```
-
-Source the correct CPU profile before every command. Configured fits,
-recovery runs, and systematics selection use a hard maximum of three CPUs.
-Keep `inference.chains` at three or fewer when chains run in parallel. The
-profile files set the same limit for BLAS, XLA, and other numerical libraries
-before Python imports them. Reference-only commands do not read a YAML
-`compute` section, so the shell profile is the limit for those commands.
-
-Use `robert-mapping doctor` before a run to report Python, JAX, NumPyro,
-ArviZ, SciPy, detected JAX devices, CPU settings, and any SLURM variables.
-Pass a YAML path when you want it to report that run's settings.
+Paths in YAML files are relative to that file. Give each scientific run a
+new output directory. Many existing examples allow output replacement.
+Save the resolved settings, input checksums, environment versions, and Git
+commit with the results.
 
 ## Development
 
+The maintained package is in `src/robert_mapping/`. Tests are in `tests/`.
+Data preparation and study reports are in `tools/`. Old local target scripts
+and result folders are not the supported student entry point.
+
 ```bash
-python -m pytest
+python -m pytest -q
 python -m robert_mapping --help
 ```
-
-Supported CPU environment files are `environment-osx-arm64.yml` and
-`environment-linux-64-cpu.yml`. `conda-lock.yml` records the platforms and
-dependency contract used to generate platform lock files. The supported
-compute profiles are documented in `profiles/README.md`.
-
-The same `eclipse-mapping` environment is for this laptop, Glamdring, and a
-SLURM CPU job. Run `robert-mapping doctor CONFIG` on each machine before a
-fit. A GPU SLURM job needs a JAX build that matches the cluster CUDA version.
-
-## Current physics limits
-
-The package has no runtime dependency on `starry`, PyMC3, or Theano. It uses
-fixed projected-disc quadrature for occultation. It does not yet use analytic
-Green's recurrences. The orbit is circular. The strict 16-pixel Hammond case
-uses the frozen `starry` Mollweide transform. Other unsupported pixel counts
-use an equal-area Fibonacci fallback. Increase the quadrature resolution and
-the sample count before a final analysis.

@@ -70,8 +70,9 @@ and CPU cap must agree.
 
 ## Reproducible environments
 
-For a repeatable installation, generate platform lock files from the shared
-specification on a machine with `conda-lock`:
+The environment YAML files specify dependency ranges. They are not solved
+lock files. For a repeatable installation, generate a lock file from the
+shared specification on a machine with `conda-lock`:
 
 ```bash
 conda-lock lock --file environment.yml --platform osx-arm64 --platform linux-64
@@ -79,3 +80,6 @@ conda-lock lock --file environment.yml --platform osx-arm64 --platform linux-64
 
 Install the lock file that matches the target platform. Never use an
 `osx-arm64` lock file on Glamdring or a SLURM worker.
+
+Test the solved environment on each target platform before the student
+handoff. Commit the generated lock file after those checks pass.

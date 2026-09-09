@@ -6,6 +6,7 @@ from pathlib import Path
 from dataclasses import replace
 
 import numpy as np
+import pytest
 
 from robert_mapping.config import SystematicsConfig, mapping_config_from_dict
 from robert_mapping.inference import run_fit
@@ -61,6 +62,15 @@ def test_exact_harmonic_fit_writes_machine_readable_outputs(tmp_path: Path) -> N
     summary = result.summary_path.read_text(encoding="utf-8")
     assert '"theta0_radians": 3.141592653589793' in summary
     assert '"sampler": "none"' in summary
+
+
+@pytest.mark.parametrize("sampler", ["map", "none"])
+def test_exact_fit_rejects_student_t_likelihood(tmp_path: Path, sampler: str) -> None:
+    config = _config(tmp_path, sampler=sampler)
+    config = replace(config, model=replace(config.model, likelihood="student_t"))
+
+    with pytest.raises(ValueError, match="only supports a Gaussian likelihood"):
+        run_fit(config)
 
 
 def test_nuts_fit_uses_configured_small_run_and_saves_samples(tmp_path: Path, monkeypatch) -> None:
