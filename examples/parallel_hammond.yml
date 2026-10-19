@@ -1,0 +1,20 @@
+# Fast synthetic benchmark with real held-out eclipse folds.
+# robert-mapping benchmark examples/parallel_hammond.yml --dry-run
+schema_version: 1
+project:
+  name: parallel-hammond-check
+  seed: 42
+system:
+  period_days: 0.813474
+  a_over_rstar: 4.859
+  radius_ratio: 0.15839
+  inclination_degrees: 82.106
+map:
+  regularization: none
+compute:
+  max_cpus: 3
+  workers: 3
+  threads: 1
+output:
+  directory: ../results/parallel_hammond
+  overwrite: true

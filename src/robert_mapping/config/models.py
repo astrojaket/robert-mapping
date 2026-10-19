@@ -232,6 +232,11 @@ class ModelConfig:
     # is an Ornstein-Uhlenbeck process. The settings below are prior scales in
     # units that are easy to read in a light-curve configuration.
     noise_model: str = "white"
+    gp_kernel: str = "matern32"
+    gp_amplitude_prior_scale_ppm: float = 100.0
+    gp_timescale_prior_median_seconds: float = 900.0
+    gp_timescale_prior_sigma_ln: float = 1.0
+    gp_max_points: int = 2000
     ou_amplitude_prior_scale_ppm: float = 100.0
     ou_timescale_prior_median_seconds: float = 900.0
     ou_timescale_prior_sigma_ln: float = 1.0
@@ -351,6 +356,7 @@ class ComputeConfig:
     x64: bool = True
     max_cpus: int = 3
     threads: int = 2
+    workers: int = 1
     jit: bool = True
     quadrature_radial: int = 16
     quadrature_azimuth: int = 64
@@ -396,6 +402,16 @@ class RecoveryConfig:
 
 
 @dataclass(frozen=True)
+class CrossValidationConfig:
+    """Explicit user-data predictive validation, separate from a fit."""
+
+    n_folds: int = 5
+    strategy: str = "eclipse_blocks"
+    null_model: str = "fourier"
+    prior_scale: float = 0.05
+
+
+@dataclass(frozen=True)
 class MappingConfig:
     schema_version: int = 1
     project: ProjectConfig = field(default_factory=ProjectConfig)
@@ -411,6 +427,7 @@ class MappingConfig:
     compute: ComputeConfig = field(default_factory=ComputeConfig)
     output: OutputConfig = field(default_factory=OutputConfig)
     recovery: RecoveryConfig = field(default_factory=RecoveryConfig)
+    cross_validation: CrossValidationConfig = field(default_factory=CrossValidationConfig)
     source_path: Path | None = field(default=None, compare=False, repr=False)
 
     @property
@@ -477,7 +494,7 @@ def default_config() -> MappingConfig:
 
 _TOP_LEVEL = {
     "schema_version", "project", "data", "system", "map", "model", "inference",
-    "systematics", "systematics_selection", "compute", "output", "recovery",
+    "systematics", "systematics_selection", "compute", "output", "recovery", "cross_validation",
 }
 
 
@@ -647,7 +664,7 @@ def mapping_config_from_dict(
         representation=_choice(
             map_section.get("representation", MapConfig.representation),
             "map.representation",
-            {"pixels", "harmonics", "spherical_harmonics", "direct_harmonics"},
+            {"pixels", "harmonics", "spherical_harmonics", "direct_harmonics", "longitude"},
         ),
         harmonic_degree=_integer(map_section.get("harmonic_degree", MapConfig.harmonic_degree), "map.harmonic_degree", minimum=0, maximum=20),
         positive=_bool(map_section.get("positive", MapConfig.positive), "map.positive"),
@@ -697,6 +714,13 @@ def mapping_config_from_dict(
         )
     if map_obj.representation == "spherical_harmonics":
         map_obj = replace(map_obj, representation="harmonics")
+    if map_obj.representation == "longitude":
+        if map_obj.harmonic_degree > 10:
+            raise _error("map.harmonic_degree", "longitude maps support degrees 0 to 10.")
+        if map_obj.positive:
+            raise _error("map.positive", "longitude uses signed Gaussian Fourier coefficients; set positive: false.")
+        if map_obj.entropy_penalty or map_obj.pixel_prior_mean_ppm is not None:
+            raise _error("map", "longitude does not use pixel or entropy priors; remove these settings.")
     if map_obj.active_harmonic_indices:
         maximum_index = (map_obj.harmonic_degree + 1) ** 2 - 1
         if len(set(map_obj.active_harmonic_indices)) != len(
@@ -725,6 +749,8 @@ def mapping_config_from_dict(
     _check_keys(model, {
         "null_model", "mapped_model", "fourier_degree", "likelihood", "student_t_nu",
         "noise_model", "ou_amplitude_prior_scale_ppm",
+        "gp_kernel", "gp_amplitude_prior_scale_ppm", "gp_timescale_prior_median_seconds",
+        "gp_timescale_prior_sigma_ln", "gp_max_points",
         "ou_timescale_prior_median_seconds", "ou_timescale_prior_sigma_ln",
         "jitter_prior_scale_ppm", "fit_baseline",
         "fit_ramp", "include_light_delay", "integrate_exposure", "fit_orbit", "fit_limb_darkening",
@@ -733,10 +759,11 @@ def mapping_config_from_dict(
     noise_model = _choice(
         model.get("noise_model", ModelConfig.noise_model),
         "model.noise_model",
-        {"white", "independent", "ou"},
+        {"white", "independent", "ou", "gp"},
     )
     if noise_model == "independent":
         noise_model = "white"
+    from ..noise import available_kernels
     model_obj = ModelConfig(
         null_model=_choice(model.get("null_model", ModelConfig.null_model), "model.null_model", {"fourier", "uniform_disk"}),
         mapped_model=_choice(model.get("mapped_model", ModelConfig.mapped_model), "model.mapped_model", {"spherical_harmonic", "eclipse_map"}),
@@ -744,6 +771,11 @@ def mapping_config_from_dict(
         likelihood=_choice(model.get("likelihood", ModelConfig.likelihood), "model.likelihood", {"gaussian", "student_t"}),
         student_t_nu=_number(model.get("student_t_nu", ModelConfig.student_t_nu), "model.student_t_nu", minimum=2.0),
         noise_model=noise_model,
+        gp_kernel=_choice(model.get("gp_kernel", ModelConfig.gp_kernel), "model.gp_kernel", set(available_kernels())),
+        gp_amplitude_prior_scale_ppm=_number(model.get("gp_amplitude_prior_scale_ppm", 100.0), "model.gp_amplitude_prior_scale_ppm", minimum=1e-12),
+        gp_timescale_prior_median_seconds=_number(model.get("gp_timescale_prior_median_seconds", 900.0), "model.gp_timescale_prior_median_seconds", minimum=1e-6),
+        gp_timescale_prior_sigma_ln=_number(model.get("gp_timescale_prior_sigma_ln", 1.0), "model.gp_timescale_prior_sigma_ln", minimum=1e-6),
+        gp_max_points=_integer(model.get("gp_max_points", 2000), "model.gp_max_points", minimum=1),
         ou_amplitude_prior_scale_ppm=_number(
             model.get(
                 "ou_amplitude_prior_scale_ppm",
@@ -801,13 +833,15 @@ def mapping_config_from_dict(
             "model",
             "fit_white_jitter and fit_error_scale cannot both be true.",
         )
-    if model_obj.fit_white_jitter and model_obj.noise_model == "ou":
+    if model_obj.fit_white_jitter and model_obj.noise_model in {"ou", "gp"}:
         raise _error(
             "model",
-            "fit_white_jitter cannot be combined with noise_model: ou; "
+            f"fit_white_jitter cannot be combined with noise_model: {model_obj.noise_model}; "
             "the time-correlated-noise model already samples independent "
             "white jitter.",
         )
+    if model_obj.noise_model == "gp" and model_obj.likelihood != "gaussian":
+        raise _error("model.likelihood", "GP kernels currently require a joint Gaussian likelihood.")
     if model_obj.fit_orbit:
         raise _error(
             "model.fit_orbit",
@@ -1128,7 +1162,7 @@ def mapping_config_from_dict(
     }, "inference")
     inference_obj = InferenceConfig(
         sampler=_choice(inference.get("sampler", InferenceConfig.sampler), "inference.sampler", {"nuts", "map", "none"}),
-        chains=_integer(inference.get("chains", InferenceConfig.chains), "inference.chains", minimum=1, maximum=64),
+        chains=_integer(inference.get("chains", InferenceConfig.chains), "inference.chains", minimum=1),
         warmup=_integer(inference.get("warmup", InferenceConfig.warmup), "inference.warmup", minimum=0),
         draws=_integer(inference.get("draws", InferenceConfig.draws), "inference.draws", minimum=1),
         target_accept=_number(inference.get("target_accept", InferenceConfig.target_accept), "inference.target_accept", minimum=0.5, maximum=0.9999),
@@ -1142,15 +1176,16 @@ def mapping_config_from_dict(
 
     compute = _section(root, "compute")
     _check_keys(compute, {
-        "profile", "jax_platform", "x64", "max_cpus", "threads", "jit",
+        "profile", "jax_platform", "x64", "max_cpus", "threads", "workers", "jit",
         "quadrature_radial", "quadrature_azimuth",
     }, "compute")
     compute_obj = ComputeConfig(
         profile=_choice(compute.get("profile", ComputeConfig.profile), "compute.profile", {"auto", "local", "slurm"}),
         jax_platform=_choice(compute.get("jax_platform", ComputeConfig.jax_platform), "compute.jax_platform", {"auto", "cpu", "gpu"}),
         x64=_bool(compute.get("x64", ComputeConfig.x64), "compute.x64"),
-        max_cpus=_integer(compute.get("max_cpus", ComputeConfig.max_cpus), "compute.max_cpus", minimum=1, maximum=3),
-        threads=_integer(compute.get("threads", ComputeConfig.threads), "compute.threads", minimum=1, maximum=3),
+        max_cpus=_integer(compute.get("max_cpus", ComputeConfig.max_cpus), "compute.max_cpus", minimum=1),
+        threads=_integer(compute.get("threads", ComputeConfig.threads), "compute.threads", minimum=1),
+        workers=_integer(compute.get("workers", ComputeConfig.workers), "compute.workers", minimum=1),
         jit=_bool(compute.get("jit", ComputeConfig.jit), "compute.jit"),
         quadrature_radial=_integer(
             compute.get("quadrature_radial", ComputeConfig.quadrature_radial),
@@ -1163,8 +1198,11 @@ def mapping_config_from_dict(
             minimum=8,
         ),
     )
-    if compute_obj.threads > compute_obj.max_cpus:
-        raise _error("compute.threads", "must not be greater than compute.max_cpus.")
+    if compute_obj.workers * compute_obj.threads > compute_obj.max_cpus:
+        raise _error(
+            "compute.workers",
+            "workers * threads must not be greater than compute.max_cpus.",
+        )
 
     output = _section(root, "output")
     _check_keys(
@@ -1328,6 +1366,15 @@ def mapping_config_from_dict(
             "longitude_grid_max_degrees must be larger than longitude_grid_min_degrees.",
         )
 
+    cv = _section(root, "cross_validation")
+    _check_keys(cv, {"n_folds", "strategy", "null_model", "prior_scale"}, "cross_validation")
+    cv_obj = CrossValidationConfig(
+        n_folds=_integer(cv.get("n_folds", 5), "cross_validation.n_folds", minimum=2, maximum=100),
+        strategy=_choice(cv.get("strategy", "eclipse_blocks"), "cross_validation.strategy", {"eclipse_blocks", "contiguous"}),
+        null_model=_choice(cv.get("null_model", "fourier"), "cross_validation.null_model", {"fourier", "uniform"}),
+        prior_scale=_number(cv.get("prior_scale", 0.05), "cross_validation.prior_scale", minimum=1e-12),
+    )
+
     return MappingConfig(
         schema_version=schema_version,
         project=project_obj,
@@ -1341,6 +1388,7 @@ def mapping_config_from_dict(
         compute=compute_obj,
         output=output_obj,
         recovery=recovery_obj,
+        cross_validation=cv_obj,
         source_path=source,
     )
 

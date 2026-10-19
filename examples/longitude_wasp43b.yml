@@ -1,0 +1,41 @@
+# Development fit to the released CV-derived light curve (not the raw joint-systematics fit).
+# robert-mapping fit examples/longitude_wasp43b.yml --dry-run
+schema_version: 1
+project:
+  name: WASP-43b longitude-only
+  seed: 42
+data:
+  file: ../data/hammond2024_wasp43b.npz
+  format: npz
+  exposure_seconds: 10.34
+  normalize: none
+system:
+  period_days: 0.8134740621723353
+  transit_time: 59913.80739501201
+  a_over_rstar: 4.859
+  radius_ratio: 0.15839
+  inclination_degrees: 82.106
+  planet_flux_ratio: 0.005
+  stellar_radius_rsun: 0.665
+  limb_darkening_u1: 0.160539777
+  limb_darkening_u2: -0.02563240137
+map:
+  representation: longitude
+  harmonic_degree: 2  # Maximum longitudinal Fourier order; five map coefficients.
+  positive: false    # Signed Gaussian coefficients; no positivity claim.
+  regularization: none
+model:
+  include_light_delay: true
+inference:
+  sampler: nuts
+  chains: 2
+  warmup: 150
+  draws: 150
+compute:
+  max_cpus: 2
+  workers: 1
+  threads: 1
+  quadrature_radial: 32
+  quadrature_azimuth: 128
+output:
+  directory: ../results/longitude_wasp43b

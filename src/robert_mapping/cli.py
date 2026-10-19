@@ -11,10 +11,11 @@ import os
 from pathlib import Path
 import platform
 import sys
-from typing import Any, Callable
+from typing import Any
 
 from . import __version__
 from .config import ConfigError, MappingConfig, default_config, load_config, write_config, write_json_summary, write_resolved_config
+from .compute import ComputePlan, apply_environment, resolve_plan
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -40,6 +41,14 @@ def _parser() -> argparse.ArgumentParser:
     fit.add_argument("--dry-run", action="store_true", help="validate and print the run plan without sampling")
     fit.add_argument("--output-dir", help="override output.directory for this run")
     fit.add_argument("--seed", type=int, help="override project.seed for this run")
+    _add_compute_overrides(fit)
+
+    cv = subparsers.add_parser("cross-validate", help="score held-out data with independent map and null fits")
+    cv.add_argument("config", help="YAML configuration with a cross_validation section")
+    cv.add_argument("--dry-run", action="store_true", help="check data, folds, model support, and CPU plan")
+    cv.add_argument("--output-dir", help="override output.directory for this run")
+    cv.add_argument("--seed", type=int, help="override project.seed for this run")
+    _add_compute_overrides(cv)
 
     select = subparsers.add_parser(
         "select-systematics",
@@ -53,12 +62,14 @@ def _parser() -> argparse.ArgumentParser:
     )
     select.add_argument("--dry-run", action="store_true", help="validate and print the selection plan")
     select.add_argument("--output-dir", help="override output.directory for this run")
+    _add_compute_overrides(select)
 
     benchmark = subparsers.add_parser("benchmark", help="run the Hammond et al. (2024) benchmark")
     benchmark.add_argument("target", help="config path, or the benchmark name when followed by a config path")
     benchmark.add_argument("config", nargs="?", help="config path when target is 'hammond'")
     benchmark.add_argument("--dry-run", action="store_true", help="validate and print the benchmark plan only")
     benchmark.add_argument("--output-dir", help="override output.directory for this run")
+    _add_compute_overrides(benchmark)
 
     wasp18b = subparsers.add_parser(
         "benchmark-wasp18b",
@@ -126,6 +137,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     recover.add_argument("--output-dir", help="override output.directory for this run")
     recover.add_argument("--seed", type=int, help="override project.seed for this run")
+    _add_compute_overrides(recover)
 
     report = subparsers.add_parser(
         "report", help="make plots and science summaries from a completed sampled fit"
@@ -138,36 +150,102 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _limit_threads(threads: int) -> None:
-    """Set common numerical thread limits before a model imports its backend."""
+def _add_compute_overrides(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--cores",
+        type=int,
+        help="override compute.max_cpus for this command",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        help="override compute.workers for this command",
+    )
+    parser.add_argument(
+        "--threads",
+        type=int,
+        help="override compute.threads for this command",
+    )
 
-    # Never exceed the project-wide three-CPU safety limit.
-    value = str(max(1, min(int(threads), 3)))
-    for name in (
-        "OMP_NUM_THREADS",
-        "OPENBLAS_NUM_THREADS",
-        "MKL_NUM_THREADS",
-        "VECLIB_MAXIMUM_THREADS",
-        "NUMEXPR_NUM_THREADS",
-    ):
-        os.environ[name] = value
-    os.environ.setdefault("XLA_FLAGS", f"--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads={value}")
+
+def _compute_plan(config: MappingConfig) -> ComputePlan:
+    try:
+        return resolve_plan(
+            max_cpus=int(config.compute.max_cpus),
+            threads=int(config.compute.threads),
+            workers=int(config.compute.workers),
+        )
+    except ValueError as exc:
+        raise ConfigError(str(exc)) from exc
 
 
-def _config_summary(config: MappingConfig) -> str:
+def _apply_compute(config: MappingConfig) -> ComputePlan:
+    """Apply compute settings before the command imports its numerical engine."""
+
+    plan = _compute_plan(config)
+    chains = int(config.inference.chains)
+    host_devices = (
+        chains
+        if chains > 1
+        and chains * plan.threads <= plan.max_cpus
+        and config.compute.jax_platform in {"auto", "cpu"}
+        else 1
+    )
+    apply_environment(
+        plan,
+        jax_platform=config.compute.jax_platform,
+        x64=config.compute.x64,
+        jit=config.compute.jit,
+        host_devices=host_devices,
+    )
+    return plan
+
+
+def _configuration_diagnostics(config: MappingConfig, operation: str) -> None:
+    """Validate operation-specific settings and print inactive-setting notes."""
+
+    from .config.diagnostics import configuration_diagnostics, validate_operation
+
+    validate_operation(config, operation)
+    for message in configuration_diagnostics(config, operation=operation):
+        print(f"Warning: {message}")
+    if config.compute.workers > 1 and operation not in {"benchmark", "cross_validation"}:
+        detail = (
+            "use inference.chains for independent NUTS chains"
+            if operation == "fit"
+            else "the worker setting is used by the Hammond benchmark"
+        )
+        label = operation.replace("_", " ")
+        print(f"Warning: compute.workers does not parallelize {label}; {detail}.")
+
+
+def _config_summary(config: MappingConfig, *, operation: str = "fit") -> str:
     data_source = (
         "synthetic data made during recovery"
         if config.data.kind == "synthetic"
         else str(config.data.file or config.data.time)
     )
+    plan = _compute_plan(config)
+    fit_description = (
+        f"nuts, {config.inference.chains} chains, {config.inference.warmup} warmup + {config.inference.draws} draws"
+        if config.inference.sampler == "nuts"
+        else "exact Gaussian linear posterior; no sampling chains"
+    )
+    map_description = f"{config.map.representation}, degree {config.map.harmonic_degree}, positive={config.map.positive}"
+    if operation == "benchmark":
+        data_source = "fixed synthetic Hammond benchmark (data file settings are not used)"
+        fit_description = "exact Gaussian/Laplace benchmark; no NUTS sampling"
+        map_description = f"fixed degree-2/4 harmonic cases; Fourier null order {config.model.fourier_degree}"
     return "\n".join(
         (
             f"Project: {config.project.name}",
             f"Data:   {data_source} (time unit: {config.data.time_unit})",
-            f"Map:    {config.map.representation}, degree {config.map.harmonic_degree}, positive={config.map.positive}",
+            f"Map:    {map_description}",
             f"Noise:  systematics={config.systematics.mode}, likelihood={config.model.likelihood}",
-            f"Fit:    {config.inference.sampler}, {config.inference.chains} chains, {config.inference.warmup} warmup + {config.inference.draws} draws",
-            f"CPU:    {config.compute.profile}/{config.compute.jax_platform}, {config.compute.threads} thread(s), max {config.compute.max_cpus} CPU(s)",
+            f"Fit:    {fit_description}",
+            f"CPU:    {config.compute.profile}/{config.compute.jax_platform}",
+            f"Requested: {config.compute.max_cpus} core(s), {config.compute.threads} thread(s), {config.compute.workers} worker(s)",
+            f"Resolved:  {plan.max_cpus} core(s), {plan.threads} thread(s), {plan.workers} worker(s)",
             f"Output: {config.output.directory}",
         )
     )
@@ -178,14 +256,27 @@ def _resolved_for_args(config: MappingConfig, args: argparse.Namespace) -> Mappi
         config = config.with_output_directory(args.output_dir)
     if getattr(args, "seed", None) is not None:
         config = replace(config, project=replace(config.project, seed=args.seed))
+    compute_values = {}
+    for argument_name, field_name in (
+        ("cores", "max_cpus"),
+        ("workers", "workers"),
+        ("threads", "threads"),
+    ):
+        value = getattr(args, argument_name, None)
+        if value is not None:
+            compute_values[field_name] = value
+    if compute_values:
+        config = replace(
+            config,
+            compute=replace(config.compute, **compute_values),
+        )
+    _compute_plan(config)
     return config
 
 
 def _load_or_error(path: str) -> MappingConfig:
     try:
-        config = load_config(path)
-        _limit_threads(config.compute.threads)
-        return config
+        return load_config(path)
     except ConfigError:
         raise
     except Exception as exc:  # keep CLI failures short and user-facing
@@ -222,6 +313,22 @@ def _call_optional_engine(config: MappingConfig, *, operation: str) -> Any:
 
 
 def _run_fit(config: MappingConfig, *, dry_run: bool) -> int:
+    _configuration_diagnostics(config, "fit")
+    _apply_compute(config)
+    if config.model.noise_model == "gp":
+        from .data import load_light_curve
+        try:
+            curve = load_light_curve(config)
+            if curve.n_observations > config.model.gp_max_points:
+                raise ValueError(
+                    f"Dense GP has {curve.n_observations} points, above model.gp_max_points={config.model.gp_max_points}. "
+                    "Use an explicitly prepared smaller light curve or the scalable OU model."
+                )
+            if any(right < left for left, right in zip(curve.time[:-1], curve.time[1:])):
+                raise ValueError("GP input times must go from early to late.")
+        except (ValueError, OSError) as exc:
+            raise ConfigError(str(exc)) from exc
+        print(f"GP kernel: {config.model.gp_kernel}; dense solver, {curve.n_observations} points")
     print(_config_summary(config))
     if dry_run:
         print("\nDry run: no samples were drawn.")
@@ -261,8 +368,8 @@ def _run_systematics_selection(args: argparse.Namespace) -> int:
                 config.systematics_selection, metric=args.metric
             ),
         )
-    # This command is deliberately sampler-free and uses one numerical thread.
-    _limit_threads(1)
+    _configuration_diagnostics(config, "systematics_selection")
+    _apply_compute(config)
     print(f"Systematics selection\n{_config_summary(config)}")
     print(
         "Method: weighted least squares; no NUTS samples, map evidence, "
@@ -315,7 +422,9 @@ def _run_benchmark(args: argparse.Namespace) -> int:
     if target not in {"hammond", "hammond2024", "hammond-et-al-2024"}:
         raise ConfigError(f"Unknown benchmark {target!r}. Use 'hammond'.")
     config = _resolved_for_args(_load_or_error(path), args)
-    print(f"Benchmark: Hammond et al. (2024)\n{_config_summary(config)}")
+    _configuration_diagnostics(config, "benchmark")
+    _apply_compute(config)
+    print(f"Benchmark: Hammond et al. (2024)\n{_config_summary(config, operation='benchmark')}")
     if args.dry_run:
         print("\nDry run: no benchmark samples were drawn.")
         return 0
@@ -342,6 +451,27 @@ def _run_benchmark(args: argparse.Namespace) -> int:
         print(f"\nBenchmark complete ({status or 'finished'}). Results: {output}")
         if status == "failed":
             return 1
+    return 0
+
+
+def _run_cross_validation(args: argparse.Namespace) -> int:
+    config = _resolved_for_args(_load_or_error(args.config), args)
+    _configuration_diagnostics(config, "cross_validation")
+    _apply_compute(config)
+    from .model_selection.workflow import run_cross_validation, validate_cross_validation
+
+    try:
+        plan = validate_cross_validation(config)
+        print("Cross-validation\n" + _config_summary(config))
+        if plan is not None:
+            print(json.dumps(plan, indent=2))
+        if args.dry_run:
+            print("\nDry run: no fold fits were run.")
+            return 0
+        run_cross_validation(config)
+    except (ValueError, FileNotFoundError) as exc:
+        raise ConfigError(str(exc)) from exc
+    print(f"Cross-validation complete. Results: {config.output.directory}")
     return 0
 
 
@@ -407,7 +537,7 @@ def _run_starry_matrix(args: argparse.Namespace) -> int:
 def _run_wasp18b_benchmark(args: argparse.Namespace) -> int:
     """Run the serial published-data wavelength-map validation."""
 
-    _limit_threads(1)
+    apply_environment(resolve_plan(max_cpus=1, threads=1, workers=1))
     output = Path(args.output_dir).expanduser().resolve()
     selected = (0, 12, 24) if args.quick else None
     try:
@@ -436,8 +566,8 @@ def _run_recovery(args: argparse.Namespace) -> int:
     """Run one small, configured recovery or rejection calibration."""
 
     config = _resolved_for_args(_load_or_error(args.config), args)
-    if not config.recovery.enabled:
-        raise ConfigError("Set recovery.enabled: true before running a recovery test.")
+    _configuration_diagnostics(config, "recover")
+    _apply_compute(config)
     print(f"Recovery case: {config.recovery.case}\n{_config_summary(config)}")
     print("Method: sampler-free GLS profile grid; inference sampling settings are not used.")
     if args.dry_run:
@@ -465,7 +595,8 @@ def _run_doctor(path: str | None) -> int:
     """Print a read-only environment report for local and SLURM runs."""
 
     config = _load_or_error(path) if path else default_config()
-    _limit_threads(config.compute.threads)
+    _configuration_diagnostics(config, "doctor")
+    plan = _apply_compute(config)
     print("robert-mapping doctor")
     print(f"Python: {platform.python_version()} ({platform.machine()})")
     for module_name in ("numpy", "jax", "numpyro", "arviz", "scipy"):
@@ -480,8 +611,8 @@ def _run_doctor(path: str | None) -> int:
                 print(f"JAX devices: {devices}")
         except Exception as exc:
             print(f"{module_name}: unavailable ({exc})")
-    print(f"Configured CPU cap: {config.compute.max_cpus}")
-    print(f"Configured numerical threads: {config.compute.threads} (hard cap: 3)")
+    print(f"Configured CPU budget: {config.compute.max_cpus}")
+    print(f"Resolved CPU plan: {plan.max_cpus} core(s), {plan.threads} thread(s), {plan.workers} worker(s)")
     print(f"JAX platform setting: {config.compute.jax_platform}")
     print("SLURM variables:")
     slurm = sorted((name, value) for name, value in os.environ.items() if name.startswith("SLURM_"))
@@ -515,6 +646,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "validate":
             config = _load_or_error(args.config)
+            _configuration_diagnostics(config, "validate")
             print("Configuration is valid.\n\n" + _config_summary(config))
             if args.write_resolved:
                 destination = write_resolved_config(config)
@@ -525,6 +657,8 @@ def main(argv: list[str] | None = None) -> int:
             return _run_fit(config, dry_run=args.dry_run)
         if args.command == "select-systematics":
             return _run_systematics_selection(args)
+        if args.command == "cross-validate":
+            return _run_cross_validation(args)
         if args.command == "benchmark":
             return _run_benchmark(args)
         if args.command == "frozen-reference":
@@ -537,6 +671,8 @@ def main(argv: list[str] | None = None) -> int:
             return _run_recovery(args)
         if args.command == "report":
             config = _load_or_error(args.config)
+            _configuration_diagnostics(config, "report")
+            _apply_compute(config)
             from .benchmark.production_report import make_production_report
 
             report = make_production_report(config)
@@ -558,6 +694,8 @@ def _template_dict(name: str) -> dict[str, Any]:
     """Return a plain dictionary so ``init`` writes readable YAML."""
 
     base = default_config().to_dict(absolute_paths=False)
+    base["map"].pop("regularization", None)
+    base["model"].pop("null_model", None)
     if name == "minimal":
         base["project"]["name"] = "my-eclipse-map"
         base["data"]["time"] = "data/time.npy"
@@ -573,8 +711,6 @@ def _template_dict(name: str) -> dict[str, Any]:
         base["systematics"]["mode"] = "multiplicative"
         base["systematics"]["exponential_ramp"] = True
         base["systematics"]["ramp_timescale_hours"] = 88.8
-        base["map"]["regularization"] = "cross_validate"
-        base["model"]["null_model"] = "fourier"
         base["output"]["directory"] = "results/hammond-wasp43b"
     return base
 

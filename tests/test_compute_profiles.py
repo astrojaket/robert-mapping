@@ -15,15 +15,17 @@ def test_platform_environment_files_share_the_environment_name() -> None:
         assert "numpyro" in dependency_text
 
 
-def test_compute_profiles_set_three_cpu_threads() -> None:
+def test_compute_profiles_use_one_thread_until_yaml_is_loaded() -> None:
     for name in ("laptop.env", "glamdring.env", "slurm.env"):
         text = (ROOT / "profiles" / name).read_text(encoding="utf-8")
-        assert "OMP_NUM_THREADS=3" in text
-        assert "XLA_FLAGS=\"--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=3\"" in text
+        assert "OMP_NUM_THREADS=1" in text
+        assert "XLA_FLAGS=\"--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1\"" in text
 
     batch = (ROOT / "profiles" / "slurm_fit.sbatch").read_text(encoding="utf-8")
     assert "#SBATCH --ntasks=1" in batch
     assert "#SBATCH --cpus-per-task=3" in batch
+    assert '--cores "${SLURM_CPUS_PER_TASK}"' in batch
+    assert 'srun --ntasks=1 --cpus-per-task=3' not in batch
 
 
 def test_example_configs_do_not_request_more_than_three_cpus() -> None:

@@ -3,8 +3,8 @@
 `robert-mapping` uses one Conda environment name on all supported machines:
 `eclipse-mapping`.
 
-The profiles in this directory keep the numerical backend on the CPU and cap
-the run at three CPUs. Use the profile that matches the machine before
+The profiles in this directory keep the numerical backend on the CPU and use
+one numerical thread until the YAML settings are loaded. Use the profile that matches the machine before
 starting Python. Do not mix the Apple Silicon environment with a Linux
 environment.
 
@@ -39,8 +39,9 @@ if your cluster requires modules. Then submit a job with:
 sbatch profiles/slurm_fit.sbatch examples/production_wasp178b_whitened.yml
 ```
 
-The batch template requests one task and three CPUs. It sets the same
-three-thread CPU environment as the laptop and Glamdring profiles. It does
+The batch template requests one task and three CPUs by default. Change the
+allocation with `sbatch --cpus-per-task=8 profiles/slurm_fit.sbatch CONFIG`.
+The template passes the allocated CPU count to `fit --cores`. It does
 not contain a site-specific partition, account, or module name. Add those
 settings in a local copy if your cluster requires them.
 
@@ -60,13 +61,16 @@ as its defaults:
 compute:
   profile: local       # use slurm in a SLURM-specific copy
   jax_platform: cpu
-  max_cpus: 3
-  threads: 3
+  max_cpus: 3          # total CPU budget
+  workers: 1          # independent target/fold processes where supported
+  threads: 1          # numerical threads per process
 ```
 
-Use no more than three parallel chains in a CPU fit. The current NumPyro
-backend launches parallel chains on separate host devices, so the chain count
-and CPU cap must agree.
+The three-CPU value is a default, not a fixed limit. Keep workers times threads
+within the CPU budget. Sampling chains are separate from the worker count.
+All requested chains run; they run in sequence if the available JAX devices
+or CPU budget cannot support parallel chains. See
+[parallel execution](../docs/parallel_execution.md) for the command-specific controls.
 
 ## Reproducible environments
 

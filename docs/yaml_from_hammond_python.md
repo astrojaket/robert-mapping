@@ -386,15 +386,21 @@ compute:
   jax_platform: cpu
   x64: true
   max_cpus: 3
-  threads: 3
+  workers: 1
+  threads: 1
   quadrature_radial: 32
   quadrature_azimuth: 128
 ```
 
-`max_cpus` and `threads` are the active local limits in the fit. The other
-fields record the requested platform settings. The shell profile sets JAX
-64-bit mode and the platform before Python starts. Source the correct profile
-before the run. Do not use more than three CPUs for this study.
+`max_cpus` is the total CPU budget. `workers` is the number of independent
+processes for supported target or fold jobs. `threads` is the numerical thread
+limit per process. Keep `workers * threads <= max_cpus`. The CLI applies the
+platform, precision, JIT, and managed thread settings before it loads the
+numerical backend. Sampling chains remain a separate scientific setting;
+the code must run every requested chain, in sequence if necessary.
+
+See [parallel execution](parallel_execution.md) for command examples, limits,
+and settings that are retained only for compatibility.
 
 ## Section 9: `output`
 
@@ -536,8 +542,9 @@ before you edit the YAML file.
 
 **The run uses too many CPUs**
 
-Source `profiles/laptop.env` or `profiles/glamdring.env`, and keep
-`max_cpus: 3` and `threads: 3` or less.
+Set `compute.max_cpus` to your CPU budget and keep
+`compute.workers * compute.threads` within that budget. On SLURM, request
+the same budget with `sbatch --cpus-per-task=N`.
 
 **A longitude was recovered, but the map was not detected**
 

@@ -49,9 +49,10 @@ another working directory.
 The numerical package versions match the original Apple Silicon run. The
 complete dependency lock was checked in a separate clean environment. A CPU
 environment on another platform can give small floating-point differences.
-The run wrapper requests CPU execution, 64-bit JAX arithmetic, and three
-threads before it starts the calculation. Existing environment settings take
-precedence; remove conflicting settings if you need the reference setup.
+The run wrapper requests CPU execution and 64-bit JAX arithmetic. For new
+parallel runs, use `study.yml` to set the total CPU budget, target worker
+count, and numerical threads per worker. Explicit run settings take precedence
+over the managed thread values in a sourced shell profile.
 The project-wide Conda environments are an alternative, but are not exact
 locks for this study.
 
@@ -63,6 +64,20 @@ Conda build found agreement within 1.4 × 10⁻¹⁰ for CSV values and
 The code retains the warnings and its finite-value checks.
 
 ## Repeat a simulation
+
+For parallel target runs, edit [`study.yml`](study.yml). Check the plan, then
+start the run:
+
+```bash
+python UNITY_Theory/run.py simulate --config UNITY_Theory/study.yml --dry-run
+python UNITY_Theory/run.py simulate --config UNITY_Theory/study.yml
+```
+
+Use `max_cpus` for the total budget, `workers` for target processes, and
+`threads` for numerical threads in each process. Workers times threads must
+fit the CPU budget. The seed and fit order stay the same when worker count
+changes. See [the execution audit](../docs/parallel_execution.md) for CPU,
+memory, SLURM, and Python API details.
 
 First check the installed numerical code with one target and a small grid:
 

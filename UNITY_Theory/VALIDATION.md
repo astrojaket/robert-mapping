@@ -1,7 +1,7 @@
 # Package validation
 
-Checked on 19 October 2026. The physics source is the unchanged
-`robert_mapping` code from base commit
+The original packaging checks below were completed on 19 October 2026.
+The frozen results used the `robert_mapping` physics from base commit
 `b1b4ef3cebad7b70d12e58ce6eee82ae0c7e27b6`.
 
 ## Checks completed before publication
@@ -61,3 +61,18 @@ checks above.
 `SHA256SUMS.json` covers the distributed study files. It excludes itself,
 local `generated/` outputs, bytecode caches, and restored profile copies.
 The numbered profile archive parts are included in the checksums.
+
+## CPU execution extension
+
+The current code adds target processes and the `study.yml` run controls.
+The original frozen simulations, input data, maps, and profile archives are
+unchanged. The checksum manifest now covers the updated source and run file.
+
+A three-target, five-draw comparison used the normal disk and exposure
+quadrature with a reduced candidate grid. One worker took 19.48 s; three
+workers took 10.04 s. All 30 CSV rows and all saved NPZ arrays were identical.
+The full current repository and study test run passed 297 tests. One check
+was skipped because its external frozen HAT-P-32b fixture was not mounted.
+The new GP and longitude tests include real NUTS runs. See
+[`parallel_validation.json`](../docs/parallel_validation.json) and the
+[execution guide](../docs/parallel_execution.md) for the settings and limits.

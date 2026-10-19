@@ -19,8 +19,8 @@ system:
 map:
   representation: pixels
   harmonic_degree: 2
-  positive: true
-  regularization: cross_validate
+  # Positivity follows the pixels representation. This is not a fit switch.
+  regularization: none  # Compatibility field; does not start cross-validation.
 
 inference:
   sampler: nuts

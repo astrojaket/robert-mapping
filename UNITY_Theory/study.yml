@@ -1,0 +1,13 @@
+# python UNITY_Theory/run.py simulate --config UNITY_Theory/study.yml --dry-run
+# Remove --dry-run to run the simulation and build its summary figures.
+case: ensemble  # ensemble: JWST noise; baseline: 50/100 ppm controls
+trials: 100
+compute:
+  max_cpus: 3   # Total CPU budget. Increase this to use more allocated cores.
+  workers: 3    # Independent target processes; no more than six useful here.
+  threads: 1    # Numerical threads in each process.
+numerics:
+  exposure_subsamples: 8
+  disk_radial: 32
+  disk_azimuth: 128
+  chunk_size: 128

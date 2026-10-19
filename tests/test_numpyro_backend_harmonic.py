@@ -75,6 +75,10 @@ class _FakeNumpyro:
 
 
 class _FakeJax:
+    @staticmethod
+    def local_device_count():
+        return 3
+
     class random:
         @staticmethod
         def key(seed):
@@ -280,7 +284,7 @@ def test_whitener_change_of_variables_preserves_normal_prior_density() -> None:
     [
         ({"coefficient_prior_sigma": [1.0]}, "one value per design column"),
         ({"coefficient_prior_sigma": [1.0, 0.0]}, "strictly positive"),
-        ({"chains": 7}, "chains"),
+        ({"chains": 0}, "positive"),
         ({"systematics_mode": "bad"}, "systematics_mode"),
     ],
 )

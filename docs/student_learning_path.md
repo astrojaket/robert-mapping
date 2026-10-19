@@ -2,7 +2,9 @@
 
 This guide gives a safe order for learning `robert-mapping`.
 
-Use one job at a time. Use no more than three CPU threads.
+Set a CPU budget for each job. Keep worker count times numerical threads
+within that budget. See [parallel execution](parallel_execution.md) for the
+YAML controls and the supported parallel workflows.
 
 ## 1. Install the code
 
@@ -31,7 +33,8 @@ source profiles/glamdring.env
 robert-mapping doctor
 ```
 
-The profile files limit JAX, BLAS, and NumPy to three CPU threads.
+The profile files start numerical libraries with one thread. The YAML file
+or CLI overrides set the CPU budget before the numerical engine loads.
 
 If you used the old Hammond Python scripts, read
 [`yaml_from_hammond_python.md`](yaml_from_hammond_python.md) before the first

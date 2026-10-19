@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-19",
+  "platform": "Apple Silicon, 14 logical CPUs available",
+  "python": "Python 3.12; UNITY_Theory/requirements-lock.txt",
+  "workload": "First three UNITY expected-noise targets; five trials; temperature_scaled scenario; longitude grid 3 degrees, width 40 degrees, latitude 0 degrees, timing 0 seconds; exposure subsamples 8, disk 32 by 128, chunk 128",
+  "serial": {
+    "workers": 1,
+    "threads": 1,
+    "elapsed_seconds": 19.48
+  },
+  "parallel": {
+    "workers": 3,
+    "threads": 1,
+    "elapsed_seconds": 10.04,
+    "observed_worker_processes": 3
+  },
+  "speedup": 1.9402390438247012,
+  "comparison": {
+    "fit_rows": 30,
+    "csv_rows_bit_identical": true,
+    "all_npz_arrays_bit_identical": true
+  },
+  "limits": [
+    "One timing instance, including process startup; no general speedup guarantee",
+    "Peak pool memory was not measured; macOS resource access denied the time -l memory check",
+    "Small-grid timing is not a measurement of the full published candidate bank"
+  ],
+  "input_source": "UNITY_Theory/data/inputs/unity_expected_noise.json",
+  "target_indices": [
+    0,
+    1,
+    2
+  ],
+  "analysis_overrides": {
+    "longitude_grid_step_degrees": 3.0,
+    "width_grid_degrees": [
+      40.0
+    ],
+    "latitude_grid_degrees": [
+      0.0
+    ],
+    "timing_grid_seconds": [
+      0.0
+    ]
+  },
+  "simulation_options": {
+    "trials": 5,
+    "exposure_subsamples": 8,
+    "disk_radial": 32,
+    "disk_azimuth": 128,
+    "chunk_size": 128
+  },
+  "runtime_chains": {
+    "plan": {
+      "max_cpus": 4,
+      "threads": 1,
+      "workers": 1,
+      "requested_max_cpus": 4,
+      "requested_threads": 1,
+      "requested_workers": 1,
+      "available_cpus": 14
+    },
+    "jax_devices": 4,
+    "requested_chains": 4,
+    "actual_chain_method": "parallel",
+    "grouped_coefficient_shape": [
+      4,
+      8,
+      2
+    ],
+    "one_cpu_sequential": {
+      "plan": {
+        "max_cpus": 1,
+        "threads": 1,
+        "workers": 1,
+        "requested_max_cpus": 1,
+        "requested_threads": 1,
+        "requested_workers": 1,
+        "available_cpus": 14
+      },
+      "jax_devices": 1,
+      "requested_chains": 4,
+      "actual_chain_method": "sequential",
+      "grouped_coefficient_shape": [
+        4,
+        8,
+        2
+      ]
+    },
+    "precision_and_jit": {
+      "jax_enable_x64": false,
+      "jax_disable_jit": true,
+      "jax_platforms": "cpu",
+      "default_backend": "cpu"
+    }
+  },
+  "final_checks": {
+    "tests_passed": 297,
+    "tests_skipped": 1,
+    "skip_reason": "External frozen HAT-P-32b fixture not mounted",
+    "ruff": "Passed on changed source and new tests",
+    "frozen_unity_results_and_inputs": "Unchanged; study SHA-256 verification passed"
+  },
+  "gp_demo": {
+    "observations": 121,
+    "kernel": "matern32",
+    "chains": 2,
+    "warmup": 100,
+    "draws_per_chain": 100,
+    "divergences": 0,
+    "all_samples_finite": true,
+    "injected_longitude_degrees": 30,
+    "retrieved_longitude_median": 46.50455522570515,
+    "retrieved_longitude_1sigma": [
+      9.43653857531865,
+      64.81354191289091
+    ],
+    "scope": "One seeded development run; not an ensemble coverage or convergence claim"
+  }
+}

@@ -4,10 +4,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import partial
+import os
 from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+
+from ..compute import ComputePlan, apply_environment, resolve_plan
+from ..noise import available_kernels, gp_log_likelihood
 
 
 @dataclass(frozen=True)
@@ -18,6 +22,7 @@ class NumpyroRun:
     extra_fields: dict[str, NDArray[np.float64]]
     sampler: Any
     grouped_samples: dict[str, NDArray[np.float64]] | None = None
+    chain_method: str | None = None
 
 
 def _imports():
@@ -32,8 +37,63 @@ def _imports():
             "NumPyro inference is not installed. Activate the eclipse-mapping "
             "Conda environment and install the locked dependencies."
         ) from exc
-    jax.config.update("jax_enable_x64", True)
+    x64 = os.environ.get("ROBERT_MAPPING_JAX_X64", "true").lower() == "true"
+    jit = os.environ.get("ROBERT_MAPPING_JAX_JIT", "true").lower() == "true"
+    try:
+        jax.config.update("jax_enable_x64", x64)
+        jax.config.update("jax_disable_jit", not jit)
+        platform = os.environ.get("JAX_PLATFORMS")
+        if platform:
+            jax.config.update("jax_platforms", platform)
+    except RuntimeError as exc:
+        raise RuntimeError(
+            "JAX settings could not be changed after its runtime started. "
+            "Call robert_mapping.compute.apply_environment before importing or "
+            "using JAX, or start a new Python process."
+        ) from exc
     return jax, jnp, numpyro, dist, MCMC, NUTS
+
+
+def _prepare_runtime(
+    chains: int,
+    *,
+    compute_plan: ComputePlan | None,
+    jax_platform: str,
+    x64: bool,
+    jit: bool,
+    host_devices: int | None,
+) -> ComputePlan:
+    """Apply compute settings before any sampling backend initializes."""
+
+    plan = compute_plan or resolve_plan(max_cpus=3, threads=1, workers=1)
+    if host_devices is None:
+        host_devices = (
+            chains
+            if jax_platform in {"auto", "cpu"}
+            and chains > 1
+            and chains * plan.threads <= plan.max_cpus
+            else 1
+        )
+    apply_environment(
+        plan,
+        jax_platform=jax_platform,
+        x64=x64,
+        jit=jit,
+        host_devices=host_devices,
+    )
+    return plan
+
+
+def _chain_method(jax: Any, chains: int, plan: ComputePlan) -> str:
+    """Use parallel chains only when devices and the CPU budget allow it."""
+
+    if chains <= 1 or chains * plan.threads > plan.max_cpus:
+        return "sequential"
+    try:
+        device_count = int(jax.local_device_count())
+    except Exception:
+        device_count = 0
+    return "parallel" if device_count >= chains else "sequential"
 
 
 def _validated_inputs(design_matrix: ArrayLike, observed: ArrayLike, sigma: ArrayLike):
@@ -68,8 +128,8 @@ def _validated_noise_inputs(
     """
 
     model = str(noise_model).lower()
-    if model not in {"white", "independent", "ou"}:
-        raise ValueError("noise_model must be white, independent, or ou")
+    if model not in {"white", "independent", "ou", "gp"}:
+        raise ValueError("noise_model must be white, independent, ou, or gp")
     if not np.isfinite(ou_amplitude_prior_scale) or ou_amplitude_prior_scale <= 0.0:
         raise ValueError("ou_amplitude_prior_scale must be positive")
     if not np.isfinite(ou_timescale_prior_median) or ou_timescale_prior_median <= 0.0:
@@ -79,8 +139,10 @@ def _validated_noise_inputs(
     if not np.isfinite(jitter_prior_scale) or jitter_prior_scale <= 0.0:
         raise ValueError("jitter_prior_scale must be positive")
     if time_seconds is None:
-        if model == "ou":
-            raise ValueError("time_seconds is required when noise_model is ou")
+        if model in {"ou", "gp"}:
+            raise ValueError(
+                f"time_seconds is required when noise_model is {model}"
+            )
         return None
     times = np.asarray(time_seconds, dtype=float)
     if times.ndim != 1 or times.size != n_observations:
@@ -95,6 +157,74 @@ def _validated_noise_inputs(
             "noise (noise_model: ou)"
         )
     return times
+
+
+def _validate_gp_inputs(
+    *,
+    noise_model: str,
+    likelihood: str,
+    fit_white_jitter: bool,
+    gp_kernel: str,
+    gp_amplitude_prior_scale: float,
+    gp_timescale_prior_median: float,
+    gp_timescale_prior_sigma_ln: float,
+    gp_max_points: int,
+    n_observations: int,
+) -> str:
+    """Validate GP controls before any covariance matrix is allocated."""
+
+    model = str(noise_model).lower()
+    kernel = str(gp_kernel).strip().lower()
+    if model != "gp":
+        return kernel
+    if likelihood != "gaussian":
+        raise ValueError(
+            "noise_model='gp' supports likelihood='gaussian' only; "
+            "the Student-t likelihood is not available for dense GP noise"
+        )
+    if fit_white_jitter:
+        raise ValueError(
+            "fit_white_jitter cannot be combined with noise_model='gp'; "
+            "the GP model already samples diagonal jitter"
+        )
+    if kernel not in available_kernels():
+        raise ValueError(
+            f"unknown GP kernel {gp_kernel!r}; available kernels: "
+            f"{', '.join(available_kernels())}"
+        )
+    if (
+        not np.isfinite(gp_amplitude_prior_scale)
+        or gp_amplitude_prior_scale <= 0.0
+    ):
+        raise ValueError("gp_amplitude_prior_scale must be positive and finite")
+    if (
+        not np.isfinite(gp_timescale_prior_median)
+        or gp_timescale_prior_median <= 0.0
+    ):
+        raise ValueError("gp_timescale_prior_median must be positive and finite")
+    if (
+        not np.isfinite(gp_timescale_prior_sigma_ln)
+        or gp_timescale_prior_sigma_ln <= 0.0
+    ):
+        raise ValueError("gp_timescale_prior_sigma_ln must be positive and finite")
+    try:
+        integral_max_points = int(gp_max_points)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("gp_max_points must be a positive integer") from exc
+    if isinstance(gp_max_points, bool) or integral_max_points != gp_max_points:
+        raise ValueError("gp_max_points must be a positive integer")
+    if integral_max_points < 1:
+        raise ValueError("gp_max_points must be a positive integer")
+    if n_observations < 1:
+        raise ValueError("noise_model='gp' requires at least one observation")
+    if n_observations > integral_max_points:
+        raise ValueError(
+            f"noise_model='gp' received {n_observations} observations, above "
+            f"gp_max_points={integral_max_points}; dense GP likelihood cost grows "
+            "as O(N^3). Increase gp_max_points only when the memory and runtime "
+            "cost is acceptable."
+        )
+    return kernel
 
 
 def _ou_kalman_log_likelihood(
@@ -208,6 +338,11 @@ def sample_positive_map(
     ou_amplitude_prior_scale: float = 100.0e-6,
     ou_timescale_prior_median: float = 900.0,
     ou_timescale_prior_sigma_ln: float = 1.0,
+    gp_kernel: str = "matern32",
+    gp_amplitude_prior_scale: float = 100.0e-6,
+    gp_timescale_prior_median: float = 900.0,
+    gp_timescale_prior_sigma_ln: float = 1.0,
+    gp_max_points: int = 2000,
     jitter_prior_scale: float = 100.0e-6,
     sample_ramp_rate: bool = False,
     ramp_rate_prior_mean_per_day: float = 3.7,
@@ -218,17 +353,38 @@ def sample_positive_map(
     fit_white_jitter: bool = False,
     multiplicative_composition: str = "linearized",
     systematics_names: tuple[str, ...] | list[str] | None = None,
+    compute_plan: ComputePlan | None = None,
+    jax_platform: str = "cpu",
+    x64: bool = True,
+    jit: bool = True,
+    host_devices: int | None = None,
 ) -> NumpyroRun:
     """Sample positive map pixels for a precomputed light-curve operator.
 
-    Set ``noise_model="ou"`` and pass ``time_seconds`` to sample stationary
-    time-correlated residual noise. Nearby errors can be similar, and this
-    similarity fades with time. The three prior scales are in flux units,
-    except for the correlation timescale, which is in seconds.
+    Set ``noise_model="ou"`` for an exact linear-time OU likelihood, or
+    ``noise_model="gp"`` for a dense Gaussian-process likelihood. Both need
+    ``time_seconds``. GP options use a dense covariance matrix and are limited
+    by ``gp_max_points``. Amplitude and jitter priors use flux units; timescale
+    priors use seconds.
     """
 
+    plan = _prepare_runtime(
+        chains,
+        compute_plan=compute_plan,
+        jax_platform=jax_platform,
+        x64=x64,
+        jit=jit,
+        host_devices=host_devices,
+    )
     design, y, error = _validated_inputs(design_matrix, observed, sigma)
     star = np.broadcast_to(np.asarray(stellar_flux, dtype=float), y.shape)
+    if str(noise_model).lower() == "gp" and not all(
+        np.all(np.isfinite(values)) for values in (design, y, error, star)
+    ):
+        raise ValueError(
+            "design_matrix, observed, sigma, and stellar_flux must contain "
+            "only finite values for GP noise"
+        )
     if systematics_design is None:
         nuisance = np.empty((y.size, 0), dtype=float)
     else:
@@ -259,8 +415,8 @@ def sample_positive_map(
         raise ValueError("ramp_amplitude_prior_sigma must be positive")
     if error_scale_log_sigma <= 0.0:
         raise ValueError("error_scale_log_sigma must be positive")
-    if min(warmup, draws, chains) < 1 or chains > 3:
-        raise ValueError("warmup and draws must be positive; chains must be from 1 to 3")
+    if min(warmup, draws, chains) < 1:
+        raise ValueError("warmup, draws, and chains must be positive")
     times = _validated_noise_inputs(
         time_seconds,
         y.size,
@@ -269,6 +425,17 @@ def sample_positive_map(
         ou_timescale_prior_median=float(ou_timescale_prior_median),
         ou_timescale_prior_sigma_ln=float(ou_timescale_prior_sigma_ln),
         jitter_prior_scale=float(jitter_prior_scale),
+    )
+    gp_kernel = _validate_gp_inputs(
+        noise_model=noise_model,
+        likelihood=likelihood,
+        fit_white_jitter=fit_white_jitter,
+        gp_kernel=gp_kernel,
+        gp_amplitude_prior_scale=float(gp_amplitude_prior_scale),
+        gp_timescale_prior_median=float(gp_timescale_prior_median),
+        gp_timescale_prior_sigma_ln=float(gp_timescale_prior_sigma_ln),
+        gp_max_points=gp_max_points,
+        n_observations=y.size,
     )
     noise_model = "white" if str(noise_model).lower() == "independent" else str(noise_model).lower()
     if sample_ramp_rate and times is None:
@@ -395,7 +562,6 @@ def sample_positive_map(
     )
 
     jax, jnp, numpyro, dist, MCMC, NUTS = _imports()
-    numpyro.set_host_device_count(chains)
     design_jax = jnp.asarray(design)
     y_jax = jnp.asarray(y)
     error_jax = jnp.asarray(error)
@@ -553,6 +719,35 @@ def sample_positive_map(
                     dist=dist,
                 ),
             )
+        elif noise_model == "gp":
+            gp_amplitude = numpyro.sample(
+                "gp_amplitude",
+                dist.HalfNormal(float(gp_amplitude_prior_scale)),
+            )
+            gp_timescale = numpyro.sample(
+                "gp_timescale",
+                dist.LogNormal(
+                    jnp.log(float(gp_timescale_prior_median)),
+                    float(gp_timescale_prior_sigma_ln),
+                ),
+            )
+            jitter = numpyro.sample(
+                "jitter",
+                dist.HalfNormal(float(jitter_prior_scale)),
+            )
+            numpyro.factor(
+                "gp_log_likelihood",
+                gp_log_likelihood(
+                    y_jax - flux,
+                    scaled_error,
+                    times_jax,
+                    gp_amplitude,
+                    gp_timescale,
+                    jitter,
+                    kernel=gp_kernel,
+                    xp=jnp,
+                ),
+            )
         else:
             observation_distribution = (
                 dist.StudentT(student_t_nu, flux, scaled_error)
@@ -561,6 +756,7 @@ def sample_positive_map(
             )
             numpyro.sample("obs", observation_distribution, obs=y_jax)
 
+    chain_method = _chain_method(jax, chains, plan)
     mcmc = MCMC(
         NUTS(
             model,
@@ -571,7 +767,7 @@ def sample_positive_map(
         num_warmup=warmup,
         num_samples=draws,
         num_chains=chains,
-        chain_method="parallel" if chains > 1 else "sequential",
+        chain_method=chain_method,
         progress_bar=progress_bar,
     )
     mcmc.run(jax.random.key(seed), extra_fields=("diverging", "accept_prob"))
@@ -585,6 +781,7 @@ def sample_positive_map(
             key: np.asarray(value)
             for key, value in mcmc.get_samples(group_by_chain=True).items()
         },
+        chain_method=chain_method,
     )
 
 
@@ -825,8 +1022,18 @@ def sample_harmonic_map(
     ou_amplitude_prior_scale: float = 100.0e-6,
     ou_timescale_prior_median: float = 900.0,
     ou_timescale_prior_sigma_ln: float = 1.0,
+    gp_kernel: str = "matern32",
+    gp_amplitude_prior_scale: float = 100.0e-6,
+    gp_timescale_prior_median: float = 900.0,
+    gp_timescale_prior_sigma_ln: float = 1.0,
+    gp_max_points: int = 2000,
     jitter_prior_scale: float = 100.0e-6,
     fit_white_jitter: bool = False,
+    compute_plan: ComputePlan | None = None,
+    jax_platform: str = "cpu",
+    x64: bool = True,
+    jit: bool = True,
+    host_devices: int | None = None,
 ) -> NumpyroRun:
     """Sample direct harmonic coefficients with a posterior-whitened state.
 
@@ -845,11 +1052,20 @@ def sample_harmonic_map(
     start at the finite MAP estimate, with optional small latent jitter.
     Deterministic physical ``coefficients``, ``flux``, and
     ``systematics_model`` values are returned in :class:`NumpyroRun` for
-    downstream diagnostics. Set ``noise_model="ou"`` and pass
-    ``time_seconds`` to sample time-correlated residual noise with uneven
-    measurement times.
+    downstream diagnostics. Set ``noise_model="ou"`` for exact linear-time
+    correlated noise, or ``noise_model="gp"`` for dense Gaussian-process
+    noise. Both require ``time_seconds``. Dense GP inference is limited by
+    ``gp_max_points`` because cost grows as O(N^3).
     """
 
+    plan = _prepare_runtime(
+        chains,
+        compute_plan=compute_plan,
+        jax_platform=jax_platform,
+        x64=x64,
+        jit=jit,
+        host_devices=host_devices,
+    )
     design, y, error = _validated_inputs(design_matrix, observed, sigma)
     if not np.all(np.isfinite(design)) or not np.all(np.isfinite(y)):
         raise ValueError("design_matrix and observed must contain only finite values")
@@ -902,8 +1118,8 @@ def sample_harmonic_map(
         raise ValueError(
             "init_strategy must be median, adapt_diag, or jitter+adapt_diag"
         )
-    if min(warmup, draws, chains) < 1 or chains > 3:
-        raise ValueError("warmup and draws must be positive; chains must be from 1 to 3")
+    if min(warmup, draws, chains) < 1:
+        raise ValueError("warmup, draws, and chains must be positive")
     times = _validated_noise_inputs(
         time_seconds,
         y.size,
@@ -912,6 +1128,17 @@ def sample_harmonic_map(
         ou_timescale_prior_median=float(ou_timescale_prior_median),
         ou_timescale_prior_sigma_ln=float(ou_timescale_prior_sigma_ln),
         jitter_prior_scale=float(jitter_prior_scale),
+    )
+    gp_kernel = _validate_gp_inputs(
+        noise_model=noise_model,
+        likelihood=likelihood,
+        fit_white_jitter=fit_white_jitter,
+        gp_kernel=gp_kernel,
+        gp_amplitude_prior_scale=float(gp_amplitude_prior_scale),
+        gp_timescale_prior_median=float(gp_timescale_prior_median),
+        gp_timescale_prior_sigma_ln=float(gp_timescale_prior_sigma_ln),
+        gp_max_points=gp_max_points,
+        n_observations=y.size,
     )
     noise_model = "white" if str(noise_model).lower() == "independent" else str(noise_model).lower()
 
@@ -982,7 +1209,6 @@ def sample_harmonic_map(
     )
 
     jax, jnp, numpyro, dist, MCMC, NUTS = _imports()
-    numpyro.set_host_device_count(chains)
     design_jax = jnp.asarray(design)
     y_jax = jnp.asarray(y)
     error_jax = jnp.asarray(error)
@@ -1096,6 +1322,35 @@ def sample_harmonic_map(
                     dist=dist,
                 ),
             )
+        elif noise_model == "gp":
+            gp_amplitude = numpyro.sample(
+                "gp_amplitude",
+                dist.HalfNormal(float(gp_amplitude_prior_scale)),
+            )
+            gp_timescale = numpyro.sample(
+                "gp_timescale",
+                dist.LogNormal(
+                    jnp.log(float(gp_timescale_prior_median)),
+                    float(gp_timescale_prior_sigma_ln),
+                ),
+            )
+            jitter = numpyro.sample(
+                "jitter",
+                dist.HalfNormal(float(jitter_prior_scale)),
+            )
+            numpyro.factor(
+                "gp_log_likelihood",
+                gp_log_likelihood(
+                    y_jax - flux,
+                    effective_error,
+                    times_jax,
+                    gp_amplitude,
+                    gp_timescale,
+                    jitter,
+                    kernel=gp_kernel,
+                    xp=jnp,
+                ),
+            )
         else:
             observation_distribution = (
                 dist.StudentT(student_t_nu, flux, effective_error)
@@ -1104,6 +1359,7 @@ def sample_harmonic_map(
             )
             numpyro.sample("obs", observation_distribution, obs=y_jax)
 
+    chain_method = _chain_method(jax, chains, plan)
     mcmc = MCMC(
         NUTS(
             model,
@@ -1114,7 +1370,7 @@ def sample_harmonic_map(
         num_warmup=warmup,
         num_samples=draws,
         num_chains=chains,
-        chain_method="parallel" if chains > 1 else "sequential",
+        chain_method=chain_method,
         progress_bar=progress_bar,
     )
     mcmc.run(jax.random.key(seed), extra_fields=("diverging", "accept_prob"))
@@ -1128,6 +1384,7 @@ def sample_harmonic_map(
             key: np.asarray(value)
             for key, value in mcmc.get_samples(group_by_chain=True).items()
         },
+        chain_method=chain_method,
     )
 
 
@@ -1143,16 +1400,28 @@ def sample_fourier_model(
     seed: int = 0,
     target_accept: float = 0.9,
     progress_bar: bool = True,
+    compute_plan: ComputePlan | None = None,
+    jax_platform: str = "cpu",
+    x64: bool = True,
+    jit: bool = True,
+    host_devices: int | None = None,
 ) -> NumpyroRun:
     """Sample a Gaussian Fourier model from its design matrix."""
 
+    plan = _prepare_runtime(
+        chains,
+        compute_plan=compute_plan,
+        jax_platform=jax_platform,
+        x64=x64,
+        jit=jit,
+        host_devices=host_devices,
+    )
     design, y, error = _validated_inputs(design_matrix, observed, sigma)
     if coefficient_scale <= 0.0:
         raise ValueError("coefficient_scale must be positive")
-    if min(warmup, draws, chains) < 1 or chains > 3:
-        raise ValueError("warmup and draws must be positive; chains must be from 1 to 3")
+    if min(warmup, draws, chains) < 1:
+        raise ValueError("warmup, draws, and chains must be positive")
     jax, jnp, numpyro, dist, MCMC, NUTS = _imports()
-    numpyro.set_host_device_count(chains)
     design_jax = jnp.asarray(design)
     y_jax = jnp.asarray(y)
     error_jax = jnp.asarray(error)
@@ -1166,12 +1435,13 @@ def sample_fourier_model(
         numpyro.deterministic("flux", flux)
         numpyro.sample("obs", dist.Normal(flux, error_jax), obs=y_jax)
 
+    chain_method = _chain_method(jax, chains, plan)
     mcmc = MCMC(
         NUTS(model, target_accept_prob=target_accept),
         num_warmup=warmup,
         num_samples=draws,
         num_chains=chains,
-        chain_method="parallel" if chains > 1 else "sequential",
+        chain_method=chain_method,
         progress_bar=progress_bar,
     )
     mcmc.run(jax.random.key(seed), extra_fields=("diverging", "accept_prob"))
@@ -1181,6 +1451,7 @@ def sample_fourier_model(
             key: np.asarray(value) for key, value in mcmc.get_extra_fields().items()
         },
         sampler=mcmc,
+        chain_method=chain_method,
         grouped_samples={
             key: np.asarray(value)
             for key, value in mcmc.get_samples(group_by_chain=True).items()

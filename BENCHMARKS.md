@@ -1,7 +1,8 @@
 # Benchmarks
 
-Reference date: 2026-08-21. All runs used the `eclipse-mapping` Conda
-environment and no more than three CPUs.
+Reference date: 2026-08-21. These reference runs used the `eclipse-mapping`
+Conda environment and at most three CPUs. New runs have a configurable CPU
+budget; see [the execution guide](docs/parallel_execution.md).
 
 ## Frozen starry v1.0.0 matrix
 

@@ -165,14 +165,17 @@ def test_direct_harmonic_fit_expands_restricted_coefficients(
         map=replace(
             config.map,
             harmonic_degree=1,
-            active_harmonic_indices=(0, 1, 3),
+            active_harmonic_indices=(1, 0, 3),
         ),
     )
+    captured: dict[str, object] = {}
 
     def fake_sampler(design, observed, sigma, **kwargs):
         del observed, sigma
         assert design.shape == (24, 3)
-        coefficients = np.tile(np.array([0.004, 0.0002, 0.0003]), (8, 1))
+        captured["prior_mean"] = np.asarray(kwargs["coefficient_prior_mean"])
+        captured["prior_sigma"] = np.asarray(kwargs["coefficient_prior_sigma"])
+        coefficients = np.tile(np.array([0.0002, 0.004, 0.0003]), (8, 1))
         flux = np.asarray(kwargs["stellar_flux"])[None, :] + coefficients @ design.T
         return NumpyroRun(
             samples={"coefficients": coefficients, "flux": flux},
@@ -188,8 +191,10 @@ def test_direct_harmonic_fit_expands_restricted_coefficients(
     result = run_fit(config)
 
     summary = json.loads(result.summary_path.read_text(encoding="utf-8"))
-    assert summary["active_harmonic_indices"] == [0, 1, 3]
+    assert summary["active_harmonic_indices"] == [1, 0, 3]
     assert summary["n_parameters"] == 3
+    np.testing.assert_allclose(captured["prior_mean"], [0.0, 0.005, 0.0])
+    np.testing.assert_allclose(captured["prior_sigma"], [0.00375, 0.0025, 0.00375])
     with np.load(result.samples_path) as archive:
         coefficients = archive["harmonic_coefficients"]
         assert coefficients.shape == (8, 4)
