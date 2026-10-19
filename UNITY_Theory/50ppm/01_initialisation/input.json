@@ -1,0 +1,209 @@
+{
+  "analysis": {
+    "baseline_intercept_ppm": 20.0,
+    "baseline_order": 1,
+    "baseline_slope_ppm": 30.0,
+    "latitude_grid_degrees": [
+      -30.0,
+      0.0,
+      30.0
+    ],
+    "longitude_grid_step_degrees": 1.0,
+    "timing_grid_seconds": [
+      -30.0,
+      0.0,
+      30.0
+    ],
+    "width_grid_degrees": [
+      30.0,
+      40.0,
+      50.0
+    ]
+  },
+  "assumptions": {
+    "depth": "Photon-weighted flat-throughput blackbody band 2.9-5.1 micron; Tbrightness=1.1*Teq; not atmospheric spectrum or ETC model",
+    "geometry": "Fixed circular representative geometry. Dated 2025-08-13 composite archive ratios and a/Rstar; inclinations checked against live NASA default 2026-10-09; periods from accepted PID10786 APT. Composite values can mix literature solutions. No orbit uncertainty or eccentricity recovery.",
+    "noise": "User-authorized white noise scenarios at 50 and 100 ppm per ideal 60 second bin; not ETC prediction",
+    "realizations": "100 saved draws per target, using the preserved seed_target_index values. All saved draws are included; no trial is selected by fit outcome.",
+    "science": "Band brightness hot spot longitude, not pressure-specific temperature offset or phase-curve peak; profile-grid screening, not full NUTS validation.",
+    "trend": "delta=atan(tan(40 degrees)*(1500 K/Teq)^3). Illustrative radiative/advection scaling inspired by Showman2020; normalization chosen for simulation, not extracted GCM prediction.",
+    "visit": "Symmetric continuous visit about eclipse, length equals APT total science exposure seconds. Ideal 60-second bins with no gaps; not measured timestamps."
+  },
+  "noise_levels_ppm": [
+    50.0
+  ],
+  "scenarios": [
+    "temperature_scaled",
+    "zero_offset",
+    "constant_30_deg",
+    "uniform_null"
+  ],
+  "seed": 20261009,
+  "showman_source": "https://doi.org/10.1007/s11214-020-00758-8",
+  "sources": [
+    {
+      "path": "merged_targets.csv (historical source: PostDoc4/Cycle_5/Emission_Survey/Plot2)",
+      "sha256": "e6d0f4961506da3742fd0380f9573829272d79e6ea26db7476b87efd7671eb4d"
+    },
+    {
+      "path": "pscomppars_recent.csv (historical source: PostDoc4/BOWIE_Meeting_Bristol)",
+      "sha256": "9c0192a748e87b053184520782702b6387a894e528c2a8c32b5b7430051a21f8"
+    },
+    {
+      "path": "10786.pdf (historical source: PostDoc4/Cycle_5/Emission_Survey)",
+      "sha256": "72f0a0084a3ec2feb01ebdd1c659df8f8652bf38259eed201fed86816f62e771"
+    },
+    {
+      "path": "UNITY_accepted_JWST.txt (historical source: PostDoc4/Fellowships/ERC/URF_Conversion/Sources)",
+      "sha256": "209854220e84871719122cc4a1f093b7f6cc2b4f9269bec1b87a8278eefdd2b3"
+    }
+  ],
+  "targets": [
+    {
+      "a_over_rstar": 7.43,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 1869.6920000000002,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.04,
+      "depth_ppm": 1486.21777356029,
+      "exposure_seconds": 60,
+      "inclination_degrees": 83.6,
+      "instrument": "NIRSpec/G395M",
+      "name": "HAT-P-30 b",
+      "noise_levels_ppm": [
+        50.0
+      ],
+      "noise_ppm": 50.0,
+      "period_days": 2.81060097,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.1109,
+      "rank": 1,
+      "seed_target_index": 0,
+      "star_teff_k": 6304.0,
+      "teq_k": 1699.72,
+      "window_hours": 6.108169722222223
+    },
+    {
+      "a_over_rstar": 5.5,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 2298.582,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0,
+      "depth_ppm": 1476.9992840463572,
+      "exposure_seconds": 60,
+      "inclination_degrees": 83.76,
+      "instrument": "NIRSpec/G395H",
+      "name": "KELT-7 b",
+      "noise_levels_ppm": [
+        50.0
+      ],
+      "noise_ppm": 50.0,
+      "period_days": 2.7347656,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.0922,
+      "rank": 2,
+      "seed_target_index": 1,
+      "star_teff_k": 6768.0,
+      "teq_k": 2089.62,
+      "window_hours": 9.419484722222222
+    },
+    {
+      "a_over_rstar": 7.17,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 2716.0870000000004,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0,
+      "depth_ppm": 1960.4517809345696,
+      "exposure_seconds": 60,
+      "inclination_degrees": 85.7,
+      "instrument": "NIRSpec/G395M",
+      "name": "WASP-178 b",
+      "noise_levels_ppm": [
+        50.0
+      ],
+      "noise_ppm": 50.0,
+      "period_days": 3.3448369,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.11066,
+      "rank": 3,
+      "seed_target_index": 2,
+      "star_teff_k": 9360.0,
+      "teq_k": 2469.17,
+      "window_hours": 9.399588055555556
+    },
+    {
+      "a_over_rstar": 9.853,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 1457.4230000000002,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0,
+      "catalog_eccentricity_source": "NASA composite snapshot2025-08-13, adopted0fixed",
+      "depth_ppm": 949.0843646538636,
+      "exposure_seconds": 60,
+      "inclination_degrees": 85.634,
+      "instrument": "NIRSpec/G395M",
+      "name": "HAT-P-1 b",
+      "noise_levels_ppm": [
+        50.0
+      ],
+      "noise_ppm": 50.0,
+      "period_days": 4.46529913,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.11802,
+      "rank": 4,
+      "seed_target_index": 3,
+      "star_teff_k": 5980.0,
+      "teq_k": 1324.93,
+      "window_hours": 7.840105277777778
+    },
+    {
+      "a_over_rstar": 5.8928,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 1896.8400000000001,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0133,
+      "depth_ppm": 1021.3735256648589,
+      "exposure_seconds": 60,
+      "inclination_degrees": 83.4,
+      "instrument": "NIRSpec/G395M",
+      "name": "HAT-P-13 b",
+      "noise_levels_ppm": [
+        50.0
+      ],
+      "noise_ppm": 50.0,
+      "period_days": 2.91624268,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.08389,
+      "rank": 5,
+      "seed_target_index": 4,
+      "star_teff_k": 5653.0,
+      "teq_k": 1724.4,
+      "window_hours": 17.04030611111111
+    },
+    {
+      "a_over_rstar": 3.0,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 2824.1180000000004,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0447,
+      "catalog_eccentricity_source": "NASA composite snapshot2025-08-13, historicalTurner2016; not adopted for injection",
+      "depth_ppm": 3946.7714153861803,
+      "exposure_seconds": 60,
+      "inclination_degrees": 81.8,
+      "instrument": "NIRSpec/G395M",
+      "name": "WASP-12 b",
+      "noise_levels_ppm": [
+        50.0
+      ],
+      "noise_ppm": 50.0,
+      "period_days": 1.091419179,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.117,
+      "rank": 6,
+      "seed_target_index": 5,
+      "star_teff_k": 6265.0,
+      "teq_k": 2567.38,
+      "window_hours": 8.19955611111111
+    }
+  ]
+}

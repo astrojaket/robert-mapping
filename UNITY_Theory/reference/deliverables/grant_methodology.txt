@@ -1,0 +1,24 @@
+Preliminary injection and recovery test for WP2
+
+We tested the six highest-ranked UNITY eclipse-mapping targets with robert-mapping: HAT-P-30b, KELT-7b, WASP-178b, HAT-P-1b, HAT-P-13b, and WASP-12b. We used the accepted programme's science exposure durations and instrument modes. For each target, we injected a positive degree-2 brightness map with a 40-degree Gaussian hot spot and a uniform component. We estimated the hot spot longitude from target temperature with delta = arctan[tan(40 degrees)(1500 K/Teq)^3]. This is a declared test scenario based on the trend discussed by Showman, Tan and Parmentier (2020). Its normalization is chosen for the test. It is not a target-specific GCM prediction.
+
+We generated 100 noise realizations per target at 50 and 100 ppm per ideal 60-second bin. We fitted each target independently, with free uniform and hot spot amplitudes, latitude, width, eclipse timing, and a linear baseline. The population trend was fitted only after the individual offset recoveries. Uniform maps, zero-offset maps, and constant-offset maps provided control tests. We compared the mapped and uniform models with delta BIC < -6 as the screening rule. We also fitted the eclipse interval alone to test how much information comes from outside eclipse.
+
+At 50 ppm, all six temperature-trend maps were detected in all 100 realizations. The absolute mean longitude bias was at most 2.65 degrees. The standard deviation of recovered offsets was 0.50-6.44 degrees across targets. No uniform-map control produced a false map detection (0/600 target trials). The recovered population slope was negative in all 100 realizations, with a median of -23.5 degrees per 1000 K. The zero-offset and constant-offset controls gave false negative trends in 8% and 4% of realizations at the nominal one-sided 95% threshold. These rates calibrate the screening statistic; it is not a full posterior test.
+
+At 100 ppm, all six maps were detected together in 35% of full-visit realizations. HAT-P-30b was detected in 48% of its target trials. A decreasing conditional offset trend can therefore remain clear even when some individual maps are not detected. The grant should claim feasibility at the stated 50 ppm noise level, rather than guaranteed recovery of all six real targets at any precision.
+
+These tests use the same Gaussian map family for injection and recovery. They assume fixed circular geometry, estimated blackbody-band eclipse depths, continuous symmetric visits, and white noise. The intervals are profile-grid intervals, not NUTS posterior intervals. Production tests must use the measured cadence, orbital uncertainties, instrument systematics, and correlated noise. A separate finer-grid WASP-12b check is saved with the study.
+
+Reference: Showman, Tan & Parmentier (2020), Atmospheric Dynamics of Hot Giant Planets and Brown Dwarfs, https://doi.org/10.1007/s11214-020-00758-8
+
+50 ppm target results (100 realizations, full visit)
+Target | Injected longitude | Mean bias | Recovery scatter | Median nominal interval half-width
+HAT-P-30 b | 29.97 deg | +0.51 deg | 6.14 deg | 6.65 deg
+KELT-7 b | 17.24 deg | +0.68 deg | 2.85 deg | 2.57 deg
+WASP-178 b | 10.65 deg | +0.26 deg | 2.94 deg | 2.16 deg
+HAT-P-1 b | 50.60 deg | +2.65 deg | 6.44 deg | 7.98 deg
+HAT-P-13 b | 28.91 deg | -0.87 deg | 2.64 deg | 3.12 deg
+WASP-12 b | 9.50 deg | +0.03 deg | 0.50 deg | 0.80 deg
+
+Longitude grid check: The WASP-12b temperature-scaled case was repeated for 100 paired noise samples on a 0.25-degree grid. Full-visit median offsets changed by at most 0.038 degrees. At 50 ppm, the mean bias was +0.024 degrees and the recovery scatter was 0.504 degrees. The median interval half-width changed from 0.804 to 0.563 degrees, and nominal 68% coverage changed from 96% to 67%. At 100 ppm, the finer-grid half-width was 1.076 degrees and coverage was 70%. Thus the offset estimates are stable, but the coarse grid inflated the narrowest intervals. Main tables retain the predeclared 1-degree grid. Use the finer-grid check when describing WASP-12b interval precision.

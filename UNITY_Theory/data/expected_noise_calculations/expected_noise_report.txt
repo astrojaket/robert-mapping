@@ -1,0 +1,29 @@
+UNITY expected NIRSpec white-light noise
+Date: 2026-10-09
+Band: 2.9--5.1 micron; reference: 60 s wall time
+
+The main value is the star-only, in-eclipse noise relative to Fstar. The saved recovery uses a fixed Fstar flux scale.
+For each 60-second wall-time sample, scale the total PandExo counts and variance by 60/(N_integrations * elapsed wall seconds per integration).
+Then compute 1e6 * sqrt(sum variance) / sum stellar electrons. This includes source shot noise, PandExo background, and read variance.
+The elapsed integration time includes reset. The measurement time excludes reset, so the scale includes detector duty loss.
+PandExo's transit-timing split can differ by one integration from the accepted APT total; the report records both. This does not change per-60-second noise because each state is scaled by its own integration count and wall time.
+The secondary-eclipse convention in PandExo uses `out` for the star-only eclipse state and `in` for star plus supplied Fp/F* outside eclipse.
+The two physical out-of-eclipse comparison values use the `in` counts/variance, divided by total flux or by the star-only Fstar reference.
+Variance closure is checked against source counts + reported background counts + per-channel read variance times the selected bin count.
+The saved Pandeia scene matches the serialized J-normalized PHOENIX spectrum; the scene adds no second normalization and applies zero extinction. Stellar Teff, logg, and metallicity come from the input evidence file because the online result does not store those scalar settings.
+No additional noise floor or correlated-noise term was added. Exact deployed online engine/reference-data versions are not present in the saved result.
+Local PySynphot reported that its optional extinction-files directory is missing. The PHOENIX grid loaded, the shape audit passed, and the saved Pandeia scene uses zero extinction.
+
+Target values (noise_ppm_60s is the recovery input):
+- HAT-P-30 b: 58.937752 ppm; outside eclipse relative to Fstar 58.993444 ppm (+0.0945%).
+  J=9.442, Teff=6304 K, logg=4.360, [Fe/H]=+0.13; PHOENIX shape audit=passed; duty=84.47%; saturation: All good (77% < 80%)
+- KELT-7 b: 29.626731 ppm; outside eclipse relative to Fstar 29.649325 ppm (+0.0763%).
+  J=7.739, Teff=6768 K, logg=4.500, [Fe/H]=+0.00; PHOENIX shape audit=passed; duty=74.79%; saturation: All good (79% < 80%)
+- WASP-178 b: 81.445187 ppm; outside eclipse relative to Fstar 81.544114 ppm (+0.1215%).
+  J=9.775, Teff=9360 K, logg=4.310, [Fe/H]=+0.21; PHOENIX shape audit=passed; duty=79.82%; saturation: All good (33% < 80%)
+- HAT-P-1 b: 51.830033 ppm; outside eclipse relative to Fstar 51.854715 ppm (+0.0476%).
+  J=9.156, Teff=5980 K, logg=4.359, [Fe/H]=+0.13; PHOENIX shape audit=passed; duty=79.82%; saturation: All good (79% < 80%)
+- HAT-P-13 b: 53.668633 ppm; outside eclipse relative to Fstar 53.693622 ppm (+0.0466%).
+  J=9.328, Teff=5653 K, logg=4.130, [Fe/H]=+0.46; PHOENIX shape audit=passed; duty=81.65%; saturation: % full well>80% (80% > 80%)
+- WASP-12 b: 89.854770 ppm; outside eclipse relative to Fstar 90.059458 ppm (+0.2278%).
+  J=10.477, Teff=6265 K, logg=4.110, [Fe/H]=+0.12; PHOENIX shape audit=passed; duty=93.87%; saturation: All good (79% < 80%)

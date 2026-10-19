@@ -1,0 +1,30 @@
+UNITY temperature-scaled injection and recovery
+Trials CSV: results/unity_erc_20261009/expected_noise_study/recovery_trials.csv
+Inputs JSON: results/unity_erc_20261009/inputs/unity_expected_noise.json
+
+One trial is reported for each target and fit scope. Noise values are in ppm.
+Input noise is the configured or runner input value; effective noise is the value used by the fit.
+
+full_window results:
+- HAT-P-30 b: Teq=1699.7 K; noise input=58.94 ppm; effective noise=58.94 ppm; injected truth=29.97 deg; analytic truth=29.97 deg; recovered median=21.94 deg; q16–q84=[16.37, 29.09] deg; map detected=yes; trial=0
+- KELT-7 b: Teq=2089.6 K; noise input=29.63 ppm; effective noise=29.63 ppm; injected truth=17.24 deg; analytic truth=17.24 deg; recovered median=19.82 deg; q16–q84=[18.36, 21.36] deg; map detected=yes; trial=0
+- WASP-178 b: Teq=2469.2 K; noise input=81.45 ppm; effective noise=81.45 ppm; injected truth=10.65 deg; analytic truth=10.65 deg; recovered median=5.28 deg; q16–q84=[2.36, 9.91] deg; map detected=yes; trial=0
+- HAT-P-1 b: Teq=1324.9 K; noise input=51.83 ppm; effective noise=51.83 ppm; injected truth=50.60 deg; analytic truth=50.60 deg; recovered median=50.82 deg; q16–q84=[42.65, 59.65] deg; map detected=yes; trial=0
+- HAT-P-13 b: Teq=1724.4 K; noise input=53.67 ppm; effective noise=53.67 ppm; injected truth=28.91 deg; analytic truth=28.91 deg; recovered median=26.26 deg; q16–q84=[22.78, 30.02] deg; map detected=yes; trial=0
+- WASP-12 b: Teq=2567.4 K; noise input=89.85 ppm; effective noise=89.85 ppm; injected truth=9.50 deg; analytic truth=9.50 deg; recovered median=10.55 deg; q16–q84=[9.58, 11.54] deg; map detected=yes; trial=0
+Approximate weighted slope: -20.586 +/- 2.729 degrees per 1000 K (n=6; weights use q16–q84 interval halfwidths).
+
+eclipse_only results:
+- HAT-P-30 b: Teq=1699.7 K; noise input=58.94 ppm; effective noise=58.94 ppm; injected truth=29.97 deg; analytic truth=29.97 deg; recovered median=27.68 deg; q16–q84=[20.83, 35.72] deg; map detected=yes; trial=0
+- KELT-7 b: Teq=2089.6 K; noise input=29.63 ppm; effective noise=29.63 ppm; injected truth=17.24 deg; analytic truth=17.24 deg; recovered median=21.61 deg; q16–q84=[17.78, 27.10] deg; map detected=yes; trial=0
+- WASP-178 b: Teq=2469.2 K; noise input=81.45 ppm; effective noise=81.45 ppm; injected truth=10.65 deg; analytic truth=10.65 deg; recovered median=7.03 deg; q16–q84=[3.01, 13.48] deg; map detected=yes; trial=0
+- HAT-P-1 b: Teq=1324.9 K; noise input=51.83 ppm; effective noise=51.83 ppm; injected truth=50.60 deg; analytic truth=50.60 deg; recovered median=51.78 deg; q16–q84=[42.81, 61.15] deg; map detected=yes; trial=0
+- HAT-P-13 b: Teq=1724.4 K; noise input=53.67 ppm; effective noise=53.67 ppm; injected truth=28.91 deg; analytic truth=28.91 deg; recovered median=35.47 deg; q16–q84=[22.35, 53.66] deg; map detected=yes; trial=0
+- WASP-12 b: Teq=2567.4 K; noise input=89.85 ppm; effective noise=89.85 ppm; injected truth=9.50 deg; analytic truth=9.50 deg; recovered median=14.55 deg; q16–q84=[10.39, 17.70] deg; map detected=yes; trial=0
+Approximate weighted slope: -25.789 +/- 6.057 degrees per 1000 K (n=6; weights use q16–q84 interval halfwidths).
+
+Limit: one noise sample per target cannot establish interval coverage or map detection rates.
+The q16–q84 ranges are profile intervals, not posterior intervals.
+The approximate weighted slope fits recovered medians with inverse squared interval-halfwidth weights.
+
+In this full-window draw, 2/6 injected offsets fall within the nominal q16–q84 intervals. The largest absolute offset error is 8.04 degrees. The matched-weight slope of the injected curve is -21.424 degrees per 1000 K. These values describe this one sample; they do not establish a coverage rate.

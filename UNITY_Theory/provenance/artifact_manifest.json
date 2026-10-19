@@ -1,0 +1,307 @@
+[
+  {
+    "path": "UNITY_Theory/code/unity_injection_recovery.py",
+    "bytes": 79477,
+    "sha256": "a1d8f11e0a7e25696bdeef7954c3bbabb4e6d1bb06fac872d0790aa5aec4ccc9"
+  },
+  {
+    "path": "UNITY_Theory/code/plot_unity_recovery.py",
+    "bytes": 64481,
+    "sha256": "f298796a793654f259f9ffaf27a697e3d6cc243ddc14d1cce1132817dbba3bca"
+  },
+  {
+    "path": "UNITY_Theory/data/inputs/unity_inputs.json",
+    "bytes": 6442,
+    "sha256": "e1a4dc4dffbe80740bfa01102cc6350b96ddc494e1491ada68c08c505641a783"
+  },
+  {
+    "path": "UNITY_Theory/data/inputs/nasa_ps_default.json",
+    "bytes": 2246,
+    "sha256": "c8a4d17a2714d9a8fcb79eb557bd1935bc32be2a6339e6b901b592976a0dfdd7"
+  },
+  {
+    "path": "UNITY_Theory/data/inputs/nasa_query_url.txt",
+    "bytes": 357,
+    "sha256": "6ef5c96e77ae0edd84a0bba9316cfa9ecb865f3279411472f2d3867176da1e11"
+  },
+  {
+    "path": "UNITY_Theory/data/inputs/wasp12_finegrid.json",
+    "bytes": 3431,
+    "sha256": "37771d83db2026b84e8aa8fa1588184f224b81cbc35b4f6159df27d388b9272f"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/summary.json",
+    "bytes": 55451,
+    "sha256": "0eefc56994d9d1769527807636aebcd61739e3fe0c2b716b041ea13d94b0b728"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/recovery_trials.csv",
+    "bytes": 6652771,
+    "sha256": "67bc6baa55fabff959d1bfaea76164f179b6f5e6a8cb04bf904fb8f96bd3bcf6"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/run_inputs.json",
+    "bytes": 12970,
+    "sha256": "4ca6dd00547e6481c55fa10a159b0ca62f75d8239e8fb6de90f94c596844400b"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/profiles.npz",
+    "bytes": 295273224,
+    "sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/examples/hat_p_13_b_curves.csv",
+    "bytes": 3168016,
+    "sha256": "4aa99b2422290ec97b7546f1b99bb9dc5c566474a46ada5d7a4943e6c22b0a86"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/examples/kelt_7_b_curves.csv",
+    "bytes": 1749646,
+    "sha256": "a98c61d8f63345ab3e22f33ed5bb047026c7b013581e332fb41f62839a9e0e8e"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/examples/hat_p_30_b_curves.csv",
+    "bytes": 1146924,
+    "sha256": "1afbd38071c5c16582e48bf8e911fcf78b2de7ee349f058c15177939b65e334f"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/examples/hat_p_1_b_curves.csv",
+    "bytes": 1452994,
+    "sha256": "f7f34d6dc958249454b40cbd433dc2d1bd90901e9fcdada06c3b56cbd721052a"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/examples/wasp_178_b_curves.csv",
+    "bytes": 1762314,
+    "sha256": "4128b8b14ffc9519e6628ef91c3e6f85a064d3e8a2a0f823f4485ccaf4b17c8b"
+  },
+  {
+    "path": "UNITY_Theory/reference/study/examples/wasp_12_b_curves.csv",
+    "bytes": 1523692,
+    "sha256": "6fada79c2c2fa0327b347dc0624e5a830a491d8a5dffb1bd50c43d95340eb718"
+  },
+  {
+    "path": "UNITY_Theory/reference/wasp12_finegrid/summary.json",
+    "bytes": 18137,
+    "sha256": "de9dc058f542fd4a182d6d5d9d2c5a8492cfef23431cbf2e8a72a755a1f313e1"
+  },
+  {
+    "path": "UNITY_Theory/reference/wasp12_finegrid/recovery_trials.csv",
+    "bytes": 294230,
+    "sha256": "1fa0a1cdbfd00cefd93064506117fd2040cf104d950a7cf24b4b04c627f49c47"
+  },
+  {
+    "path": "UNITY_Theory/reference/wasp12_finegrid/run_inputs.json",
+    "bytes": 16576,
+    "sha256": "6e93b68eed774d57a2274f38456495c7619003ee9729b0f835b59e3e0ea6011f"
+  },
+  {
+    "path": "UNITY_Theory/reference/wasp12_finegrid/profiles.npz",
+    "bytes": 50916580,
+    "sha256": "25540341835072b75ce85d5b9c5ec7a6326c443ab7edc2508d9298e739438e78"
+  },
+  {
+    "path": "UNITY_Theory/reference/wasp12_finegrid/examples/wasp_12_b_curves.csv",
+    "bytes": 389244,
+    "sha256": "be6b340cf69e029cec2cc366d9d2ad049052d265da4fd39bfe327089650bb5e7"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/noiseless_sign_recovery.json",
+    "bytes": 609,
+    "sha256": "cc4cd40c6e024bb89e1f3c1fc5840912a652542bddb4bf815869d0cc1d79ebb1"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/grid_convergence.json",
+    "bytes": 2639,
+    "sha256": "b71159b9ef8408f38534818188fcab02a3cf414a5b17c705d10b82c63527d594"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/final_checks.json",
+    "bytes": 604,
+    "sha256": "e4b8838156da9df328724b91b6b3a1e6e397e120a564bb5f87947c99ab4f3217"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/constrained_solver.json",
+    "bytes": 373,
+    "sha256": "743b43694b211354aa8ebb84c67a04c4ddfbab634518b0b1a7a86a6c831e874c"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/environment.json",
+    "bytes": 847,
+    "sha256": "c89eee37281943b8807334861f2008ebb945e83db40a6ff2715b8d03c28ce2ef"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/map_delta_bic_full_window.svg",
+    "bytes": 621146,
+    "sha256": "c4600858cb2496e30ca927dfd72d4c5672e0999c79a5fb7a8f6387f6fe871fe7"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/offset_recovery_eclipse_only.png",
+    "bytes": 194545,
+    "sha256": "0fdfcf168b458e3ad93a875dc1172c5deb509f0b21c30940c9152776ee00ab93"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/recovery_bias_full_window.svg",
+    "bytes": 510490,
+    "sha256": "5de4e5fcea7eb922d8341c32a59482c4e7d0e7bd1cd1a0ec2eebdc89c4b4e9c4"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/offset_recovery_eclipse_only.pdf",
+    "bytes": 30647,
+    "sha256": "e45ff6e60df93c4badf3b4e4ab4c3099f371174255d76c9d200fb271f901bd05"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/representative_trials_eclipse_only.csv",
+    "bytes": 34603,
+    "sha256": "a9a543fe0281fc564adc439838f89401f434681d9b48a7c24ccadcd98d9249ad"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/grant_methodology.txt",
+    "bytes": 4065,
+    "sha256": "0ca524ba1b983d9127d4653cbc26df552fde9499ad98df860997b7220102e405"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/population_slope_summary.csv",
+    "bytes": 3902,
+    "sha256": "cf0837c1f73cea752b2d15bbd5a46d762fcba6895d325dc3203205689aba9f6b"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/recovery_bias_full_window.png",
+    "bytes": 338702,
+    "sha256": "850c166622cd2bb8a0598d8372104719297de205e4d63a1f4da804fa46da4e7b"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/map_delta_bic_full_window.pdf",
+    "bytes": 80088,
+    "sha256": "1718a37b20eb7a18f7f0f8ad195c15b347440e8c1aa0d6d731253480b36bc003"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/target_recovery_summary.csv",
+    "bytes": 25048,
+    "sha256": "9ba14ed045b3f4d16d17a4241edd4ca7108ea6e0373e223bfe7b67dfd48c2955"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/recovery_bias_full_window.pdf",
+    "bytes": 91230,
+    "sha256": "0a5980983a5e05283b3ed237abc2a19b8c7bfc5a379ac2a34517fd063cc7689d"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/offset_recovery_eclipse_only.svg",
+    "bytes": 138282,
+    "sha256": "82c2a4be404232d66b6bf9259d812057813d72719a31a038f074b9bd0f40eeab"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/map_delta_bic_full_window.png",
+    "bytes": 306601,
+    "sha256": "caa9b2a8fedaac9fa8568b872f85b4ff446970fd214c56e9b751bd8efdac7678"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_full_window.svg",
+    "bytes": 128842,
+    "sha256": "05d5f1e89c972ed7e2f0393c1b19fb605278b1fa7fdeb159d0eefc145ba0a1c2"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/map_delta_bic_eclipse_only.svg",
+    "bytes": 616526,
+    "sha256": "fd12ede18f63b6f07c38799386ab45fee6f3b582552b7e575ec4043425bc0049"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/recovery_bias_eclipse_only.svg",
+    "bytes": 513782,
+    "sha256": "a19a7aa81baf45f6f18c489ae27a45943e3c2931acb88765fbffd4695bb58912"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_eclipse_only.svg",
+    "bytes": 130181,
+    "sha256": "34aefdea9668ae9c87c2e468c5f8256353552bc4eace234601576784a80452f4"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/unity_hotspot_trend.svg",
+    "bytes": 37686,
+    "sha256": "7abccff65d190451669cabb7ac3e5e400af9f804d5fe119da992d2b088ef1f5f"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/representative_trials_full_window.csv",
+    "bytes": 34539,
+    "sha256": "16e37f09d212003b772cb051d1fcfe9352228711f2b5cc1c666e1fe15f14e906"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/offset_recovery_full_window.png",
+    "bytes": 192577,
+    "sha256": "c2bde361495ae8992f9852021dc9c788b1fdf7858ff1fec7bf35b1529b032e8a"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/population_slope_recovery.csv",
+    "bytes": 251246,
+    "sha256": "81cd48684aadec1b80635e709ddb5418aba5dbfdd3b844ecc1d46ac81e4ce48c"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/offset_recovery_full_window.pdf",
+    "bytes": 30592,
+    "sha256": "2e434cb803d2b7cad539445242896346e92b5df71842446cf8407eef9588f072"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/unity_hotspot_trend.pdf",
+    "bytes": 21899,
+    "sha256": "4ab2c2601b3e3f98ebe0dba19e6a90525f2a1d0a81b1391f8ffb61102537aab7"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/reproduce.txt",
+    "bytes": 1522,
+    "sha256": "d91048d30082e4d4b55347d0454c4bfb6cdc29d25b0206999f938d241971ee6b"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/offset_recovery_full_window.svg",
+    "bytes": 138307,
+    "sha256": "f16ff195ecbd4bd0da194d286bb59d1085cdbb6de525a158a22b7ac934cb043f"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/unity_hotspot_trend.png",
+    "bytes": 137650,
+    "sha256": "88ae1dd324ce270a779d8f5cd1d22fe3e2a20c7123df7a8e857907f335eb413f"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_full_window.pdf",
+    "bytes": 29926,
+    "sha256": "aad2ddd3a69771f7281149dfd55bbc99d2deada368884f61c9bce88835fcfadd"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/recovery_bias_eclipse_only.pdf",
+    "bytes": 91495,
+    "sha256": "36d6a8ba10e25a73381777dc3825d2cf1f2c2db1c2ea2f03f98b16a8c2cf263c"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_eclipse_only.png",
+    "bytes": 152508,
+    "sha256": "0c92f442cc5150b254509f93cf1fec64051049edccc6b980d87ff06a807407d6"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/map_delta_bic_eclipse_only.pdf",
+    "bytes": 80680,
+    "sha256": "eef64f438eadd4265879b1a7fdce9392b50e5d93ef4aa19d00843e3d61e48e33"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/recovery_bias_eclipse_only.png",
+    "bytes": 357233,
+    "sha256": "6d81b020c32e56cb3e213cac05c8092843cdee393d9057a9386c7c5fc4a99741"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_eclipse_only.pdf",
+    "bytes": 30278,
+    "sha256": "2cf951797ab438dfaa5cd20937e65a5519b94826d9ec31a6df8f6d1663765a2f"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/map_delta_bic_eclipse_only.png",
+    "bytes": 355679,
+    "sha256": "e61356ce802825151d9e1eafb19e70444fee00714e644f35f48a290789b0d047"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_full_window.png",
+    "bytes": 145418,
+    "sha256": "a8de90e6fb7366813ed0ecfe021821da04ea65633d7273aa12a57f7b1333fecd"
+  },
+  {
+    "path": "UNITY_Theory/reference/deliverables/methodology.txt",
+    "bytes": 13276,
+    "sha256": "42fe16b4d1b27fcf8b2ff44d9a4577eb441e7ebc351418a6999dafee29eb0451"
+  }
+]

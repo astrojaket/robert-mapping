@@ -1,0 +1,19 @@
+{
+  "rows": 12,
+  "trials_per_target": 1,
+  "six_calibrated_noise_values_verified": true,
+  "six_phoenix_audits_pass": true,
+  "predeclared_seeds_match_original_trial_zero": true,
+  "all_maps_positive": true,
+  "profile_arrays_finite": true,
+  "weight_normalization_max_error": 2.220446049250313e-16,
+  "profile_scope": "full_window",
+  "longitude_grid_degrees": 0.25,
+  "new_script_py_compile": "passed",
+  "git_diff_check": "passed",
+  "png_pdf_svg_export": "passed",
+  "figure_visual_review": "passed: no clipped labels or overlapping legend entries",
+  "existing_model_tests": "18 passed in prior study; unchanged model code",
+  "noise_variance_closure": "passed for all six",
+  "truth_trend_is_illustrative": "documented"
+}

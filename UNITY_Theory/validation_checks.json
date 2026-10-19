@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-19",
+  "status": "passed",
+  "clean_environment_package_tests": 19,
+  "existing_physics_and_recovery_tests": 14,
+  "full_resolution_first_target_comparison": {
+    "status": "passed",
+    "csv_max_abs_diff": 4.731877112362781e-10,
+    "profile_max_abs_diff": {
+      "posterior_weights": 1.5740787145945845e-11,
+      "profile_bic": 9.66247171163559e-09,
+      "profile_log_likelihood": 4.831235855817795e-09
+    }
+  },
+  "case_folders": {
+    "JWST_Noise": {
+      "rows": 1200,
+      "retrieved_maps": 1200,
+      "source_rows_unchanged": true,
+      "coefficient_columns": [
+        "y_l0_m0",
+        "y_l1_mneg1",
+        "y_l1_m0",
+        "y_l1_mpos1",
+        "y_l2_mneg2",
+        "y_l2_mneg1",
+        "y_l2_m0",
+        "y_l2_mpos1",
+        "y_l2_mpos2"
+      ],
+      "map_checks": "passed",
+      "archive_pointers": 5
+    },
+    "50ppm": {
+      "rows": 4800,
+      "retrieved_maps": 4800,
+      "source_rows_unchanged": true,
+      "coefficient_columns": [
+        "y_l0_m0",
+        "y_l1_mneg1",
+        "y_l1_m0",
+        "y_l1_mpos1",
+        "y_l2_mneg2",
+        "y_l2_mneg1",
+        "y_l2_m0",
+        "y_l2_mpos1",
+        "y_l2_mpos2"
+      ],
+      "map_checks": "passed",
+      "archive_pointers": 9,
+      "finegrid_rows": 200
+    },
+    "100ppm": {
+      "rows": 4800,
+      "retrieved_maps": 4800,
+      "source_rows_unchanged": true,
+      "coefficient_columns": [
+        "y_l0_m0",
+        "y_l1_mneg1",
+        "y_l1_m0",
+        "y_l1_mpos1",
+        "y_l2_mneg2",
+        "y_l2_mneg1",
+        "y_l2_m0",
+        "y_l2_mpos1",
+        "y_l2_mpos2"
+      ],
+      "map_checks": "passed",
+      "archive_pointers": 9,
+      "finegrid_rows": 200
+    }
+  },
+  "primary_figures_pixel_identical": true,
+  "noise_matches_all_six_inputs": true,
+  "shared_and_standalone_organizer_checks": "passed"
+}

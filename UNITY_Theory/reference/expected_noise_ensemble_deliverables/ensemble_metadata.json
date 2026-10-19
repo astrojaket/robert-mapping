@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "trials_csv": "UNITY_Theory/reference/expected_noise_ensemble/recovery_trials.csv",
+  "inputs_json": "UNITY_Theory/data/inputs/unity_expected_noise.json",
+  "profiles_npz": "UNITY_Theory/reference/expected_noise_ensemble/profiles.npz",
+  "expected_draws_per_target_and_scope": 100,
+  "target_count": 6,
+  "fit_scopes": [
+    "full_window",
+    "eclipse_only"
+  ],
+  "all_draws_included_regardless_of_map_detection": true,
+  "quantile_probabilities": {
+    "one_sigma_lower": 0.158655,
+    "one_sigma_upper": 0.841345,
+    "two_sigma_lower": 0.02275,
+    "two_sigma_upper": 0.97725
+  },
+  "empirical_ranges": "Central empirical ranges across recovered profile medians from independent noise draws. Not posterior intervals and not standard errors of the mean.",
+  "profile_mixture": {
+    "available": true,
+    "path": "UNITY_Theory/reference/expected_noise_ensemble/profiles.npz",
+    "profile_rows_by_target": {
+      "HAT-P-30 b": 100,
+      "KELT-7 b": 100,
+      "WASP-178 b": 100,
+      "HAT-P-1 b": 100,
+      "HAT-P-13 b": 100,
+      "WASP-12 b": 100
+    },
+    "fit_scope": "full_window",
+    "weight_field": "posterior_weights (saved approximate BIC-weighted profile weights)",
+    "longitude_field": "candidate_peak_longitude_degrees",
+    "mixture_rule": "Each noise draw has equal total mixture weight; its normalized profile weights are retained.",
+    "interpretation": "The mixture includes conditional profile-fit uncertainty as well as noise variation. It is not full posterior sampling and does not represent repeated real visits combined."
+  },
+  "plots": {
+    "marginalised": {
+      "plot": "unity_expected_noise_marginalised",
+      "canvas_inches": [
+        3.5,
+        3.5
+      ],
+      "saved_with_tight_bbox": false,
+      "target_labels": [
+        "HAT-P-1 b",
+        "HAT-P-30 b",
+        "HAT-P-13 b",
+        "KELT-7 b",
+        "WASP-178 b",
+        "WASP-12 b"
+      ],
+      "label_offsets_points": {
+        "HAT-P-1 b": [
+          5.0,
+          8.0
+        ],
+        "HAT-P-30 b": [
+          -5.0,
+          -10.0
+        ],
+        "HAT-P-13 b": [
+          5.0,
+          14.0
+        ],
+        "KELT-7 b": [
+          5.0,
+          8.0
+        ],
+        "WASP-178 b": [
+          10.0,
+          -22.0
+        ],
+        "WASP-12 b": [
+          9.511250248233983,
+          22.0
+        ]
+      },
+      "label_overlap_pairs": [],
+      "label_overlap_check": "Passed on the 3.5-inch square canvas using the Agg renderer; labels are inside the plot panel."
+    },
+    "ensemble": {
+      "plot": "unity_expected_noise_ensemble",
+      "canvas_inches": [
+        3.5,
+        3.5
+      ],
+      "saved_with_tight_bbox": false,
+      "target_labels": [
+        "HAT-P-1 b",
+        "HAT-P-30 b",
+        "HAT-P-13 b",
+        "KELT-7 b",
+        "WASP-178 b",
+        "WASP-12 b"
+      ],
+      "label_offsets_points": {
+        "HAT-P-1 b": [
+          5.0,
+          8.0
+        ],
+        "HAT-P-30 b": [
+          -5.0,
+          -10.0
+        ],
+        "HAT-P-13 b": [
+          5.0,
+          14.0
+        ],
+        "KELT-7 b": [
+          5.0,
+          8.0
+        ],
+        "WASP-178 b": [
+          10.0,
+          -22.0
+        ],
+        "WASP-12 b": [
+          9.511250248233983,
+          22.0
+        ]
+      },
+      "label_overlap_pairs": [],
+      "label_overlap_check": "Passed on the 3.5-inch square canvas using the Agg renderer; labels are inside the plot panel."
+    }
+  },
+  "limitations": [
+    "Fixed geometry and depth.",
+    "Approximate blackbody band depths.",
+    "Target-specific PandExo white-noise only.",
+    "Profile fits are not full posterior sampling.",
+    "Illustrative Showman-inspired normalization, not exact GCM predictions."
+  ]
+}

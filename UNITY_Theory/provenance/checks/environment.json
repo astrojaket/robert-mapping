@@ -1,0 +1,26 @@
+{
+  "python": "3.12.13 | packaged by conda-forge | (main, Aug 11 2026, 10:25:41) [Clang 19.1.7 ]",
+  "executable": "python (historical eclipse-mapping environment)",
+  "versions": {
+    "numpy": "2.2.6",
+    "scipy": "1.18.0",
+    "matplotlib": "3.11.1",
+    "jax": "0.10.2",
+    "numpyro": "0.21.0",
+    "PyYAML": "6.0.3",
+    "robert-mapping": "0.1.0"
+  },
+  "git_commit": "b1b4ef3cebad7b70d12e58ce6eee82ae0c7e27b6",
+  "prior_worktree_changes": "?? tools/plot_unity_recovery.py\n",
+  "required_checks": {
+    "existing_forward_and_recovery_tests": "18 passed in2.99s",
+    "future": [
+      "noiseless offset recovery",
+      "fit positivity and interval coverage",
+      "uniform map false positives",
+      "constant-offset population false trends",
+      "quadrature and exposure convergence",
+      "final plot visual inspection"
+    ]
+  }
+}

@@ -1,0 +1,69 @@
+UNITY six-target injection and recovery: methods and limits
+
+Output folder: UNITY_Theory/results/unity_erc_20261009/deliverables
+Trial table: UNITY_Theory/reference/study/recovery_trials.csv
+Input record: UNITY_Theory/data/inputs/unity_inputs.json
+Targets in the trial table: 6 (HAT-P-30 b, KELT-7 b, WASP-178 b, HAT-P-1 b, HAT-P-13 b, WASP-12 b)
+Noise cases: 50 ppm per ideal 60-second bin, 100 ppm per ideal 60-second bin.
+Fit scopes: full_window, eclipse_only.
+Trials by case: temperature_scaled, 50 ppm, full_window: 100; temperature_scaled, 50 ppm, eclipse_only: 100; temperature_scaled, 100 ppm, full_window: 100; temperature_scaled, 100 ppm, eclipse_only: 100; zero_offset, 50 ppm, full_window: 100; zero_offset, 50 ppm, eclipse_only: 100; zero_offset, 100 ppm, full_window: 100; zero_offset, 100 ppm, eclipse_only: 100; constant_30_deg, 50 ppm, full_window: 100; constant_30_deg, 50 ppm, eclipse_only: 100; constant_30_deg, 100 ppm, full_window: 100; constant_30_deg, 100 ppm, eclipse_only: 100; uniform_null, 50 ppm, full_window: 100; uniform_null, 50 ppm, eclipse_only: 100; uniform_null, 100 ppm, full_window: 100; uniform_null, 100 ppm, eclipse_only: 100.
+Saved longitude grid step: 1 degrees.
+Map detection threshold: delta BIC < -6 (saved runner metadata).
+
+Each target is fitted independently. The population slope is fitted only after the target fits, from the six recovered medians for each scenario, noise case, fit scope, and trial. The input trend is not a constraint or prior in any target fit.
+
+A representative plot uses one common trial number across all six targets, selected as trial 0 when complete or otherwise the lowest complete trial. Its vertical bars are the saved q16 to q84 profile-grid intervals, marginalized over unique longitude values and with a minimum width of one longitude grid step. These are profile intervals, not posterior intervals. The recovered offset is conditional on the mapped model; a small delta BIC can mean that the map is not detected.
+
+The population fit is weighted least squares: recovered longitude = intercept + slope * ((Teq - mean(Teq))/1000 K). Each target weight uses an approximate 1-sigma value equal to half the q84-q16 profile interval. If the interval has zero width, the uncertainty is floored at the standard deviation of one uniform grid cell (grid step / sqrt(12)). The fit assumes independent target errors. The reported slope uncertainty uses the inverse weighted design matrix. A negative trend is marked detected when its Gaussian approximation gives P(slope < 0) >= 0.95. This nominal threshold is not a posterior probability. The reported false-detection fractions in the zero, constant-offset, and uniform-planet control cases show how often this approximation gives a negative trend when none is injected.
+For injected longitude trends, each realization's input slope is also fitted with the same target weights as the recovered slope. This avoids comparing the weighted recovered slope with a different unweighted fit to the nonlinear input trend. The slope error is recovered slope minus this matched-weight input slope. The uniform-planet null has no injected longitude and therefore no input slope.
+
+Bias is recovered median minus injected longitude. Ensemble bias, interval coverage, interval width, and the fraction of intervals limited by the longitude grid are calculated across repeat trials for each target, scenario, noise case, and fit scope. The representative figure shows one trial only; it does not show an ensemble interval as if it were one realization.
+
+Map evidence uses delta BIC = BIC(mapped) - BIC(uniform), so negative values support the mapped model. The all-six detection fraction is the fraction of complete six-target trials in which all six saved target fits pass their map-detection rule. The uniform-null case has no injected hotspot longitude; its recovered location remains conditional on fitting a map.
+
+Temperature-scaled injection: delta=atan(tan(40 degrees)*(1500 K/Teq)^3). Illustrative radiative/advection scaling inspired by Showman2020; normalization chosen for simulation, not extracted GCM prediction.
+This scenario is inspired by Showman et al. (2020), but it is an illustrative analytic scaling with a chosen normalization. It is not an offset predicted by a specific GCM or a full population prediction. Source: https://doi.org/10.1007/s11214-020-00758-8
+Figure caption for unity_hotspot_trend: Six independent full-window hot-spot longitude fits for preselected trial 0 (master seed 20261009) at 50 and 100 ppm per ideal 60-second white-noise bin. The purple line shows delta = atan[tan(40 degrees) * (1500 K / Teq)^3], an illustrative Showman-inspired scaling with a chosen normalization, not an offset from a specific GCM. Black markers show recovered medians; bars show saved q16-q84 profile-grid intervals, not posterior intervals. Open symbols mark cases that do not meet the map-detection rule, delta BIC < -6. The model uses fixed circular geometry and symmetric continuous visits.
+
+Study assumptions: User-authorized white noise scenarios at 50 and 100 ppm per ideal 60 second bin; not ETC prediction
+Depth assumption: Photon-weighted flat-throughput blackbody band 2.9-5.1 micron; Tbrightness=1.1*Teq; not atmospheric spectrum or ETC model
+Geometry assumption: Fixed circular representative geometry. Dated 2025-08-13 composite archive ratios and a/Rstar; inclinations checked against live NASA default 2026-10-09; periods from accepted PID10786 APT. Composite values can mix literature solutions. No orbit uncertainty or eccentricity recovery.
+Visit assumption: Symmetric continuous visit about eclipse, length equals APT total science exposure seconds. Ideal 60-second bins with no gaps; not measured timestamps.
+Science scope: Band brightness hot spot longitude, not pressure-specific temperature offset or phase-curve peak; profile-grid screening, not full NUTS validation.
+
+The analysis uses ideal white-noise cases at 50 and 100 ppm per 60-second bin because no ETC result was supplied. It does not include observed time stamps, gaps, orbit uncertainty, eccentricity recovery, correlated noise, or instrument systematics unless the runner metadata states otherwise. Do not read the recovery fraction as a prediction of real-data performance without those terms.
+
+Off-grid check: 6/6 unique temperature-scaled injected values were off the saved regular longitude grid.
+
+Population slope results (slope units are degrees per 1000 K):
+- temperature_scaled, 50 ppm, full_window: median recovered slope -23.5 (q16-q84 -26.7 to -20.8); Matched-weight input slope median -23.5 (q16-q84 -24.2 to -23.1); recovered-minus-input slope median 0.32 (q16-q84 -3.19 to 2.76); negative-slope detection fraction 1.000; all-six map detection fraction 1.000; n=100 trials.
+- temperature_scaled, 50 ppm, eclipse_only: median recovered slope -28.5 (q16-q84 -33.6 to -24.1); Matched-weight input slope median -27.1 (q16-q84 -28.1 to -26.2); recovered-minus-input slope median -1.91 (q16-q84 -6.88 to 2.24); negative-slope detection fraction 1.000; all-six map detection fraction 1.000; n=100 trials.
+- temperature_scaled, 100 ppm, full_window: median recovered slope -24.8 (q16-q84 -28.6 to -20.6); Matched-weight input slope median -24.3 (q16-q84 -25.1 to -23.7); recovered-minus-input slope median -0.408 (q16-q84 -4.6 to 3.6); negative-slope detection fraction 1.000; all-six map detection fraction 0.350; n=100 trials.
+- temperature_scaled, 100 ppm, eclipse_only: median recovered slope -33.6 (q16-q84 -42.8 to -25.4); Matched-weight input slope median -28 (q16-q84 -29.2 to -26.9); recovered-minus-input slope median -5.48 (q16-q84 -14.3 to 1.53); negative-slope detection fraction 1.000; all-six map detection fraction 0.030; n=100 trials.
+- zero_offset, 50 ppm, full_window: median recovered slope -0.0625 (q16-q84 -3.21 to 3.31); Matched-weight input slope median 0 (q16-q84 0 to 0); recovered-minus-input slope median -0.0625 (q16-q84 -3.21 to 3.31); negative-slope detection fraction 0.080; all-six map detection fraction 0.320; n=100 trials.
+- zero_offset, 50 ppm, eclipse_only: median recovered slope -0.71 (q16-q84 -3.9 to 3.49); Matched-weight input slope median 0 (q16-q84 0 to 0); recovered-minus-input slope median -0.71 (q16-q84 -3.9 to 3.49); negative-slope detection fraction 0.020; all-six map detection fraction 0.260; n=100 trials.
+- zero_offset, 100 ppm, full_window: median recovered slope 0.786 (q16-q84 -4.36 to 4.93); Matched-weight input slope median 0 (q16-q84 0 to 0); recovered-minus-input slope median 0.786 (q16-q84 -4.36 to 4.93); negative-slope detection fraction 0.030; all-six map detection fraction 0.000; n=100 trials.
+- zero_offset, 100 ppm, eclipse_only: median recovered slope 0.637 (q16-q84 -7.93 to 7.67); Matched-weight input slope median 0 (q16-q84 0 to 0); recovered-minus-input slope median 0.637 (q16-q84 -7.93 to 7.67); negative-slope detection fraction 0.010; all-six map detection fraction 0.000; n=100 trials.
+- constant_30_deg, 50 ppm, full_window: median recovered slope -0.0595 (q16-q84 -3.25 to 2.48); Matched-weight input slope median -1.52e-15 (q16-q84 -2.75e-14 to 3.54e-14); recovered-minus-input slope median -0.0595 (q16-q84 -3.25 to 2.48); negative-slope detection fraction 0.040; all-six map detection fraction 1.000; n=100 trials.
+- constant_30_deg, 50 ppm, eclipse_only: median recovered slope -2.2 (q16-q84 -7.78 to 1.92); Matched-weight input slope median -6.41e-17 (q16-q84 -3.43e-14 to 3.2e-14); recovered-minus-input slope median -2.2 (q16-q84 -7.78 to 1.92); negative-slope detection fraction 0.090; all-six map detection fraction 0.990; n=100 trials.
+- constant_30_deg, 100 ppm, full_window: median recovered slope -0.397 (q16-q84 -5.02 to 3.28); Matched-weight input slope median -1.74e-15 (q16-q84 -3.13e-14 to 3.13e-14); recovered-minus-input slope median -0.397 (q16-q84 -5.02 to 3.28); negative-slope detection fraction 0.050; all-six map detection fraction 0.060; n=100 trials.
+- constant_30_deg, 100 ppm, eclipse_only: median recovered slope -7.27 (q16-q84 -18 to 2.32); Matched-weight input slope median 2.65e-15 (q16-q84 -1.22e-14 to 1.65e-14); recovered-minus-input slope median -7.27 (q16-q84 -18 to 2.32); negative-slope detection fraction 0.180; all-six map detection fraction 0.020; n=100 trials.
+- uniform_null, 50 ppm, full_window: median recovered slope -2.29 (q16-q84 -29.1 to 26.7) negative-slope detection fraction 0.000; all-six map detection fraction 0.000; n=100 trials.
+- uniform_null, 50 ppm, eclipse_only: median recovered slope -4.41 (q16-q84 -23.3 to 22.7) negative-slope detection fraction 0.000; all-six map detection fraction 0.000; n=100 trials.
+- uniform_null, 100 ppm, full_window: median recovered slope 0.877 (q16-q84 -25.1 to 24) negative-slope detection fraction 0.000; all-six map detection fraction 0.000; n=100 trials.
+- uniform_null, 100 ppm, eclipse_only: median recovered slope -1.46 (q16-q84 -27.2 to 28.9) negative-slope detection fraction 0.000; all-six map detection fraction 0.000; n=100 trials.
+False detections of a negative trend in zero-slope controls, full_window: zero_offset at 50 ppm: 0.080; zero_offset at 100 ppm: 0.030; constant_30_deg at 50 ppm: 0.040; constant_30_deg at 100 ppm: 0.050; uniform_null at 50 ppm: 0.000; uniform_null at 100 ppm: 0.000.
+False detections of a negative trend in zero-slope controls, eclipse_only: zero_offset at 50 ppm: 0.020; zero_offset at 100 ppm: 0.010; constant_30_deg at 50 ppm: 0.090; constant_30_deg at 100 ppm: 0.180; uniform_null at 50 ppm: 0.000; uniform_null at 100 ppm: 0.000.
+
+Generated products:
+- unity_hotspot_trend: compact 50/100 ppm full-window figure for preselected trial 0.
+- Offset recovery figures: one common trial, with injected truths and recovered 68% profile intervals.
+- Bias figures: repeat-trial bias distributions by target.
+- Map evidence figures: delta-BIC distributions by target and case.
+- Population slope figures and CSV tables: per-trial weighted slopes and repeat-trial summaries.
+- target_recovery_summary.csv: per-target bias, precision, coverage, and detection rates.
+- population_slope_recovery.csv and population_slope_summary.csv: slope estimates and trend-detection rates.
+
+Longitude grid check: The WASP-12b temperature-scaled case was repeated for 100 paired noise samples on a 0.25-degree grid. Full-visit median offsets changed by at most 0.038 degrees. At 50 ppm, the mean bias was +0.024 degrees and the recovery scatter was 0.504 degrees. The median interval half-width changed from 0.804 to 0.563 degrees, and nominal 68% coverage changed from 96% to 67%. At 100 ppm, the finer-grid half-width was 1.076 degrees and coverage was 70%. Thus the offset estimates are stable, but the coarse grid inflated the narrowest intervals. Main tables retain the predeclared 1-degree grid. Use the finer-grid check when describing WASP-12b interval precision.
+
+Detection plots use a symmetric logarithmic y axis, with a linear region from -10 to +10, for non-uniform injections. Uniform-null panels use linear axes. The saved profile NPZ files contain full-window fits only; the CSV tables contain both fit scopes.

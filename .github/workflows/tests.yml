@@ -26,3 +26,6 @@ jobs:
       - name: Run tests
         shell: bash -el {0}
         run: pytest -q
+      - name: Check UNITY reproduction tools
+        shell: bash -el {0}
+        run: python -m pytest -q UNITY_Theory/tests

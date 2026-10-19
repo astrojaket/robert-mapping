@@ -1,0 +1,80 @@
+[
+  {
+    "pl_name": "HAT-P-13 b",
+    "pl_orbper": 2.91625,
+    "pl_ratdor": 5.8928,
+    "pl_ratror": 0.08389,
+    "pl_orbincl": 83.4,
+    "pl_orbeccen": 0.0133,
+    "pl_eqt": null,
+    "st_teff": null,
+    "st_rad": null,
+    "pl_radj": 1.272,
+    "pl_refname": "<a refstr=WINN_ET_AL__2010 href=https://ui.adsabs.harvard.edu/abs/2010ApJ...718..575W/abstract target=ref> Winn et al. 2010 </a>"
+  },
+  {
+    "pl_name": "HAT-P-1 b",
+    "pl_orbper": 4.46529976,
+    "pl_ratdor": 9.853,
+    "pl_ratror": 0.11802,
+    "pl_orbincl": 85.634,
+    "pl_orbeccen": null,
+    "pl_eqt": 1322.0,
+    "st_teff": 5980.0,
+    "st_rad": 1.174,
+    "pl_radj": 1.319,
+    "pl_refname": "<a refstr=NIKOLOV_ET_AL__2014 href=https://ui.adsabs.harvard.edu/abs/2014MNRAS.437...46N/abstract target=ref>Nikolov et al. 2014</a>"
+  },
+  {
+    "pl_name": "HAT-P-30 b",
+    "pl_orbper": 2.8106,
+    "pl_ratdor": 7.43,
+    "pl_ratror": null,
+    "pl_orbincl": 83.6,
+    "pl_orbeccen": 0.04,
+    "pl_eqt": null,
+    "st_teff": 6304.0,
+    "st_rad": 1.31,
+    "pl_radj": 1.44,
+    "pl_refname": "<a refstr=STASSUN_ET_AL__2017 href=https://ui.adsabs.harvard.edu/abs/2017AJ....153..136S/abstract target=ref>Stassun et al. 2017</a>"
+  },
+  {
+    "pl_name": "KELT-7 b",
+    "pl_orbper": 2.73477,
+    "pl_ratdor": 5.5,
+    "pl_ratror": null,
+    "pl_orbincl": 83.76,
+    "pl_orbeccen": 0.0,
+    "pl_eqt": null,
+    "st_teff": 6768.0,
+    "st_rad": 1.81,
+    "pl_radj": 1.6,
+    "pl_refname": "<a refstr=STASSUN_ET_AL__2017 href=https://ui.adsabs.harvard.edu/abs/2017AJ....153..136S/abstract target=ref>Stassun et al. 2017</a>"
+  },
+  {
+    "pl_name": "WASP-12 b",
+    "pl_orbper": 1.091418901,
+    "pl_ratdor": null,
+    "pl_ratror": null,
+    "pl_orbincl": 81.8,
+    "pl_orbeccen": null,
+    "pl_eqt": null,
+    "st_teff": 6265.0,
+    "st_rad": 1.69,
+    "pl_radj": 1.965,
+    "pl_refname": "<a refstr=LEONARDI_ET_AL__2024 href=https://ui.adsabs.harvard.edu/abs/2024A&A...686A..84L/abstract target=ref>Leonardi et al. 2024</a>"
+  },
+  {
+    "pl_name": "WASP-178 b",
+    "pl_orbper": 3.3448285,
+    "pl_ratdor": 7.17,
+    "pl_ratror": null,
+    "pl_orbincl": 85.7,
+    "pl_orbeccen": 0.0,
+    "pl_eqt": 2470.0,
+    "st_teff": 9360.0,
+    "st_rad": 1.67,
+    "pl_radj": 1.81,
+    "pl_refname": "<a refstr=HELLIER_ET_AL__2019 href=https://ui.adsabs.harvard.edu/abs/2019MNRAS.490.1479H/abstract target=ref>Hellier et al. 2019</a>"
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "tests": "18 passed",
+  "py_compile": "passed",
+  "git_diff_check": "passed",
+  "visual_review": "Main grant figure and recovery diagnostics checked. Labels and legends are readable.",
+  "main": {
+    "csv_rows": 9600,
+    "all_recovered_maps_positive": true,
+    "profiles_finite": true,
+    "weight_normalization_max_error": 4.440892098500626e-16,
+    "profile_scope": "full_window"
+  },
+  "fine_grid": {
+    "csv_rows": 400,
+    "all_recovered_maps_positive": true,
+    "profiles_finite": true,
+    "weight_normalization_max_error": 4.440892098500626e-16,
+    "profile_scope": "full_window"
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "source_snapshot": "results/unity_erc_20261009",
+  "part_size_bytes": 33554432,
+  "maximum_part_bytes": 41943040,
+  "restore_note": "Run archive_profiles.py from any working directory. Parts are relative to archive/profiles_manifest.json.",
+  "studies": {
+    "study": {
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "restore_path": "reference/study/profiles.npz",
+      "bytes": 295273224,
+      "sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "parts": [
+        {
+          "path": "study/profiles.npz.part001",
+          "bytes": 33554432,
+          "sha256": "79df0946c4d463521de537023d3d5e51c3982e6b4e7651c08c40b5b81af38b66"
+        },
+        {
+          "path": "study/profiles.npz.part002",
+          "bytes": 33554432,
+          "sha256": "fbaf17fe1d4fb1c5cc384c338810b96b07132013d4daf9a345e0be9f7080db9b"
+        },
+        {
+          "path": "study/profiles.npz.part003",
+          "bytes": 33554432,
+          "sha256": "c0273bb975099f9a97093f01add4f32a6c83d521c930e439bac56c66c402fab0"
+        },
+        {
+          "path": "study/profiles.npz.part004",
+          "bytes": 33554432,
+          "sha256": "a7f3da05146c9b46b058e754b6b919c2895510197d9e102eeee91079ac5e3ece"
+        },
+        {
+          "path": "study/profiles.npz.part005",
+          "bytes": 33554432,
+          "sha256": "16d2a33cdd280d8bfce74b077bae683612cd829209b76135998a86011fa6bd74"
+        },
+        {
+          "path": "study/profiles.npz.part006",
+          "bytes": 33554432,
+          "sha256": "4cb697601728db143d523f68a5efd42b7575a5ce7fc6d5a6794e2c60e570d1ac"
+        },
+        {
+          "path": "study/profiles.npz.part007",
+          "bytes": 33554432,
+          "sha256": "52b0b9dba95a0bd8510479c8e83d87f0d5c181893c7ccf584333af8efaa0c0a2"
+        },
+        {
+          "path": "study/profiles.npz.part008",
+          "bytes": 33554432,
+          "sha256": "5d13cc8b69716864e4b719a040e1949a9e0c3bd17d64a9d12ce65ac5fafe2ee1"
+        },
+        {
+          "path": "study/profiles.npz.part009",
+          "bytes": 26837768,
+          "sha256": "663806ea2f327961c2ac54962f9b95497cfdc65d5afb8435111025e9aa910b4f"
+        }
+      ]
+    },
+    "expected_noise_study": {
+      "source_path": "results/unity_erc_20261009/expected_noise_study/profiles.npz",
+      "restore_path": "reference/expected_noise_study/profiles.npz",
+      "bytes": 1556601,
+      "sha256": "ef208cac007d99a5f2ef5f6939d9994c484b2757a586e81c78f4d78fc68f593d",
+      "parts": [
+        {
+          "path": "expected_noise_study/profiles.npz.part001",
+          "bytes": 1556601,
+          "sha256": "ef208cac007d99a5f2ef5f6939d9994c484b2757a586e81c78f4d78fc68f593d"
+        }
+      ]
+    },
+    "expected_noise_ensemble": {
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/profiles.npz",
+      "restore_path": "reference/expected_noise_ensemble/profiles.npz",
+      "bytes": 155063409,
+      "sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "parts": [
+        {
+          "path": "expected_noise_ensemble/profiles.npz.part001",
+          "bytes": 33554432,
+          "sha256": "5bd85b623ec9f014f089cd0a940f56b6174e6336170f9951e7c2365be28e4981"
+        },
+        {
+          "path": "expected_noise_ensemble/profiles.npz.part002",
+          "bytes": 33554432,
+          "sha256": "fd846674c3e33a7566e527b3d4e4234629132ce8d0e82f840e7942eee9f41e80"
+        },
+        {
+          "path": "expected_noise_ensemble/profiles.npz.part003",
+          "bytes": 33554432,
+          "sha256": "a5560ecc68c55e769625e7acc36ccf7b791e7a4181e9945ea8874621308d1243"
+        },
+        {
+          "path": "expected_noise_ensemble/profiles.npz.part004",
+          "bytes": 33554432,
+          "sha256": "c9372b9828fdf0e222c9d5a984726c389efacb39bf028c128b57df88e275ba0a"
+        },
+        {
+          "path": "expected_noise_ensemble/profiles.npz.part005",
+          "bytes": 20845681,
+          "sha256": "9c584ddbc855567c147711e66404507c32369259c33ab37fde90f1bb03a893ae"
+        }
+      ]
+    },
+    "wasp12_finegrid": {
+      "source_path": "results/unity_erc_20261009/wasp12_finegrid/profiles.npz",
+      "restore_path": "reference/wasp12_finegrid/profiles.npz",
+      "bytes": 50916580,
+      "sha256": "25540341835072b75ce85d5b9c5ec7a6326c443ab7edc2508d9298e739438e78",
+      "parts": [
+        {
+          "path": "wasp12_finegrid/profiles.npz.part001",
+          "bytes": 33554432,
+          "sha256": "c4c10356179edd0d8ae7b1e71fcee776d755bb29a0e631336a038e35cf3c525e"
+        },
+        {
+          "path": "wasp12_finegrid/profiles.npz.part002",
+          "bytes": 17362148,
+          "sha256": "3639bc65c43fedbf1df58692f99c8395a713d1f4e93525194f78fb0f99cef3e1"
+        }
+      ]
+    }
+  }
+}

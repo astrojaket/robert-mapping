@@ -1,0 +1,11 @@
+# Keep the frozen input and result tables that the parent project ignores.
+!*.csv
+!*.txt
+!*.pdf
+
+# New runs and restored byte-identical profile archives are local products.
+generated/
+reference/**/profiles.npz
+__pycache__/
+.pytest_cache/
+*.pyc

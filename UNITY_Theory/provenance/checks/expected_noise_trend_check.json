@@ -1,0 +1,10 @@
+{
+  "weighted_recovered_slope_deg_per_1000K": -20.58572303239598,
+  "approximate_profile_based_slope_error": 2.728681930937568,
+  "matched_weight_injected_slope_deg_per_1000K": -21.423752185594854,
+  "nominal_68pct_interval_contains_truth_count": 2,
+  "total_targets": 6,
+  "maps_detected": 6,
+  "largest_absolute_single_draw_offset_error_deg": 8.037281933787476,
+  "qualification": "Descriptive weighted trend from one sample and profile intervals; not a population posterior or calibrated detection significance."
+}

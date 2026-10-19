@@ -1,0 +1,188 @@
+{
+  "retrieval_date": "2026-10-09",
+  "service": "https://exoctk.stsci.edu/pandexo/",
+  "normalization": "J magnitudes from dated NASA composite snapshot; Phoenix stellar spectrum. No extra noise floor. Fixed accepted instrument settings.",
+  "targets": [
+    {
+      "target": "HAT-P-30 b",
+      "pickle_path": "hatp30.p",
+      "calculation_id": "09e5b287-20cd-4049-aca0-41d971066c9ee",
+      "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/09e5b287-20cd-4049-aca0-41d971066c9ee",
+      "download_url": "https://exoctk.stsci.edu/pandexo/calculation/download/09e5b287-20cd-4049-aca0-41d971066c9ee",
+      "submitted_star": {
+        "model": "Phoenix",
+        "teff_k": 6304.0,
+        "logg": 4.36,
+        "metallicity": 0.13,
+        "J_mag": 9.442
+      },
+      "submitted_instrument": {
+        "instrument": "NIRSpec",
+        "template": "NIRSpec Bright Object Time Series",
+        "grating": "G395M",
+        "filter": "F290LP",
+        "subarray": "SUB2048",
+        "groups_per_integration": 12,
+        "readout_pattern": "NRSRAPID",
+        "total_integrations": 1872,
+        "total_exposure_seconds_from_proposal_pdf": 21989.411,
+        "integration_seconds_derived": 11.74648,
+        "integration_seconds_method": "Total Exposure Time divided by Total Integrations; this is a derived value."
+      },
+      "brightness_temperature_k": 1869.6920000000002,
+      "reference_wave_micron": 1.26,
+      "noise_floor_ppm": 0
+    },
+    {
+      "target": "KELT-7 b",
+      "pickle_path": "kelt7.p",
+      "calculation_id": "bc20cfe9-ca59-4cd0-baf3-8d002cfed755e",
+      "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/bc20cfe9-ca59-4cd0-baf3-8d002cfed755e",
+      "download_url": "https://exoctk.stsci.edu/pandexo/calculation/download/bc20cfe9-ca59-4cd0-baf3-8d002cfed755e",
+      "submitted_star": {
+        "model": "Phoenix",
+        "teff_k": 6768.0,
+        "logg": 4.5,
+        "metallicity": 0.0,
+        "J_mag": 7.739
+      },
+      "submitted_instrument": {
+        "instrument": "NIRSpec",
+        "template": "NIRSpec Bright Object Time Series",
+        "grating": "G395H",
+        "filter": "F290LP",
+        "subarray": "SUB2048",
+        "groups_per_integration": 7,
+        "readout_pattern": "NRSRAPID",
+        "total_integrations": 4686,
+        "total_exposure_seconds_from_proposal_pdf": 33910.145,
+        "integration_seconds_derived": 7.23648,
+        "integration_seconds_method": "Total Exposure Time divided by Total Integrations; this is a derived value."
+      },
+      "brightness_temperature_k": 2298.582,
+      "reference_wave_micron": 1.26,
+      "noise_floor_ppm": 0
+    },
+    {
+      "target": "WASP-178 b",
+      "pickle_path": "wasp178.p",
+      "calculation_id": "4096ff2c-bdba-4c70-98f8-656795b72a58e",
+      "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/4096ff2c-bdba-4c70-98f8-656795b72a58e",
+      "download_url": "https://exoctk.stsci.edu/pandexo/calculation/download/4096ff2c-bdba-4c70-98f8-656795b72a58e",
+      "submitted_star": {
+        "model": "Phoenix",
+        "teff_k": 9360.0,
+        "logg": 4.31,
+        "metallicity": 0.21,
+        "J_mag": 9.775
+      },
+      "submitted_instrument": {
+        "instrument": "NIRSpec",
+        "template": "NIRSpec Bright Object Time Series",
+        "grating": "G395M",
+        "filter": "F290LP",
+        "subarray": "SUB2048",
+        "groups_per_integration": 9,
+        "readout_pattern": "NRSRAPID",
+        "total_integrations": 3743,
+        "total_exposure_seconds_from_proposal_pdf": 33838.517,
+        "integration_seconds_derived": 9.04048,
+        "integration_seconds_method": "Total Exposure Time divided by Total Integrations; this is a derived value."
+      },
+      "brightness_temperature_k": 2716.0870000000004,
+      "reference_wave_micron": 1.26,
+      "noise_floor_ppm": 0
+    },
+    {
+      "target": "HAT-P-1 b",
+      "pickle_path": "hatp1.p",
+      "calculation_id": "e34a5984-b683-4bce-b40f-d7d78cf8345ae",
+      "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/e34a5984-b683-4bce-b40f-d7d78cf8345ae",
+      "download_url": "https://exoctk.stsci.edu/pandexo/calculation/download/e34a5984-b683-4bce-b40f-d7d78cf8345ae",
+      "submitted_star": {
+        "model": "Phoenix",
+        "teff_k": 5980.0,
+        "logg": 4.359,
+        "metallicity": 0.13,
+        "J_mag": 9.156
+      },
+      "submitted_instrument": {
+        "instrument": "NIRSpec",
+        "template": "NIRSpec Bright Object Time Series",
+        "grating": "G395M",
+        "filter": "F290LP",
+        "subarray": "SUB2048",
+        "groups_per_integration": 9,
+        "readout_pattern": "NRSRAPID",
+        "total_integrations": 3122,
+        "total_exposure_seconds_from_proposal_pdf": 28224.379,
+        "integration_seconds_derived": 9.04048,
+        "integration_seconds_method": "Total Exposure Time divided by Total Integrations; this is a derived value."
+      },
+      "brightness_temperature_k": 1457.4230000000002,
+      "reference_wave_micron": 1.26,
+      "noise_floor_ppm": 0
+    },
+    {
+      "target": "HAT-P-13 b",
+      "pickle_path": "hatp13.p",
+      "calculation_id": "f9a7b495-b5bf-4d50-ac86-84d04abb1f72e",
+      "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/f9a7b495-b5bf-4d50-ac86-84d04abb1f72e",
+      "download_url": "https://exoctk.stsci.edu/pandexo/calculation/download/f9a7b495-b5bf-4d50-ac86-84d04abb1f72e",
+      "submitted_star": {
+        "model": "Phoenix",
+        "teff_k": 5653.0,
+        "logg": 4.13,
+        "metallicity": 0.46,
+        "J_mag": 9.328
+      },
+      "submitted_instrument": {
+        "instrument": "NIRSpec",
+        "template": "NIRSpec Bright Object Time Series",
+        "grating": "G395M",
+        "filter": "F290LP",
+        "subarray": "SUB2048",
+        "groups_per_integration": 10,
+        "readout_pattern": "NRSRAPID",
+        "total_integrations": 6170,
+        "total_exposure_seconds_from_proposal_pdf": 61345.102,
+        "integration_seconds_derived": 9.94248,
+        "integration_seconds_method": "Total Exposure Time divided by Total Integrations; this is a derived value."
+      },
+      "brightness_temperature_k": 1896.8400000000001,
+      "reference_wave_micron": 1.26,
+      "noise_floor_ppm": 0
+    },
+    {
+      "target": "WASP-12 b",
+      "pickle_path": "wasp12.p",
+      "calculation_id": "e6cec414-76cf-48f5-a6a0-fcf80f8e3784e",
+      "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/e6cec414-76cf-48f5-a6a0-fcf80f8e3784e",
+      "download_url": "https://exoctk.stsci.edu/pandexo/calculation/download/e6cec414-76cf-48f5-a6a0-fcf80f8e3784e",
+      "submitted_star": {
+        "model": "Phoenix",
+        "teff_k": 6265.0,
+        "logg": 4.11,
+        "metallicity": 0.12,
+        "J_mag": 10.477
+      },
+      "submitted_instrument": {
+        "instrument": "NIRSpec",
+        "template": "NIRSpec Bright Object Time Series",
+        "grating": "G395M",
+        "filter": "F290LP",
+        "subarray": "SUB2048",
+        "groups_per_integration": 32,
+        "readout_pattern": "NRSRAPID",
+        "total_integrations": 991,
+        "total_exposure_seconds_from_proposal_pdf": 29518.402,
+        "integration_seconds_derived": 29.78648,
+        "integration_seconds_method": "Total Exposure Time divided by Total Integrations; this is a derived value."
+      },
+      "brightness_temperature_k": 2824.1180000000004,
+      "reference_wave_micron": 1.26,
+      "noise_floor_ppm": 0
+    }
+  ],
+  "calculation_duration_note": "HAT-P-30 and KELT-7 calculations used the first resolved HAT-P-30 duration of 2.2499254 hr. Other calculation durations used circular contact durations from adopted geometry. White noise per60sec is computed from per-integration counts/variance and wall time, so it is independent of the in/out duration partition. Recovery uses each target geometry and accepted visit length."
+}

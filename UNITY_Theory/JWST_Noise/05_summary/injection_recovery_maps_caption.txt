@@ -1,0 +1,14 @@
+Injected and retrieved map pairs for the temperature_scaled scenario. The left map in each row is the injected map. The right map is the ‘Best-fit map, trial 0’: the conditional best-fit map from the saved `trial = 0`, `fit_scope = full_window` row. The same purple colour scale is used for both maps in each row. Colour shows reconstructed surface intensity multiplied by the target planet depth, in stellar-ppm scale; it is not an observed light-curve sample. Longitude is measured east from the substellar point. Row order, top to bottom:
+1. HAT-P-30 b
+2. KELT-7 b
+3. WASP-178 b
+4. HAT-P-1 b
+5. HAT-P-13 b
+6. WASP-12 b
+Detection status for each right-hand map:
+HAT-P-30 b: delta BIC = -76.44308281755775; map_detected = True. The displayed right-hand map is the conditional best fit, including for a non-detection.
+KELT-7 b: delta BIC = -412.8429993919217; map_detected = True. The displayed right-hand map is the conditional best fit, including for a non-detection.
+WASP-178 b: delta BIC = -32.515040857555505; map_detected = True. The displayed right-hand map is the conditional best fit, including for a non-detection.
+HAT-P-1 b: delta BIC = -119.05836851422737; map_detected = True. The displayed right-hand map is the conditional best fit, including for a non-detection.
+HAT-P-13 b: delta BIC = -557.4582567887574; map_detected = True. The displayed right-hand map is the conditional best fit, including for a non-detection.
+WASP-12 b: delta BIC = -3136.9747095085404; map_detected = True. The displayed right-hand map is the conditional best fit, including for a non-detection.
