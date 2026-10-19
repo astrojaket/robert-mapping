@@ -1,0 +1,93 @@
+{
+  "status": "passed",
+  "created_utc": "2026-10-09T15:24:33.778374+00:00",
+  "command": "source profiles/laptop.env; export MPLCONFIGDIR=temporary directory/unity-mpl; python (historical eclipse-mapping environment) tools/unity_injection_recovery.py --inputs results/unity_erc_20261009/inputs/unity_expected_noise.json --output results/unity_erc_20261009/expected_noise_ensemble --trials 100 --exposure-subsamples 8 --disk-radial 32 --disk-azimuth 128 --chunk-size 128",
+  "input": {
+    "path": "results/unity_erc_20261009/inputs/unity_expected_noise.json",
+    "sha256_before_run": "516233423cc44e05dd1e7db2a3cb3433b2116d54d8f32a4733fc636071edfe7d",
+    "sha256_after_run": "516233423cc44e05dd1e7db2a3cb3433b2116d54d8f32a4733fc636071edfe7d",
+    "unchanged": true,
+    "run_input_snapshot_matches_file": true
+  },
+  "run": {
+    "summary_status": "complete",
+    "target_count": 6,
+    "targets": [
+      "HAT-P-30 b",
+      "KELT-7 b",
+      "WASP-178 b",
+      "HAT-P-1 b",
+      "HAT-P-13 b",
+      "WASP-12 b"
+    ],
+    "trials_per_target": 100,
+    "master_seed": 20261009,
+    "scenarios": [
+      "temperature_scaled"
+    ],
+    "fit_scopes": [
+      "eclipse_only",
+      "full_window"
+    ],
+    "longitude_grid_step_degrees": 0.25,
+    "per_target_noise_source_urls_present": true
+  },
+  "trial_rows": {
+    "count": 1200,
+    "expected_count": 1200,
+    "per_target_per_fit_scope": {
+      "HAT-P-30 b|eclipse_only": 100,
+      "HAT-P-30 b|full_window": 100,
+      "KELT-7 b|eclipse_only": 100,
+      "KELT-7 b|full_window": 100,
+      "WASP-178 b|eclipse_only": 100,
+      "WASP-178 b|full_window": 100,
+      "HAT-P-1 b|eclipse_only": 100,
+      "HAT-P-1 b|full_window": 100,
+      "HAT-P-13 b|eclipse_only": 100,
+      "HAT-P-13 b|full_window": 100,
+      "WASP-12 b|eclipse_only": 100,
+      "WASP-12 b|full_window": 100
+    },
+    "each_target_trial_has_both_fit_scopes": true,
+    "unique_target_scenario_trial_scope_keys": true
+  },
+  "profiles": {
+    "array_shapes": {
+      "profile_log_likelihood": [
+        600,
+        19467
+      ],
+      "profile_bic": [
+        600,
+        19467
+      ],
+      "posterior_weights": [
+        600,
+        19467
+      ]
+    },
+    "all_profile_values_finite": true,
+    "posterior_weights_nonnegative": true,
+    "posterior_weight_rows_normalized": true,
+    "minimum_saved_posterior_weight": 0.0,
+    "zero_weight_count_from_floating_point_underflow": 1183396
+  },
+  "best_maps": {
+    "all_best_maps_positive": true,
+    "positive_map_rows": 1200,
+    "minimum_best_map_intensity": 7.346830062398765e-05
+  },
+  "trial_zero_reproduction": {
+    "row_count_each_run": 12,
+    "same_target_scenario_trial_scope_keys": true,
+    "csv_rows_identical": true,
+    "csv_difference_count": 0,
+    "profile_candidate_grid_identical": true,
+    "profile_arrays_identical": {
+      "profile_log_likelihood": true,
+      "profile_bic": true,
+      "posterior_weights": true
+    }
+  }
+}

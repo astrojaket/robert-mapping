@@ -1,0 +1,2 @@
+target,run_id,scenario,trial,fit_scope,noise_input_ppm,noise_ppm,delta_bic,delta_bic_detection_threshold,map_detected,displayed_map
+WASP-12 b,wasp_12_b__100ppm__temperature_scaled__trial000__full_window,temperature_scaled,0,full_window,100.0,100.0,-2527.885174692964,-6.0,True,"conditional best-fit map from the saved fit, including when map_detected is false"

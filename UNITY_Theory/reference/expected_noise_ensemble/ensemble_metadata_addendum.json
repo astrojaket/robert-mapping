@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-09T15:24:34.366839+00:00",
+  "applies_to": "results/unity_erc_20261009/expected_noise_ensemble",
+  "input_file": "results/unity_erc_20261009/inputs/unity_expected_noise.json",
+  "input_file_sha256": "516233423cc44e05dd1e7db2a3cb3433b2116d54d8f32a4733fc636071edfe7d",
+  "ensemble_scope": {
+    "scenario": "temperature_scaled",
+    "target_count": 6,
+    "trials_per_target": 100,
+    "seed_policy": "100 deterministic trial seeds per target from master seed 20261009; the existing runner derives each seed from the master seed, target index, noise index, and trial index.",
+    "fit_scopes": [
+      "eclipse_only",
+      "full_window"
+    ],
+    "longitude_grid_step_degrees": 0.25,
+    "trial_zero": "Trial 0 reproduces the prior one-draw run exactly in all recovery_trials.csv fields and saved profile arrays."
+  },
+  "interpretation_notes": {
+    "single_realization": {
+      "inherited_input_text": "One predeclared seed per target, master seed20261009; same target seed index as original first trial. No sample selection. 0.25-degree longitude grid for all six targets.",
+      "ensemble_note": "This description is retained in the unchanged input snapshot for provenance. It describes the original one-draw study and is superseded for this ensemble output by the 100 deterministic trials per target stated above."
+    },
+    "noise": {
+      "target_input_basis": "Target-level noise_ppm and noise_levels_ppm values are specific to saved online PandExo results. Each target record retains its PandExo source URL and expected-noise warnings. The input assumptions describe saved counts and variances, reset duty cycle, read noise, and background.",
+      "runner_generic_note": "The generic source_assumptions.noise text in summary.json and run_inputs.json describes the recovery runner: it samples independent white Gaussian noise and adds no correlated/red noise or extra floor. Its phrase “No ETC” means the runner does not call an ETC. It does not mean the target-specific input noise values lack a PandExo basis."
+    },
+    "posterior_weights": "Saved weights are finite, nonnegative, and normalized within floating-point tolerance. Some entries are zero from floating-point underflow; no weight is negative."
+  },
+  "check_file": "ensemble_run_check.json"
+}

@@ -1,0 +1,1 @@
+https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name%2Cpl_orbper%2Cpl_ratdor%2Cpl_ratror%2Cpl_orbincl%2Cpl_orbeccen%2Cpl_eqt%2Cst_teff%2Cst_rad%2Cpl_radj%2Cpl_refname+from+ps+where+default_flag%3D1+and+pl_name+in+%28%27HAT-P-30+b%27%2C%27KELT-7+b%27%2C%27WASP-178+b%27%2C%27HAT-P-1+b%27%2C%27HAT-P-13+b%27%2C%27WASP-12+b%27%29&format=json

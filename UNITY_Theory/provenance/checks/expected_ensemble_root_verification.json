@@ -1,0 +1,74 @@
+{
+  "row_count": 1200,
+  "target_count": 6,
+  "scopes": {
+    "full_window": {
+      "negative_slopes": 100,
+      "slope_median": -32.31455199934547,
+      "slope_1sigma": [
+        -36.487119368602265,
+        -27.491773124041547
+      ],
+      "slope_2sigma": [
+        -42.29734303838052,
+        -24.68131072205459
+      ]
+    },
+    "eclipse_only": {
+      "negative_slopes": 100,
+      "slope_median": -31.602756175517577,
+      "slope_1sigma": [
+        -37.50373300970498,
+        -28.14647494539255
+      ],
+      "slope_2sigma": [
+        -43.82961638002488,
+        -22.032662147703043
+      ]
+    }
+  },
+  "first_draw_matches_original": true,
+  "profile_shape": [
+    600,
+    19467
+  ],
+  "max_weight_sum_error": 4.440892098500626e-16,
+  "figures": {
+    "unity_expected_noise_ensemble.png": [
+      2100,
+      2100
+    ],
+    "unity_expected_noise_marginalised.png": [
+      2100,
+      2100
+    ]
+  },
+  "artifact_hashes": {
+    "expected_noise_ensemble/summary.json": "1937c97d21f414f4c68b4e000d636cb2fd3e3ef53647a37a19c72c728f4c4aea",
+    "expected_noise_ensemble/ensemble_metadata_addendum.json": "06c1bac538b444679b26dc56b9bef27552a4a95d65a212d522a28c6d13bc7942",
+    "expected_noise_ensemble/recovery_trials.csv": "4232e603055d7d1e5db08ba8b25e63f00a3449e03f7f814c7a56e80cc4d16fa4",
+    "expected_noise_ensemble/ensemble_run_check.json": "6d89e23cfbb75cacf0ebebbb2d45f53de02aff640e9c7b5b3a8824495f813db0",
+    "expected_noise_ensemble/run_inputs.json": "43cba785c315e00324c85b89a785a77a499ff2b527bac1e0277cec988b0c917b",
+    "expected_noise_ensemble/profiles.npz": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+    "expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.png": "416109714b20d1e5cf499496b45e83ea1a15a4709caffd7055bb5384ce654024",
+    "expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.pdf": "3ff39a34c4f4f8fb78786ef16031d94d619823f4437f6ce40d800630fa92923a",
+    "expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.png": "9772745e2e18bf39bde3d4874c9a5453702337b59ba1dbf0ff81a02c79a488d0",
+    "expected_noise_ensemble_deliverables/ensemble_report.txt": "628f8eb8b34523c340152fc4e99d9bbf510f91e3248ee0db148591b9096eedc7",
+    "expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.pdf": "e34f79ccfe72696f24636a7812c0f86649ba1fe6642acd001a565b763eea4805",
+    "expected_noise_ensemble_deliverables/trend_summary.json": "b618f57245dc032abb2013e7f498c10277d30679f77ad0ab3eefb42ea420b99d",
+    "expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.svg": "299ba02672fec5c5da9f46da0d110b0cd88facf5e08bc808f4cbb8817e8402ec",
+    "expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.svg": "a8bad621e503c7ee1130509c370b6d71245f9b3f8c3e560be9d9b6c3557a2d0f",
+    "expected_noise_ensemble_deliverables/recovery_draws.csv": "3e44ba089bbc61226ef75979ee863d00bbbd799784636447d8b192541176bf7f",
+    "expected_noise_ensemble_deliverables/ensemble_metadata.json": "1444c6bb675c007931ae6cb8c6e24967a850debed86660058e3eb5707716d207",
+    "expected_noise_ensemble_deliverables/equal_weight_profile_mixture.csv": "079e1dedb675c756d029e8e0e1f37c853ffa2a0f606d2c92dc676d1d1dbc9f4e",
+    "expected_noise_ensemble_deliverables/caption_marginalised.txt": "e0e1c3ecfbae36a9a218c5acb2d347c4aa864cfa7e7d2364e182181a74c2992b",
+    "expected_noise_ensemble_deliverables/trend_per_realization.csv": "3385dbbaa21b8bc5aec682ae84901dc4799545b5eeda52895a7a5f7713565193",
+    "expected_noise_ensemble_deliverables/target_summary.csv": "c5970a64a36ad266d38e7ec66be467650d3d2f709fdf38cb6d70894cca4b13ef",
+    "expected_noise_ensemble_deliverables/caption_ensemble.txt": "72c84b3edb16e08aff3ed6310a8165e069f39753a79cfe38c07639fcdb91ae37",
+    "expected_noise_ensemble_deliverables/methodology.txt": "d012c86a25221f2234ef4ee2cd511b8463197346646cb1244db6281da8309b81"
+  },
+  "independent_profile_mixture_quantile_check": "PASS: averaged candidate weights and circular quantiles agree to 1e-10",
+  "all_six_injected_offsets_in_mixture_1sigma": true,
+  "all_1200_best_maps_positive": true,
+  "visual_review": "PASS: both final square PNGs; labels, leaders, legends, all ranges visible; no grid or titles."
+}

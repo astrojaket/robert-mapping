@@ -1,0 +1,10 @@
+{
+  "seed": 709,
+  "n_observations": 100,
+  "n_candidates": 8,
+  "max_chi2_difference": 2.4158453015843406e-13,
+  "max_uniform_amplitude_difference": 8.881784197001252e-16,
+  "max_spot_amplitude_difference": 2.3592239273284576e-16,
+  "pass": true,
+  "comparison": "Batched positivity-constrained solver versus public fit_profile after nonnegative basis transform u=z+s/r"
+}

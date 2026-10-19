@@ -1,0 +1,32 @@
+UNITY expected-noise ensemble summary
+Recovery trials CSV: UNITY_Theory/reference/expected_noise_ensemble/recovery_trials.csv
+Input JSON: UNITY_Theory/data/inputs/unity_expected_noise.json
+Profile arrays: UNITY_Theory/reference/expected_noise_ensemble/profiles.npz
+Independent noise draws per target: 100
+
+Empirical ranges are across recovered profile medians from noise realizations. They are not posterior intervals and are not standard errors of the mean.
+All realizations are included, whether or not the map-detection flag is true.
+The simulation uses fixed geometry and depth, approximate blackbody depths, target-specific PandExo white noise only (29.6 to 89.9 ppm per 60 seconds), profile fits rather than full posterior sampling, and an illustrative Showman-inspired normalization rather than exact GCM predictions.
+
+The primary marginalised plot and equal-weight profile-mixture CSV combine each draw's normalized approximate BIC-weighted profile distribution with equal weight per noise draw.
+This profile mixture includes conditional profile-fit uncertainty as well as noise variation. It is not full Bayesian posterior sampling and does not describe combining multiple real visits.
+
+full_window target summaries:
+- HAT-P-30 b: median=30.59 deg; 1σ range=[23.78, 36.97] deg; 2σ range=[19.64, 43.49] deg; scatter=6.40 deg; mean bias=0.84 deg; map detections=100/100
+- KELT-7 b: median=17.41 deg; 1σ range=[16.29, 18.45] deg; 2σ range=[14.39, 20.19] deg; scatter=1.50 deg; mean bias=0.18 deg; map detections=100/100
+- WASP-178 b: median=10.73 deg; 1σ range=[5.95, 16.02] deg; 2σ range=[2.72, 20.03] deg; scatter=4.59 deg; mean bias=0.35 deg; map detections=100/100
+- HAT-P-1 b: median=53.44 deg; 1σ range=[47.31, 58.93] deg; 2σ range=[40.82, 65.69] deg; scatter=6.52 deg; mean bias=2.66 deg; map detections=100/100
+- HAT-P-13 b: median=28.30 deg; 1σ range=[25.38, 30.83] deg; 2σ range=[22.57, 33.09] deg; scatter=2.77 deg; mean bias=-0.84 deg; map detections=100/100
+- WASP-12 b: median=9.48 deg; 1σ range=[8.66, 10.52] deg; 2σ range=[8.04, 11.15] deg; scatter=0.87 deg; mean bias=0.05 deg; map detections=100/100
+Unweighted recovered trend: median=-32.315 deg per 1000 K; 1σ range=[-36.48711936860226, -27.491773124041536]; 2σ range=[-42.29734303838053, -24.681310722054583]; input-relation slope=-30.908 deg per 1000 K; negative fraction=1.000.
+Weighted recovered trend: median=-21.325 deg per 1000 K; 1σ range=[-24.22655218552694, -18.573285910733482]; 2σ range=[-27.368431117034046, -16.405752063755518]; negative fraction=1.000.
+
+eclipse_only target summaries:
+- HAT-P-30 b: median=31.97 deg; 1σ range=[24.92, 40.38] deg; 2σ range=[20.64, 53.28] deg; scatter=8.42 deg; mean bias=3.13 deg; map detections=100/100
+- KELT-7 b: median=18.51 deg; 1σ range=[14.91, 22.04] deg; 2σ range=[9.95, 28.67] deg; scatter=4.36 deg; mean bias=1.51 deg; map detections=100/100
+- WASP-178 b: median=12.95 deg; 1σ range=[8.61, 18.85] deg; 2σ range=[5.95, 27.54] deg; scatter=5.67 deg; mean bias=3.23 deg; map detections=94/100
+- HAT-P-1 b: median=52.59 deg; 1σ range=[47.78, 60.40] deg; 2σ range=[42.44, 66.62] deg; scatter=6.50 deg; mean bias=2.96 deg; map detections=100/100
+- HAT-P-13 b: median=34.41 deg; 1σ range=[27.50, 42.93] deg; 2σ range=[21.68, 64.59] deg; scatter=9.85 deg; mean bias=7.19 deg; map detections=100/100
+- WASP-12 b: median=10.82 deg; 1σ range=[8.23, 14.55] deg; 2σ range=[4.47, 16.44] deg; scatter=3.07 deg; mean bias=1.41 deg; map detections=100/100
+Unweighted recovered trend: median=-31.603 deg per 1000 K; 1σ range=[-37.50373300970499, -28.146474945392537]; 2σ range=[-43.82961638002487, -22.032662147703043]; input-relation slope=-30.908 deg per 1000 K; negative fraction=1.000.
+Weighted recovered trend: median=-28.359 deg per 1000 K; 1σ range=[-34.10811818851149, -22.999321038449217]; 2σ range=[-39.490826189602586, -18.30091423738806]; negative fraction=1.000.

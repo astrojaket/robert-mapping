@@ -1,0 +1,312 @@
+{
+  "analysis": {
+    "baseline_intercept_ppm": 20.0,
+    "baseline_order": 1,
+    "baseline_slope_ppm": 30.0,
+    "latitude_grid_degrees": [
+      -30.0,
+      0.0,
+      30.0
+    ],
+    "longitude_grid_step_degrees": 0.25,
+    "timing_grid_seconds": [
+      -30.0,
+      0.0,
+      30.0
+    ],
+    "width_grid_degrees": [
+      30.0,
+      40.0,
+      50.0
+    ]
+  },
+  "assumptions": {
+    "cadence": "Expected noise per60seconds of wall time. Recovery uses ideal continuous 60-second integrated bins, not exact detector timestamps; reset loss is included in noise, not explicitly masked within each model exposure.",
+    "depth": "Photon-weighted flat-throughput blackbody band 2.9-5.1 micron; Tbrightness=1.1*Teq; not atmospheric spectrum or ETC model",
+    "geometry": "Fixed circular representative geometry. Dated 2025-08-13 composite archive ratios and a/Rstar; inclinations checked against live NASA default 2026-10-09; periods from accepted PID10786 APT. Composite values can mix literature solutions. No orbit uncertainty or eccentricity recovery.",
+    "noise": "Expected 2.9-5.1 micron white-light noise from official online PandExo saved counts and variances, including reset duty cycle, read noise and background. J-normalized Phoenix spectrum and accepted PID10786 detector setup. No extra noise floor or correlated noise. Engine/refdata version is not exposed by online output.",
+    "realizations": "100 saved draws per target, using the preserved seed_target_index values. All saved draws are included; no trial is selected by fit outcome.",
+    "science": "Band brightness hot spot longitude, not pressure-specific temperature offset or phase-curve peak; profile-grid screening, not full NUTS validation.",
+    "trend": "delta=atan(tan(40 degrees)*(1500 K/Teq)^3). Illustrative radiative/advection scaling inspired by Showman2020; normalization chosen for simulation, not extracted GCM prediction.",
+    "visit": "Symmetric continuous visit about eclipse, length equals APT total science exposure seconds. Ideal 60-second bins with no gaps; not measured timestamps."
+  },
+  "scenarios": [
+    "temperature_scaled"
+  ],
+  "seed": 20261009,
+  "showman_source": "https://doi.org/10.1007/s11214-020-00758-8",
+  "sources": [
+    {
+      "path": "merged_targets.csv (historical source: PostDoc4/Cycle_5/Emission_Survey/Plot2)",
+      "sha256": "e6d0f4961506da3742fd0380f9573829272d79e6ea26db7476b87efd7671eb4d"
+    },
+    {
+      "path": "pscomppars_recent.csv (historical source: PostDoc4/BOWIE_Meeting_Bristol)",
+      "sha256": "9c0192a748e87b053184520782702b6387a894e528c2a8c32b5b7430051a21f8"
+    },
+    {
+      "path": "10786.pdf (historical source: PostDoc4/Cycle_5/Emission_Survey)",
+      "sha256": "72f0a0084a3ec2feb01ebdd1c659df8f8652bf38259eed201fed86816f62e771"
+    },
+    {
+      "path": "UNITY_accepted_JWST.txt (historical source: PostDoc4/Fellowships/ERC/URF_Conversion/Sources)",
+      "sha256": "209854220e84871719122cc4a1f093b7f6cc2b4f9269bec1b87a8278eefdd2b3"
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp30.p",
+      "sha256": "1979fe9aa037a42b6b81c7889d330c88aa6abe1cbab65cd65f1de87c228aa2f2"
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/kelt7.p",
+      "sha256": "ca309776626c439414f1c057c872531eac84af894c7f7368125dcf28d258298d"
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/wasp178.p",
+      "sha256": "20b7be5df001d012321579f8ee97afdd098ffe39be30df9b29779caf7adfb2bd"
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp1.p",
+      "sha256": "f01420d90abeeeff626e8a24a6e74212e5f7434465c1493bb2d790e3b18a2f46"
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp13.p",
+      "sha256": "ad5ef64f65e07c1af92f0849166a036cdc850a3332b45270e985469b15308d14"
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/wasp12.p",
+      "sha256": "1caeb98bddb6f6ae51556be6488e937cffd46b5f2b8a417201771d00e04de34f"
+    }
+  ],
+  "targets": [
+    {
+      "a_over_rstar": 7.43,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 1869.6920000000002,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.04,
+      "depth_ppm": 1486.21777356029,
+      "detector_elapsed_integration_seconds": 11.74648,
+      "detector_groups": 12,
+      "detector_measurement_seconds": 9.922,
+      "expected_noise_warnings": {
+        "% full well high?": "All good (77% < 80%)",
+        "Group Number Too High?": "All good",
+        "Group Number Too Low?": "All good",
+        "Minimum Integrations?": "All good",
+        "Non linear?": "All good",
+        "Num Groups Reset?": "All good",
+        "Saturated?": "All good"
+      },
+      "exposure_seconds": 60,
+      "inclination_degrees": 83.6,
+      "instrument": "NIRSpec/G395M",
+      "name": "HAT-P-30 b",
+      "noise_levels_ppm": [
+        58.93775222438686
+      ],
+      "noise_ppm": 58.93775222438686,
+      "noise_reference_seconds": 60,
+      "noise_source": "https://exoctk.stsci.edu/pandexo/calculation/view/09e5b287-20cd-4049-aca0-41d971066c9ee",
+      "period_days": 2.81060097,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.1109,
+      "rank": 1,
+      "seed_target_index": 0,
+      "star_teff_k": 6304.0,
+      "teq_k": 1699.72,
+      "window_hours": 6.108169722222223
+    },
+    {
+      "a_over_rstar": 5.5,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 2298.582,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0,
+      "depth_ppm": 1476.9992840463572,
+      "detector_elapsed_integration_seconds": 7.23648,
+      "detector_groups": 7,
+      "detector_measurement_seconds": 5.412,
+      "expected_noise_warnings": {
+        "% full well high?": "All good (79% < 80%)",
+        "Group Number Too High?": "All good",
+        "Group Number Too Low?": "All good",
+        "Minimum Integrations?": "All good",
+        "Non linear?": "All good",
+        "Num Groups Reset?": "All good",
+        "Saturated?": "All good"
+      },
+      "exposure_seconds": 60,
+      "inclination_degrees": 83.76,
+      "instrument": "NIRSpec/G395H",
+      "name": "KELT-7 b",
+      "noise_levels_ppm": [
+        29.62673119053213
+      ],
+      "noise_ppm": 29.62673119053213,
+      "noise_reference_seconds": 60,
+      "noise_source": "https://exoctk.stsci.edu/pandexo/calculation/view/bc20cfe9-ca59-4cd0-baf3-8d002cfed755e",
+      "period_days": 2.7347656,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.0922,
+      "rank": 2,
+      "seed_target_index": 1,
+      "star_teff_k": 6768.0,
+      "teq_k": 2089.62,
+      "window_hours": 9.419484722222222
+    },
+    {
+      "a_over_rstar": 7.17,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 2716.0870000000004,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0,
+      "depth_ppm": 1960.4517809345696,
+      "detector_elapsed_integration_seconds": 9.040479999999999,
+      "detector_groups": 9,
+      "detector_measurement_seconds": 7.216,
+      "expected_noise_warnings": {
+        "% full well high?": "All good (33% < 80%)",
+        "Group Number Too High?": "All good",
+        "Group Number Too Low?": "All good",
+        "Minimum Integrations?": "All good",
+        "Non linear?": "All good",
+        "Num Groups Reset?": "All good",
+        "Saturated?": "All good"
+      },
+      "exposure_seconds": 60,
+      "inclination_degrees": 85.7,
+      "instrument": "NIRSpec/G395M",
+      "name": "WASP-178 b",
+      "noise_levels_ppm": [
+        81.44518728680512
+      ],
+      "noise_ppm": 81.44518728680512,
+      "noise_reference_seconds": 60,
+      "noise_source": "https://exoctk.stsci.edu/pandexo/calculation/view/4096ff2c-bdba-4c70-98f8-656795b72a58e",
+      "period_days": 3.3448369,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.11066,
+      "rank": 3,
+      "seed_target_index": 2,
+      "star_teff_k": 9360.0,
+      "teq_k": 2469.17,
+      "window_hours": 9.399588055555556
+    },
+    {
+      "a_over_rstar": 9.853,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 1457.4230000000002,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0,
+      "catalog_eccentricity_source": "NASA composite snapshot2025-08-13, adopted0fixed",
+      "depth_ppm": 949.0843646538636,
+      "detector_elapsed_integration_seconds": 9.040479999999999,
+      "detector_groups": 9,
+      "detector_measurement_seconds": 7.216,
+      "expected_noise_warnings": {
+        "% full well high?": "All good (79% < 80%)",
+        "Group Number Too High?": "All good",
+        "Group Number Too Low?": "All good",
+        "Minimum Integrations?": "All good",
+        "Non linear?": "All good",
+        "Num Groups Reset?": "All good",
+        "Saturated?": "All good"
+      },
+      "exposure_seconds": 60,
+      "inclination_degrees": 85.634,
+      "instrument": "NIRSpec/G395M",
+      "name": "HAT-P-1 b",
+      "noise_levels_ppm": [
+        51.83003282959801
+      ],
+      "noise_ppm": 51.83003282959801,
+      "noise_reference_seconds": 60,
+      "noise_source": "https://exoctk.stsci.edu/pandexo/calculation/view/e34a5984-b683-4bce-b40f-d7d78cf8345ae",
+      "period_days": 4.46529913,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.11802,
+      "rank": 4,
+      "seed_target_index": 3,
+      "star_teff_k": 5980.0,
+      "teq_k": 1324.93,
+      "window_hours": 7.840105277777778
+    },
+    {
+      "a_over_rstar": 5.8928,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 1896.8400000000001,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0133,
+      "depth_ppm": 1021.3735256648589,
+      "detector_elapsed_integration_seconds": 9.94248,
+      "detector_groups": 10,
+      "detector_measurement_seconds": 8.118,
+      "expected_noise_warnings": {
+        "% full well high?": "% full well>80% (80% > 80%)",
+        "Group Number Too High?": "All good",
+        "Group Number Too Low?": "All good",
+        "Minimum Integrations?": "All good",
+        "Non linear?": "All good",
+        "Num Groups Reset?": "All good",
+        "Saturated?": "All good"
+      },
+      "exposure_seconds": 60,
+      "inclination_degrees": 83.4,
+      "instrument": "NIRSpec/G395M",
+      "name": "HAT-P-13 b",
+      "noise_levels_ppm": [
+        53.66863328525716
+      ],
+      "noise_ppm": 53.66863328525716,
+      "noise_reference_seconds": 60,
+      "noise_source": "https://exoctk.stsci.edu/pandexo/calculation/view/f9a7b495-b5bf-4d50-ac86-84d04abb1f72e",
+      "period_days": 2.91624268,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.08389,
+      "rank": 5,
+      "seed_target_index": 4,
+      "star_teff_k": 5653.0,
+      "teq_k": 1724.4,
+      "window_hours": 17.04030611111111
+    },
+    {
+      "a_over_rstar": 3.0,
+      "adopted_eccentricity": 0.0,
+      "brightness_temperature_k": 2824.1180000000004,
+      "cadence_seconds": 60,
+      "catalog_eccentricity": 0.0447,
+      "catalog_eccentricity_source": "NASA composite snapshot2025-08-13, historicalTurner2016; not adopted for injection",
+      "depth_ppm": 3946.7714153861803,
+      "detector_elapsed_integration_seconds": 29.78648,
+      "detector_groups": 32,
+      "detector_measurement_seconds": 27.962,
+      "expected_noise_warnings": {
+        "% full well high?": "All good (79% < 80%)",
+        "Group Number Too High?": "All good",
+        "Group Number Too Low?": "All good",
+        "Minimum Integrations?": "All good",
+        "Non linear?": "All good",
+        "Num Groups Reset?": "All good",
+        "Saturated?": "All good"
+      },
+      "exposure_seconds": 60,
+      "inclination_degrees": 81.8,
+      "instrument": "NIRSpec/G395M",
+      "name": "WASP-12 b",
+      "noise_levels_ppm": [
+        89.85476991236047
+      ],
+      "noise_ppm": 89.85476991236047,
+      "noise_reference_seconds": 60,
+      "noise_source": "https://exoctk.stsci.edu/pandexo/calculation/view/e6cec414-76cf-48f5-a6a0-fcf80f8e3784e",
+      "period_days": 1.091419179,
+      "period_reference": "Accepted PID10786 APT PDF, generated2026-03-16",
+      "radius_ratio": 0.117,
+      "rank": 6,
+      "seed_target_index": 5,
+      "star_teff_k": 6265.0,
+      "teq_k": 2567.38,
+      "window_hours": 8.19955611111111
+    }
+  ]
+}

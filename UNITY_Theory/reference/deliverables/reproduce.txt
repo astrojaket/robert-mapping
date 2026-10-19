@@ -1,0 +1,14 @@
+Run from UNITY_Theory
+
+source profiles/laptop.env
+export MPLCONFIGDIR=temporary directory/unity-mpl
+python (historical eclipse-mapping environment) tools/unity_injection_recovery.py --help
+
+The exact input configuration and run metadata are saved in inputs/unity_inputs.json and study/run_inputs.json. The supplementary grid input is inputs/wasp12_finegrid.json. Commands for the two runs follow:
+python (historical eclipse-mapping environment) tools/unity_injection_recovery.py --inputs results/unity_erc_20261009/inputs/unity_inputs.json --output results/unity_erc_20261009/study --trials 100 --exposure-subsamples 8 --disk-radial 32 --disk-azimuth 128 --chunk-size 128
+
+python (historical eclipse-mapping environment) tools/unity_injection_recovery.py --inputs results/unity_erc_20261009/inputs/wasp12_finegrid.json --output results/unity_erc_20261009/wasp12_finegrid --trials 100 --exposure-subsamples 8 --disk-radial 32 --disk-azimuth 128 --chunk-size 128
+
+python (historical eclipse-mapping environment) tools/plot_unity_recovery.py --output-dir results/unity_erc_20261009/deliverables --trials results/unity_erc_20261009/study/recovery_trials.csv --inputs results/unity_erc_20261009/inputs/unity_inputs.json --run-inputs results/unity_erc_20261009/study/run_inputs.json --summary results/unity_erc_20261009/study/summary.json --profiles results/unity_erc_20261009/study/profiles.npz
+
+Grant methods and grid-check addenda are separately reviewed text. Plot generation rewrites methodology.txt.

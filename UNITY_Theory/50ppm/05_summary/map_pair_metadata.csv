@@ -1,0 +1,7 @@
+target,run_id,scenario,trial,fit_scope,noise_input_ppm,noise_ppm,delta_bic,delta_bic_detection_threshold,map_detected,displayed_map
+HAT-P-30 b,hat_p_30_b__50ppm__temperature_scaled__trial000__full_window,temperature_scaled,0,full_window,50.0,50.0,-111.06178750758772,-6.0,True,"conditional best-fit map from the saved fit, including when map_detected is false"
+KELT-7 b,kelt_7_b__50ppm__temperature_scaled__trial000__full_window,temperature_scaled,0,full_window,50.0,50.0,-111.26404218479911,-6.0,True,"conditional best-fit map from the saved fit, including when map_detected is false"
+WASP-178 b,wasp_178_b__50ppm__temperature_scaled__trial000__full_window,temperature_scaled,0,full_window,50.0,50.0,-135.8048843142151,-6.0,True,"conditional best-fit map from the saved fit, including when map_detected is false"
+HAT-P-1 b,hat_p_1_b__50ppm__temperature_scaled__trial000__full_window,temperature_scaled,0,full_window,50.0,50.0,-130.3285363403602,-6.0,True,"conditional best-fit map from the saved fit, including when map_detected is false"
+HAT-P-13 b,hat_p_13_b__50ppm__temperature_scaled__trial000__full_window,temperature_scaled,0,full_window,50.0,50.0,-650.4210209815374,-6.0,True,"conditional best-fit map from the saved fit, including when map_detected is false"
+WASP-12 b,wasp_12_b__50ppm__temperature_scaled__trial000__full_window,temperature_scaled,0,full_window,50.0,50.0,-10188.5595434942,-6.0,True,"conditional best-fit map from the saved fit, including when map_detected is false"

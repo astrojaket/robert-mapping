@@ -1,0 +1,60 @@
+{
+  "description": "Independent numerical spot-curve check at241 exposure centers across +/-2.5h about eclipse. Equator-on map projection. 60s exposure. Degree2 Gaussian40deg with .8spot+.2uniform. Initial NASA default periods (before APT update); geometries as recorded inputs. This checks integration resolution; production viewing geometry checked separately.",
+  "checks": [
+    {
+      "target": "HAT-P-30 b",
+      "rms_32_to_64_ppm": 0.15309907417725252,
+      "max_32_to_64_ppm": 1.1822795244852387,
+      "rms_64_to_96_ppm": 0.06015389184002789,
+      "max_64_to_96_ppm": 0.4039891879112929,
+      "rms_sub8_to_16_ppm": 0.044794183002925245,
+      "max_sub8_to_16_ppm": 0.20808962710657397
+    },
+    {
+      "target": "KELT-7 b",
+      "rms_32_to_64_ppm": 0.10365657925654365,
+      "max_32_to_64_ppm": 0.512638849220366,
+      "rms_64_to_96_ppm": 0.04747254764315338,
+      "max_64_to_96_ppm": 0.30726174599448086,
+      "rms_sub8_to_16_ppm": 0.04490466878625197,
+      "max_sub8_to_16_ppm": 0.2465230875841371
+    },
+    {
+      "target": "WASP-178 b",
+      "rms_32_to_64_ppm": 0.1763298892487684,
+      "max_32_to_64_ppm": 1.0700327020553004,
+      "rms_64_to_96_ppm": 0.06409358132245689,
+      "max_64_to_96_ppm": 0.4628863229768285,
+      "rms_sub8_to_16_ppm": 0.06312278349440445,
+      "max_sub8_to_16_ppm": 0.34136835661706755
+    },
+    {
+      "target": "HAT-P-1 b",
+      "rms_32_to_64_ppm": 0.08232343372066701,
+      "max_32_to_64_ppm": 0.4779158843896312,
+      "rms_64_to_96_ppm": 0.04474000238244446,
+      "max_64_to_96_ppm": 0.31052556435849965,
+      "rms_sub8_to_16_ppm": 0.03826064134461168,
+      "max_sub8_to_16_ppm": 0.22928097493513633
+    },
+    {
+      "target": "HAT-P-13 b",
+      "rms_32_to_64_ppm": 0.07587026473951021,
+      "max_32_to_64_ppm": 0.667393222351734,
+      "rms_64_to_96_ppm": 0.034968481155510094,
+      "max_64_to_96_ppm": 0.2082617786126093,
+      "rms_sub8_to_16_ppm": 0.03906563023858109,
+      "max_sub8_to_16_ppm": 0.295806374710196
+    },
+    {
+      "target": "WASP-12 b",
+      "rms_32_to_64_ppm": 0.2808058936858601,
+      "max_32_to_64_ppm": 1.4620088102179807,
+      "rms_64_to_96_ppm": 0.1284316769669619,
+      "max_64_to_96_ppm": 0.7127562978121205,
+      "rms_sub8_to_16_ppm": 0.11576665098706754,
+      "max_sub8_to_16_ppm": 0.852518773081897
+    }
+  ],
+  "passed": true
+}

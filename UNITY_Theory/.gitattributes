@@ -1,0 +1,7 @@
+# Preserve the frozen scientific files byte for byte on every platform.
+* -text
+*.csv -text whitespace=cr-at-eol
+*.svg -text -whitespace
+*.p binary
+*.npz binary
+archive/**/profiles.npz.part* binary

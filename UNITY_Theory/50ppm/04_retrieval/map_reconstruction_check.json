@@ -1,0 +1,25 @@
+{
+  "checked_truth_trial_zero_rows": 48,
+  "map_metrics": {
+    "checked_finite_coefficient_rows": 4800,
+    "checked_trial_zero_rows": 48,
+    "maximum_trial_zero_minimum_absolute_error": 7.056490631401902e-08,
+    "maximum_trial_zero_peak_error_degrees": 0.0,
+    "metric_tolerance": {
+      "minimum_absolute": 2e-06,
+      "peak_degrees": 0.500001
+    },
+    "result": "passed",
+    "schema_version": 1
+  },
+  "maximum_truth_minimum_absolute_error": 2.7755575615628914e-17,
+  "maximum_truth_peak_error_degrees": 0.0,
+  "reconstruction": {
+    "map_grid": "Canonical _map_metrics at 0.5 degree spacing.",
+    "peak_longitude": "best_map_peak_longitude_degrees minus best_map_peak_shift_degrees, wrapped to [-180, 180).",
+    "recovery": "Normalized uniform template times best_uniform_map_amplitude_scale plus _hotspot_at_viewing_latitude times best_spot_amplitude_scale.",
+    "truth": "Canonical _mixture_coefficients; uniform_null uses _uniform_coefficients with the full-phase normalization."
+  },
+  "result": "passed",
+  "schema_version": 1
+}

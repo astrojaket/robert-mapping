@@ -1,0 +1,41 @@
+UNITY: expected white noise, one noise realization
+
+White-noise method
+The six calculations were submitted to the official ExoCTK/PandExo web service on 9 October 2026. Each uses a Phoenix stellar spectrum, normalized to the catalog J magnitude, and the accepted PID10786 NIRSpec grating, F290LP filter, SUB2048 subarray, NRSRAPID readout, and groups per integration. The web output does not expose the exact engine/reference-data version. Full output files and their source URLs are saved.
+
+The noise uses the star-only state. In secondary-eclipse PandExo output this is called RawData.electrons_out and var_out, although the planet is physically occulted in this state. This gives the stellar/in-eclipse noise level in units of stellar flux. We use this constant value through the whole simulated visit. The small extra photon noise from planetary emission is reported separately in the noise audit.
+
+For each calculation, sum the electron counts N and the variances V over 2.9–5.1 microns. Let T be the number of contributing integrations times the wall time per integration, including reset. The white noise for a 60-second wall-time bin is sigma_ppm = 10^6 sqrt(V*T/60)/N. This includes the model read/background noise and reset loss. It assumes independent spectral errors and independent integrations. It adds no arbitrary noise floor or correlated noise.
+
+Calculated values used in the run (ppm per 60 seconds):
+HAT-P-30 b: 58.938 ppm; NIRSpec/G395M; 12 groups
+KELT-7 b: 29.627 ppm; NIRSpec/G395H; 7 groups
+WASP-178 b: 81.445 ppm; NIRSpec/G395M; 9 groups
+HAT-P-1 b: 51.830 ppm; NIRSpec/G395M; 9 groups
+HAT-P-13 b: 53.669 ppm; NIRSpec/G395M; 10 groups
+WASP-12 b: 89.855 ppm; NIRSpec/G395M; 32 groups
+
+HAT-P-13 has a full-well warning near 80% with the accepted 10-group setup. The service reports no saturated or nonlinear pixels. Other targets have no warning. WASP-178 reaches only about 33% full well with the adopted 9360 K stellar model; this differs from the proposal narrative estimate. The accepted group count is retained.
+
+Recovery setup
+The rerun uses one noise sample for each target. The master seed remains 20261009. Each target has its original index, so the standardized noise draw is the predeclared first draw from the original study. No favorable realization was selected. Each longitude grid has 0.25-degree spacing. Fits retain free map amplitudes, map width, latitude, eclipse timing, and a linear baseline. Both full-visit and eclipse-only results are saved.
+
+The injected offset remains delta = atan[tan(40 degrees)*(1500 K/Teq)^3]. This is an illustrative temperature scaling inspired by Showman, Tan and Parmentier (2020), not an extracted GCM prediction. The estimated blackbody-band eclipse depth and fixed circular geometry are retained from the original study.
+
+Limits
+This is an expected white-noise test. Recovery still assumes ideal continuous 60-second bins. Detector reset loss enters the noise calculation, but exact missing read/reset times are not masked within the forward model. Orbital uncertainties, flux contamination from companions, stellar-model uncertainty, and correlated instrument noise are not fitted. The injection and recovery use the same Gaussian map family. One realization can show a recovered trend, but cannot establish interval coverage or a recovery success rate. The quoted q16–q84 ranges are profile-grid intervals, not full posterior intervals.
+
+Sources
+https://jwst-docs.stsci.edu/jwst-other-tools/jwst-exoplanet-observations-proposal-tools/exoctk-exoplanet-etc-pandexo
+https://arxiv.org/abs/1702.01820
+https://doi.org/10.1007/s11214-020-00758-8
+
+Reproduce the recovery from UNITY_Theory:
+source profiles/laptop.env
+export MPLCONFIGDIR=temporary directory/unity-mpl
+python (historical eclipse-mapping environment) tools/unity_injection_recovery.py --inputs results/unity_erc_20261009/inputs/unity_expected_noise.json --output results/unity_erc_20261009/expected_noise_study --trials 1 --exposure-subsamples 8 --disk-radial 32 --disk-azimuth 128 --chunk-size 128
+python (historical eclipse-mapping environment) tools/plot_unity_expected_noise.py --inputs results/unity_erc_20261009/inputs/unity_expected_noise.json --trials results/unity_erc_20261009/expected_noise_study/recovery_trials.csv --output-dir results/unity_erc_20261009/expected_noise_deliverables
+
+Reproduce the saved noise extraction and stellar-spectrum checks:
+PYSYN_CDBS=trds (historical source: Pandexo_Files/grp/redcat) python (historical PandExo environment) tools/compute_unity_expected_noise.py
+The extraction script includes a process-only np.alltrue compatibility alias for PySynphot on NumPy 2. It changes no installed package files.

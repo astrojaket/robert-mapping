@@ -1,0 +1,22 @@
+{
+  "eclipse_center_uniform_ppm": 0.0,
+  "trials": [
+    {
+      "truth_longitude": -30.0,
+      "recovered_longitude": -30.0,
+      "minimum_chi2": 8.940696716308594e-08
+    },
+    {
+      "truth_longitude": 0.0,
+      "recovered_longitude": 0.0,
+      "minimum_chi2": 2.1606683731079102e-07
+    },
+    {
+      "truth_longitude": 30.0,
+      "recovered_longitude": 30.0,
+      "minimum_chi2": 2.9802322387695312e-08
+    }
+  ],
+  "pass": true,
+  "description": "Noiseless signed offsets with free uniform/spot amplitudes and linear baseline on actual viewing geometry;97timepoints16/64quadrature4subsamples"
+}

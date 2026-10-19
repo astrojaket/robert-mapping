@@ -1,0 +1,86 @@
+[
+  {
+    "scope": "full_window",
+    "noise_ppm": 50.0,
+    "paired_seeds_match": true,
+    "main": {
+      "mean_bias_deg": 0.027725453433363613,
+      "scatter_deg": 0.5034497457453229,
+      "coverage": 0.96,
+      "median_interval_halfwidth_deg": 0.8039357366047497,
+      "map_detection_fraction": 1.0
+    },
+    "fine": {
+      "mean_bias_deg": 0.02386265993989838,
+      "scatter_deg": 0.5039963527580983,
+      "coverage": 0.67,
+      "median_interval_halfwidth_deg": 0.5632676888588435,
+      "map_detection_fraction": 1.0
+    },
+    "paired_median_change_max_abs_deg": 0.021980935513255417,
+    "paired_median_change_rms_deg": 0.008516948354608771
+  },
+  {
+    "scope": "full_window",
+    "noise_ppm": 100.0,
+    "paired_seeds_match": true,
+    "main": {
+      "mean_bias_deg": 0.06066688051123293,
+      "scatter_deg": 0.9781243671297413,
+      "coverage": 0.78,
+      "median_interval_halfwidth_deg": 1.2244367185696987,
+      "map_detection_fraction": 1.0
+    },
+    "fine": {
+      "mean_bias_deg": 0.05795537735340673,
+      "scatter_deg": 0.9783350062723201,
+      "coverage": 0.7,
+      "median_interval_halfwidth_deg": 1.0761671785310938,
+      "map_detection_fraction": 1.0
+    },
+    "paired_median_change_max_abs_deg": 0.037454965074232405,
+    "paired_median_change_rms_deg": 0.009887721445765513
+  },
+  {
+    "scope": "eclipse_only",
+    "noise_ppm": 50.0,
+    "paired_seeds_match": true,
+    "main": {
+      "mean_bias_deg": 0.38292567793948423,
+      "scatter_deg": 1.633784807231961,
+      "coverage": 0.82,
+      "median_interval_halfwidth_deg": 1.0078774490124474,
+      "map_detection_fraction": 1.0
+    },
+    "fine": {
+      "mean_bias_deg": 0.37085451034280537,
+      "scatter_deg": 1.6562056436550419,
+      "coverage": 0.7,
+      "median_interval_halfwidth_deg": 0.742185986112176,
+      "map_detection_fraction": 1.0
+    },
+    "paired_median_change_max_abs_deg": 0.4317779085288578,
+    "paired_median_change_rms_deg": 0.1066828215536734
+  },
+  {
+    "scope": "eclipse_only",
+    "noise_ppm": 100.0,
+    "paired_seeds_match": true,
+    "main": {
+      "mean_bias_deg": 1.6612706075012529,
+      "scatter_deg": 3.3012611211364193,
+      "coverage": 0.63,
+      "median_interval_halfwidth_deg": 3.596530355581791,
+      "map_detection_fraction": 1.0
+    },
+    "fine": {
+      "mean_bias_deg": 1.6479169875295878,
+      "scatter_deg": 3.3054370855106634,
+      "coverage": 0.62,
+      "median_interval_halfwidth_deg": 3.5361173310542853,
+      "map_detection_fraction": 1.0
+    },
+    "paired_median_change_max_abs_deg": 0.11353904287201999,
+    "paired_median_change_rms_deg": 0.04882711057346093
+  }
+]

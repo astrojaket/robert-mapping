@@ -1,0 +1,716 @@
+{
+  "retrieval_date": "2026-10-09",
+  "service": "https://exoctk.stsci.edu/pandexo/",
+  "normalization": "J magnitudes from dated NASA composite snapshot; Phoenix stellar spectrum. No extra noise floor. Fixed accepted instrument settings.",
+  "reference_cadence_seconds": 60.0,
+  "white_light_band_um": [
+    2.9,
+    5.1
+  ],
+  "calculation_method": {
+    "summary": "PandExo first-minus-last (fml) noise from online NIRSpec BOTS result pickles",
+    "reference_flux": "Fstar; the star-only secondary-eclipse state is the recovery white-light normalization",
+    "formula": "noise_ppm_60s = 1e6 * sqrt(sum(var_out[band]) * 60 / wall_time_out) / (sum(electrons_out[band]) * 60 / wall_time_out)",
+    "wall_time": "N integrations times elapsed seconds per integration, including reset",
+    "variance_components": "Source shot variance + PandExo reported background variance contribution + read variance; closure is checked per target",
+    "other_terms": "No added noise floor or correlated noise. Reset duty loss is included by scaling to wall time.",
+    "secondary_eclipse_states": "PandExo f_unit=fp/f*: out is star-only/in-eclipse; in is star plus supplied planet flux/out-of-eclipse."
+  },
+  "stellar_input_audit": "Saved spectrum is compared with local pysynphot PHOENIX spectra using archive Teff, logg, and metallicity. The free scale is fitted in J; the submitted PandExo target magnitude is checked against the catalog J magnitude.",
+  "engine_version_note": "The online result pickle does not expose the deployed PandExo engine or reference-data version.",
+  "targets": [
+    {
+      "name": "HAT-P-30 b",
+      "noise_ppm_60s": 58.93775222438686,
+      "noise_definition": "star-only / in-eclipse white noise, relative to Fstar; used for the recovery input",
+      "physical_out_of_eclipse_noise_relative_to_stellar_flux_ppm_60s": 58.993444260051206,
+      "physical_out_of_eclipse_noise_relative_to_total_flux_ppm_60s": 58.88059938064049,
+      "physical_out_of_eclipse_change_vs_star_only_percent": 0.09449297532135859,
+      "white_light_band_um": [
+        2.9,
+        5.1
+      ],
+      "n_valid_spectral_bins": 1225,
+      "wavelength_coverage_um": [
+        2.9014066785222625,
+        5.098341666396355
+      ],
+      "stellar_input": {
+        "catalog_j_mag": 9.442,
+        "catalog_j_mag_error": 0.026,
+        "catalog_k_mag": 9.151,
+        "catalog_k_mag_error": 0.023,
+        "submitted_pandexo_target_mag": 9.442000389099121,
+        "submitted_minus_catalog_j_mag": 3.8909912092321974e-07,
+        "pandeia_scene_matches_saved_phoenix_spectrum_max_fractional_error": 0.0,
+        "pandeia_extinction_value_mag": 0.0,
+        "pandeia_scene_normalization": "none",
+        "stellar_parameter_source": "archive evidence JSON; scalar Teff/logg/metallicity are not stored in the online result, so the saved spectrum is audited against this PHOENIX model",
+        "teff_k": 6304.0,
+        "logg_cgs": 4.36,
+        "metallicity_dex": 0.13,
+        "phoenix_sed_shape_audit": {
+          "status": "passed",
+          "reference_model": "pysynphot Icat('phoenix', Teff, [Fe/H], logg)",
+          "reference_grid_parameters": {
+            "teff_k": 6304.0,
+            "metallicity_dex": 0.13,
+            "logg_cgs": 4.36
+          },
+          "normalization": "one free multiplicative scale fit by median ratio in 1.22--1.28 micron J band",
+          "max_absolute_fractional_shape_difference_2p9_to_5p1_um": 6.938893903907228e-13,
+          "pysynphot_warnings": [
+            "pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html",
+            "Extinction files not found in extinction (historical source: Pandexo_Files/grp/redcat/trds)"
+          ]
+        }
+      },
+      "instrument": {
+        "instrument": "nirspec",
+        "mode": "bots",
+        "disperser": "g395m",
+        "filter": "f290lp",
+        "aperture": "s1600a1",
+        "subarray": "sub2048",
+        "readout_pattern": "nrsrapid",
+        "groups_per_integration": 12,
+        "calculation_type": "fml",
+        "primary_secondary": "fp/f*",
+        "nirspec_superstripes": 1
+      },
+      "timing": {
+        "elapsed_wall_seconds_per_integration_including_reset": 11.74648,
+        "measurement_seconds_per_integration": 9.922,
+        "integration_duty_cycle_fraction": 0.8446785760500167,
+        "accepted_apt_total_integrations": 1872,
+        "pandexo_timing_total_integrations": 1873,
+        "pandexo_minus_accepted_integration_count": 1,
+        "observing_efficiency_percent_from_pandexo": 84.46785760500167,
+        "star_only_in_eclipse_state": {
+          "integrations": 1183,
+          "wall_time_seconds": 13896.08584,
+          "on_source_time_seconds": 11737.726,
+          "duty_cycle_fraction": 0.8446785760500167,
+          "scaling_factor_to_60s_wall_time": 0.004317762619693201,
+          "band_electrons_total": 67581694216.54035,
+          "band_variance_electron2_total": 68502125868.5263,
+          "background_electrons_total": 1514149.7838403953,
+          "read_variance_electron2_total": 918917502.202099,
+          "band_electrons_per_60s_wall_time": 291801713.06371415,
+          "band_variance_electron2_per_60s_wall_time": 295775918.44464153,
+          "background_electrons_per_60s_wall_time": 6537.7393372826,
+          "read_variance_electron2_per_60s_wall_time": 3967667.641590068,
+          "white_noise_relative_to_state_flux_ppm_60s": 58.93775222438686,
+          "variance_closure_relative_residual": 0.0
+        },
+        "physical_out_of_eclipse_star_plus_planet_state": {
+          "integrations": 690,
+          "wall_time_seconds": 8105.0712,
+          "on_source_time_seconds": 6846.18,
+          "duty_cycle_fraction": 0.8446785760500167,
+          "scaling_factor_to_60s_wall_time": 0.007402772723329068,
+          "band_electrons_total": 39493438879.95316,
+          "band_variance_electron2_total": 40030292506.21715,
+          "background_electrons_total": 883147.3802619381,
+          "read_variance_electron2_total": 535970478.8837264,
+          "band_electrons_per_60s_wall_time": 292360952.09098095,
+          "band_variance_electron2_per_60s_wall_time": 296335157.4719083,
+          "background_electrons_per_60s_wall_time": 6537.739337282599,
+          "read_variance_electron2_per_60s_wall_time": 3967667.641590068,
+          "white_noise_relative_to_state_flux_ppm_60s": 58.88059938064049,
+          "variance_closure_relative_residual": -1.9059052666340299e-16
+        }
+      },
+      "pandexo_warnings": {
+        "Group Number Too Low?": "All good",
+        "Group Number Too High?": "All good",
+        "Non linear?": "All good",
+        "Saturated?": "All good",
+        "% full well high?": "All good (77% < 80%)",
+        "Num Groups Reset?": "All good",
+        "Minimum Integrations?": "All good"
+      },
+      "engine_result": {
+        "pickle": "UNITY_Theory/data/expected_noise_calculations/online/hatp30.p",
+        "calculation_id": "09e5b287-20cd-4049-aca0-41d971066c9ee",
+        "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/09e5b287-20cd-4049-aca0-41d971066c9ee",
+        "calculation": "fml; online engine/reference-data version is not exposed by the saved result"
+      }
+    },
+    {
+      "name": "KELT-7 b",
+      "noise_ppm_60s": 29.626731190532126,
+      "noise_definition": "star-only / in-eclipse white noise, relative to Fstar; used for the recovery input",
+      "physical_out_of_eclipse_noise_relative_to_stellar_flux_ppm_60s": 29.649324653648925,
+      "physical_out_of_eclipse_noise_relative_to_total_flux_ppm_60s": 29.603504979822773,
+      "physical_out_of_eclipse_change_vs_star_only_percent": 0.07626039798820372,
+      "white_light_band_um": [
+        2.9,
+        5.1
+      ],
+      "n_valid_spectral_bins": 3166,
+      "wavelength_coverage_um": [
+        2.9002760550925624,
+        5.0995471309453855
+      ],
+      "stellar_input": {
+        "catalog_j_mag": 7.739,
+        "catalog_j_mag_error": 0.021,
+        "catalog_k_mag": 7.543,
+        "catalog_k_mag_error": 0.026,
+        "submitted_pandexo_target_mag": 7.739,
+        "submitted_minus_catalog_j_mag": 0.0,
+        "pandeia_scene_matches_saved_phoenix_spectrum_max_fractional_error": 0.0,
+        "pandeia_extinction_value_mag": 0.0,
+        "pandeia_scene_normalization": "none",
+        "stellar_parameter_source": "archive evidence JSON; scalar Teff/logg/metallicity are not stored in the online result, so the saved spectrum is audited against this PHOENIX model",
+        "teff_k": 6768.0,
+        "logg_cgs": 4.5,
+        "metallicity_dex": 0.0,
+        "phoenix_sed_shape_audit": {
+          "status": "passed",
+          "reference_model": "pysynphot Icat('phoenix', Teff, [Fe/H], logg)",
+          "reference_grid_parameters": {
+            "teff_k": 6768.0,
+            "metallicity_dex": 0.0,
+            "logg_cgs": 4.5
+          },
+          "normalization": "one free multiplicative scale fit by median ratio in 1.22--1.28 micron J band",
+          "max_absolute_fractional_shape_difference_2p9_to_5p1_um": 5.024869409453459e-13,
+          "pysynphot_warnings": []
+        }
+      },
+      "instrument": {
+        "instrument": "nirspec",
+        "mode": "bots",
+        "disperser": "g395h",
+        "filter": "f290lp",
+        "aperture": "s1600a1",
+        "subarray": "sub2048",
+        "readout_pattern": "nrsrapid",
+        "groups_per_integration": 7,
+        "calculation_type": "fml",
+        "primary_secondary": "fp/f*",
+        "nirspec_superstripes": 1
+      },
+      "timing": {
+        "elapsed_wall_seconds_per_integration_including_reset": 7.23648,
+        "measurement_seconds_per_integration": 5.412,
+        "integration_duty_cycle_fraction": 0.7478774210665958,
+        "accepted_apt_total_integrations": 4686,
+        "pandexo_timing_total_integrations": 4686,
+        "pandexo_minus_accepted_integration_count": 0,
+        "observing_efficiency_percent_from_pandexo": 74.78774210665958,
+        "star_only_in_eclipse_state": {
+          "integrations": 3566,
+          "wall_time_seconds": 25805.28768,
+          "on_source_time_seconds": 19299.192,
+          "duty_cycle_fraction": 0.7478774210665958,
+          "scaling_factor_to_60s_wall_time": 0.00232510486780979,
+          "band_electrons_total": 497054730549.9745,
+          "band_variance_electron2_total": 504218112493.1094,
+          "background_electrons_total": 4454851.864612893,
+          "read_variance_electron2_total": 7158927091.270274,
+          "band_electrons_per_60s_wall_time": 1155704373.5696292,
+          "band_variance_electron2_per_60s_wall_time": 1172359987.7955928,
+          "background_electrons_per_60s_wall_time": 10357.997755782957,
+          "read_variance_electron2_per_60s_wall_time": 16645256.228207894,
+          "white_noise_relative_to_state_flux_ppm_60s": 29.626731190532126,
+          "variance_closure_relative_residual": 0.0
+        },
+        "physical_out_of_eclipse_star_plus_planet_state": {
+          "integrations": 1120,
+          "wall_time_seconds": 8104.8576,
+          "on_source_time_seconds": 6061.44,
+          "duty_cycle_fraction": 0.7478774210665958,
+          "scaling_factor_to_60s_wall_time": 0.007402967820187242,
+          "band_electrons_total": 156355285646.6131,
+          "band_variance_electron2_total": 158605142005.64594,
+          "background_electrons_total": 1399168.2805290073,
+          "read_variance_electron2_total": 2248457190.7523017,
+          "band_electrons_per_60s_wall_time": 1157493148.1580608,
+          "band_variance_electron2_per_60s_wall_time": 1174148762.3840246,
+          "background_electrons_per_60s_wall_time": 10357.997755782957,
+          "read_variance_electron2_per_60s_wall_time": 16645256.228207896,
+          "white_noise_relative_to_state_flux_ppm_60s": 29.603504979822773,
+          "variance_closure_relative_residual": 1.9241228713703148e-16
+        }
+      },
+      "pandexo_warnings": {
+        "Group Number Too Low?": "All good",
+        "Group Number Too High?": "All good",
+        "Non linear?": "All good",
+        "Saturated?": "All good",
+        "% full well high?": "All good (79% < 80%)",
+        "Num Groups Reset?": "All good",
+        "Minimum Integrations?": "All good"
+      },
+      "engine_result": {
+        "pickle": "UNITY_Theory/data/expected_noise_calculations/online/kelt7.p",
+        "calculation_id": "bc20cfe9-ca59-4cd0-baf3-8d002cfed755e",
+        "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/bc20cfe9-ca59-4cd0-baf3-8d002cfed755e",
+        "calculation": "fml; online engine/reference-data version is not exposed by the saved result"
+      }
+    },
+    {
+      "name": "WASP-178 b",
+      "noise_ppm_60s": 81.44518728680511,
+      "noise_definition": "star-only / in-eclipse white noise, relative to Fstar; used for the recovery input",
+      "physical_out_of_eclipse_noise_relative_to_stellar_flux_ppm_60s": 81.54411350774792,
+      "physical_out_of_eclipse_noise_relative_to_total_flux_ppm_60s": 81.33984477519797,
+      "physical_out_of_eclipse_change_vs_star_only_percent": 0.12146355633568806,
+      "white_light_band_um": [
+        2.9,
+        5.1
+      ],
+      "n_valid_spectral_bins": 1225,
+      "wavelength_coverage_um": [
+        2.9014066785222625,
+        5.098341666396355
+      ],
+      "stellar_input": {
+        "catalog_j_mag": 9.775,
+        "catalog_j_mag_error": 0.031,
+        "catalog_k_mag": 9.703,
+        "catalog_k_mag_error": 0.021,
+        "submitted_pandexo_target_mag": 9.775,
+        "submitted_minus_catalog_j_mag": 0.0,
+        "pandeia_scene_matches_saved_phoenix_spectrum_max_fractional_error": 0.0,
+        "pandeia_extinction_value_mag": 0.0,
+        "pandeia_scene_normalization": "none",
+        "stellar_parameter_source": "archive evidence JSON; scalar Teff/logg/metallicity are not stored in the online result, so the saved spectrum is audited against this PHOENIX model",
+        "teff_k": 9360.0,
+        "logg_cgs": 4.31,
+        "metallicity_dex": 0.21,
+        "phoenix_sed_shape_audit": {
+          "status": "passed",
+          "reference_model": "pysynphot Icat('phoenix', Teff, [Fe/H], logg)",
+          "reference_grid_parameters": {
+            "teff_k": 9360.0,
+            "metallicity_dex": 0.21,
+            "logg_cgs": 4.31
+          },
+          "normalization": "one free multiplicative scale fit by median ratio in 1.22--1.28 micron J band",
+          "max_absolute_fractional_shape_difference_2p9_to_5p1_um": 8.926193117986259e-14,
+          "pysynphot_warnings": []
+        }
+      },
+      "instrument": {
+        "instrument": "nirspec",
+        "mode": "bots",
+        "disperser": "g395m",
+        "filter": "f290lp",
+        "aperture": "s1600a1",
+        "subarray": "sub2048",
+        "readout_pattern": "nrsrapid",
+        "groups_per_integration": 9,
+        "calculation_type": "fml",
+        "primary_secondary": "fp/f*",
+        "nirspec_superstripes": 1
+      },
+      "timing": {
+        "elapsed_wall_seconds_per_integration_including_reset": 9.040479999999999,
+        "measurement_seconds_per_integration": 7.216,
+        "integration_duty_cycle_fraction": 0.7981877068474241,
+        "accepted_apt_total_integrations": 3743,
+        "pandexo_timing_total_integrations": 3744,
+        "pandexo_minus_accepted_integration_count": 1,
+        "observing_efficiency_percent_from_pandexo": 79.81877068474242,
+        "star_only_in_eclipse_state": {
+          "integrations": 2356,
+          "wall_time_seconds": 21299.37088,
+          "on_source_time_seconds": 17000.896,
+          "duty_cycle_fraction": 0.7981877068474241,
+          "scaling_factor_to_60s_wall_time": 0.0028169846113313937,
+          "band_electrons_total": 55289614856.654526,
+          "band_variance_electron2_total": 57121875263.659775,
+          "background_electrons_total": 2193090.700823111,
+          "read_variance_electron2_total": 1830067316.3044338,
+          "band_electrons_per_60s_wall_time": 155749994.2176354,
+          "band_variance_electron2_per_60s_wall_time": 160911443.588121,
+          "background_electrons_per_60s_wall_time": 6177.902755472685,
+          "read_variance_electron2_per_60s_wall_time": 5155271.467730132,
+          "white_noise_relative_to_state_flux_ppm_60s": 81.44518728680511,
+          "variance_closure_relative_residual": -1.33563446508622e-16
+        },
+        "physical_out_of_eclipse_star_plus_planet_state": {
+          "integrations": 1388,
+          "wall_time_seconds": 12548.186239999999,
+          "on_source_time_seconds": 10015.808,
+          "duty_cycle_fraction": 0.7981877068474241,
+          "scaling_factor_to_60s_wall_time": 0.004781567539118706,
+          "band_electrons_total": 32654799469.652023,
+          "band_variance_electron2_total": 33734246602.471756,
+          "background_electrons_total": 1292024.5724713407,
+          "read_variance_electron2_total": 1078155108.247264,
+          "band_electrons_per_60s_wall_time": 156141129.14051884,
+          "band_variance_electron2_per_60s_wall_time": 161302578.51100445,
+          "background_electrons_per_60s_wall_time": 6177.902755472686,
+          "read_variance_electron2_per_60s_wall_time": 5155271.467730132,
+          "white_noise_relative_to_state_flux_ppm_60s": 81.33984477519797,
+          "variance_closure_relative_residual": -1.1308084957633207e-16
+        }
+      },
+      "pandexo_warnings": {
+        "Group Number Too Low?": "All good",
+        "Group Number Too High?": "All good",
+        "Non linear?": "All good",
+        "Saturated?": "All good",
+        "% full well high?": "All good (33% < 80%)",
+        "Num Groups Reset?": "All good",
+        "Minimum Integrations?": "All good"
+      },
+      "engine_result": {
+        "pickle": "UNITY_Theory/data/expected_noise_calculations/online/wasp178.p",
+        "calculation_id": "4096ff2c-bdba-4c70-98f8-656795b72a58e",
+        "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/4096ff2c-bdba-4c70-98f8-656795b72a58e",
+        "calculation": "fml; online engine/reference-data version is not exposed by the saved result"
+      }
+    },
+    {
+      "name": "HAT-P-1 b",
+      "noise_ppm_60s": 51.83003282959801,
+      "noise_definition": "star-only / in-eclipse white noise, relative to Fstar; used for the recovery input",
+      "physical_out_of_eclipse_noise_relative_to_stellar_flux_ppm_60s": 51.854714708583664,
+      "physical_out_of_eclipse_noise_relative_to_total_flux_ppm_60s": 51.80468829475745,
+      "physical_out_of_eclipse_change_vs_star_only_percent": 0.04762080523237344,
+      "white_light_band_um": [
+        2.9,
+        5.1
+      ],
+      "n_valid_spectral_bins": 1225,
+      "wavelength_coverage_um": [
+        2.9014066785222625,
+        5.098341666396355
+      ],
+      "stellar_input": {
+        "catalog_j_mag": 9.156,
+        "catalog_j_mag_error": 0.026,
+        "catalog_k_mag": 8.858,
+        "catalog_k_mag_error": 0.018,
+        "submitted_pandexo_target_mag": 9.156,
+        "submitted_minus_catalog_j_mag": 0.0,
+        "pandeia_scene_matches_saved_phoenix_spectrum_max_fractional_error": 0.0,
+        "pandeia_extinction_value_mag": 0.0,
+        "pandeia_scene_normalization": "none",
+        "stellar_parameter_source": "archive evidence JSON; scalar Teff/logg/metallicity are not stored in the online result, so the saved spectrum is audited against this PHOENIX model",
+        "teff_k": 5980.0,
+        "logg_cgs": 4.359,
+        "metallicity_dex": 0.13,
+        "phoenix_sed_shape_audit": {
+          "status": "passed",
+          "reference_model": "pysynphot Icat('phoenix', Teff, [Fe/H], logg)",
+          "reference_grid_parameters": {
+            "teff_k": 5980.0,
+            "metallicity_dex": 0.13,
+            "logg_cgs": 4.359
+          },
+          "normalization": "one free multiplicative scale fit by median ratio in 1.22--1.28 micron J band",
+          "max_absolute_fractional_shape_difference_2p9_to_5p1_um": 8.495426584431698e-13,
+          "pysynphot_warnings": []
+        }
+      },
+      "instrument": {
+        "instrument": "nirspec",
+        "mode": "bots",
+        "disperser": "g395m",
+        "filter": "f290lp",
+        "aperture": "s1600a1",
+        "subarray": "sub2048",
+        "readout_pattern": "nrsrapid",
+        "groups_per_integration": 9,
+        "calculation_type": "fml",
+        "primary_secondary": "fp/f*",
+        "nirspec_superstripes": 1
+      },
+      "timing": {
+        "elapsed_wall_seconds_per_integration_including_reset": 9.040479999999999,
+        "measurement_seconds_per_integration": 7.216,
+        "integration_duty_cycle_fraction": 0.7981877068474241,
+        "accepted_apt_total_integrations": 3122,
+        "pandexo_timing_total_integrations": 3123,
+        "pandexo_minus_accepted_integration_count": 1,
+        "observing_efficiency_percent_from_pandexo": 79.81877068474242,
+        "star_only_in_eclipse_state": {
+          "integrations": 1975,
+          "wall_time_seconds": 17854.947999999997,
+          "on_source_time_seconds": 14251.6,
+          "duty_cycle_fraction": 0.7981877068474242,
+          "scaling_factor_to_60s_wall_time": 0.0033604130350869694,
+          "band_electrons_total": 112290897379.13075,
+          "band_variance_electron2_total": 113826854214.41241,
+          "background_electrons_total": 1838435.5782456603,
+          "read_variance_electron2_total": 1534118399.7034194,
+          "band_electrons_per_60s_wall_time": 377343795.27444416,
+          "band_variance_electron2_per_60s_wall_time": 382505244.6450556,
+          "background_electrons_per_60s_wall_time": 6177.902881304367,
+          "read_variance_electron2_per_60s_wall_time": 5155271.467730132,
+          "white_noise_relative_to_state_flux_ppm_60s": 51.83003282959801,
+          "variance_closure_relative_residual": 0.0
+        },
+        "physical_out_of_eclipse_star_plus_planet_state": {
+          "integrations": 1148,
+          "wall_time_seconds": 10378.471039999999,
+          "on_source_time_seconds": 8283.968,
+          "duty_cycle_fraction": 0.7981877068474242,
+          "scaling_factor_to_60s_wall_time": 0.005781198383533767,
+          "band_electrons_total": 65333891195.92322,
+          "band_variance_electron2_total": 66226690409.54516,
+          "background_electrons_total": 1068619.7690258322,
+          "read_variance_electron2_total": 891730593.8529245,
+          "band_electrons_per_60s_wall_time": 377708186.1718423,
+          "band_variance_electron2_per_60s_wall_time": 382869635.5424537,
+          "background_electrons_per_60s_wall_time": 6177.902881304368,
+          "read_variance_electron2_per_60s_wall_time": 5155271.467730133,
+          "white_noise_relative_to_state_flux_ppm_60s": 51.80468829475745,
+          "variance_closure_relative_residual": -2.3040240978584026e-16
+        }
+      },
+      "pandexo_warnings": {
+        "Group Number Too Low?": "All good",
+        "Group Number Too High?": "All good",
+        "Non linear?": "All good",
+        "Saturated?": "All good",
+        "% full well high?": "All good (79% < 80%)",
+        "Num Groups Reset?": "All good",
+        "Minimum Integrations?": "All good"
+      },
+      "engine_result": {
+        "pickle": "UNITY_Theory/data/expected_noise_calculations/online/hatp1.p",
+        "calculation_id": "e34a5984-b683-4bce-b40f-d7d78cf8345ae",
+        "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/e34a5984-b683-4bce-b40f-d7d78cf8345ae",
+        "calculation": "fml; online engine/reference-data version is not exposed by the saved result"
+      }
+    },
+    {
+      "name": "HAT-P-13 b",
+      "noise_ppm_60s": 53.66863328525716,
+      "noise_definition": "star-only / in-eclipse white noise, relative to Fstar; used for the recovery input",
+      "physical_out_of_eclipse_noise_relative_to_stellar_flux_ppm_60s": 53.69362159916964,
+      "physical_out_of_eclipse_noise_relative_to_total_flux_ppm_60s": 53.64299059996629,
+      "physical_out_of_eclipse_change_vs_star_only_percent": 0.04656036940546837,
+      "white_light_band_um": [
+        2.9,
+        5.1
+      ],
+      "n_valid_spectral_bins": 1225,
+      "wavelength_coverage_um": [
+        2.9014066785222625,
+        5.098341666396355
+      ],
+      "stellar_input": {
+        "catalog_j_mag": 9.328,
+        "catalog_j_mag_error": 0.018,
+        "catalog_k_mag": 8.975,
+        "catalog_k_mag_error": 0.017,
+        "submitted_pandexo_target_mag": 9.328,
+        "submitted_minus_catalog_j_mag": 0.0,
+        "pandeia_scene_matches_saved_phoenix_spectrum_max_fractional_error": 0.0,
+        "pandeia_extinction_value_mag": 0.0,
+        "pandeia_scene_normalization": "none",
+        "stellar_parameter_source": "archive evidence JSON; scalar Teff/logg/metallicity are not stored in the online result, so the saved spectrum is audited against this PHOENIX model",
+        "teff_k": 5653.0,
+        "logg_cgs": 4.13,
+        "metallicity_dex": 0.46,
+        "phoenix_sed_shape_audit": {
+          "status": "passed",
+          "reference_model": "pysynphot Icat('phoenix', Teff, [Fe/H], logg)",
+          "reference_grid_parameters": {
+            "teff_k": 5653.0,
+            "metallicity_dex": 0.46,
+            "logg_cgs": 4.13
+          },
+          "normalization": "one free multiplicative scale fit by median ratio in 1.22--1.28 micron J band",
+          "max_absolute_fractional_shape_difference_2p9_to_5p1_um": 3.064215547965432e-14,
+          "pysynphot_warnings": []
+        }
+      },
+      "instrument": {
+        "instrument": "nirspec",
+        "mode": "bots",
+        "disperser": "g395m",
+        "filter": "f290lp",
+        "aperture": "s1600a1",
+        "subarray": "sub2048",
+        "readout_pattern": "nrsrapid",
+        "groups_per_integration": 10,
+        "calculation_type": "fml",
+        "primary_secondary": "fp/f*",
+        "nirspec_superstripes": 1
+      },
+      "timing": {
+        "elapsed_wall_seconds_per_integration_including_reset": 9.94248,
+        "measurement_seconds_per_integration": 8.118,
+        "integration_duty_cycle_fraction": 0.816496487797813,
+        "accepted_apt_total_integrations": 6170,
+        "pandexo_timing_total_integrations": 6171,
+        "pandexo_minus_accepted_integration_count": 1,
+        "observing_efficiency_percent_from_pandexo": 81.6496487797813,
+        "star_only_in_eclipse_state": {
+          "integrations": 5000,
+          "wall_time_seconds": 49712.4,
+          "on_source_time_seconds": 40590.0,
+          "duty_cycle_fraction": 0.816496487797813,
+          "scaling_factor_to_60s_wall_time": 0.0012069423322953628,
+          "band_electrons_total": 291493194128.9186,
+          "band_variance_electron2_total": 295382274210.44745,
+          "background_electrons_total": 5236031.646855431,
+          "read_variance_electron2_total": 3883844049.882075,
+          "band_electrons_per_60s_wall_time": 351815475.57018197,
+          "band_variance_electron2_per_60s_wall_time": 356509370.95426583,
+          "background_electrons_per_60s_wall_time": 6319.588247828023,
+          "read_variance_electron2_per_60s_wall_time": 4687575.795836139,
+          "white_noise_relative_to_state_flux_ppm_60s": 53.66863328525716,
+          "variance_closure_relative_residual": -2.0663107294825354e-16
+        },
+        "physical_out_of_eclipse_star_plus_planet_state": {
+          "integrations": 1171,
+          "wall_time_seconds": 11642.64408,
+          "on_source_time_seconds": 9506.178,
+          "duty_cycle_fraction": 0.816496487797813,
+          "scaling_factor_to_60s_wall_time": 0.005153468540970807,
+          "band_electrons_total": 68332140618.93413,
+          "band_variance_electron2_total": 69242963174.0282,
+          "background_electrons_total": 1226278.6116935418,
+          "read_variance_electron2_total": 909596276.4823819,
+          "band_electrons_per_60s_wall_time": 352147537.01687044,
+          "band_variance_electron2_per_60s_wall_time": 356841432.4009544,
+          "background_electrons_per_60s_wall_time": 6319.588247828023,
+          "read_variance_electron2_per_60s_wall_time": 4687575.7958361395,
+          "white_noise_relative_to_state_flux_ppm_60s": 53.64299059996629,
+          "variance_closure_relative_residual": 0.0
+        }
+      },
+      "pandexo_warnings": {
+        "Group Number Too Low?": "All good",
+        "Group Number Too High?": "All good",
+        "Non linear?": "All good",
+        "Saturated?": "All good",
+        "% full well high?": "% full well>80% (80% > 80%)",
+        "Num Groups Reset?": "All good",
+        "Minimum Integrations?": "All good"
+      },
+      "engine_result": {
+        "pickle": "UNITY_Theory/data/expected_noise_calculations/online/hatp13.p",
+        "calculation_id": "f9a7b495-b5bf-4d50-ac86-84d04abb1f72e",
+        "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/f9a7b495-b5bf-4d50-ac86-84d04abb1f72e",
+        "calculation": "fml; online engine/reference-data version is not exposed by the saved result"
+      }
+    },
+    {
+      "name": "WASP-12 b",
+      "noise_ppm_60s": 89.85476991236047,
+      "noise_definition": "star-only / in-eclipse white noise, relative to Fstar; used for the recovery input",
+      "physical_out_of_eclipse_noise_relative_to_stellar_flux_ppm_60s": 90.05945804143384,
+      "physical_out_of_eclipse_noise_relative_to_total_flux_ppm_60s": 89.64544505235494,
+      "physical_out_of_eclipse_change_vs_star_only_percent": 0.2277988461525382,
+      "white_light_band_um": [
+        2.9,
+        5.1
+      ],
+      "n_valid_spectral_bins": 1225,
+      "wavelength_coverage_um": [
+        2.9014066785222625,
+        5.098341666396355
+      ],
+      "stellar_input": {
+        "catalog_j_mag": 10.477,
+        "catalog_j_mag_error": 0.021,
+        "catalog_k_mag": 10.188,
+        "catalog_k_mag_error": 0.02,
+        "submitted_pandexo_target_mag": 10.477,
+        "submitted_minus_catalog_j_mag": 0.0,
+        "pandeia_scene_matches_saved_phoenix_spectrum_max_fractional_error": 0.0,
+        "pandeia_extinction_value_mag": 0.0,
+        "pandeia_scene_normalization": "none",
+        "stellar_parameter_source": "archive evidence JSON; scalar Teff/logg/metallicity are not stored in the online result, so the saved spectrum is audited against this PHOENIX model",
+        "teff_k": 6265.0,
+        "logg_cgs": 4.11,
+        "metallicity_dex": 0.12,
+        "phoenix_sed_shape_audit": {
+          "status": "passed",
+          "reference_model": "pysynphot Icat('phoenix', Teff, [Fe/H], logg)",
+          "reference_grid_parameters": {
+            "teff_k": 6265.0,
+            "metallicity_dex": 0.12,
+            "logg_cgs": 4.11
+          },
+          "normalization": "one free multiplicative scale fit by median ratio in 1.22--1.28 micron J band",
+          "max_absolute_fractional_shape_difference_2p9_to_5p1_um": 6.685763054292693e-13,
+          "pysynphot_warnings": []
+        }
+      },
+      "instrument": {
+        "instrument": "nirspec",
+        "mode": "bots",
+        "disperser": "g395m",
+        "filter": "f290lp",
+        "aperture": "s1600a1",
+        "subarray": "sub2048",
+        "readout_pattern": "nrsrapid",
+        "groups_per_integration": 32,
+        "calculation_type": "fml",
+        "primary_secondary": "fp/f*",
+        "nirspec_superstripes": 1
+      },
+      "timing": {
+        "elapsed_wall_seconds_per_integration_including_reset": 29.78648,
+        "measurement_seconds_per_integration": 27.962,
+        "integration_duty_cycle_fraction": 0.9387480494506232,
+        "accepted_apt_total_integrations": 991,
+        "pandexo_timing_total_integrations": 992,
+        "pandexo_minus_accepted_integration_count": 1,
+        "observing_efficiency_percent_from_pandexo": 93.87480494506232,
+        "star_only_in_eclipse_state": {
+          "integrations": 634,
+          "wall_time_seconds": 18884.62832,
+          "on_source_time_seconds": 17727.908,
+          "duty_cycle_fraction": 0.9387480494506232,
+          "scaling_factor_to_60s_wall_time": 0.0031771872330924435,
+          "band_electrons_total": 39471603026.49794,
+          "band_variance_electron2_total": 39966361326.197395,
+          "background_electrons_total": 2286874.1744084796,
+          "read_variance_electron2_total": 492471425.5250471,
+          "band_electrons_per_60s_wall_time": 125408673.2054823,
+          "band_variance_electron2_per_60s_wall_time": 126980612.95875394,
+          "background_electrons_per_60s_wall_time": 7265.8274306194435,
+          "read_variance_electron2_per_60s_wall_time": 1564673.9258410158,
+          "white_noise_relative_to_state_flux_ppm_60s": 89.85476991236047,
+          "variance_closure_relative_residual": 0.0
+        },
+        "physical_out_of_eclipse_star_plus_planet_state": {
+          "integrations": 358,
+          "wall_time_seconds": 10663.55984,
+          "on_source_time_seconds": 10010.396,
+          "duty_cycle_fraction": 0.9387480494506233,
+          "scaling_factor_to_60s_wall_time": 0.005626638842962595,
+          "band_electrons_total": 22391316804.90953,
+          "band_variance_electron2_total": 22670691365.307648,
+          "background_electrons_total": 1291326.4265587316,
+          "read_variance_electron2_total": 278083233.9715566,
+          "band_electrons_per_60s_wall_time": 125987852.87958507,
+          "band_variance_electron2_per_60s_wall_time": 127559792.63285673,
+          "background_electrons_per_60s_wall_time": 7265.827430619444,
+          "read_variance_electron2_per_60s_wall_time": 1564673.925841016,
+          "white_noise_relative_to_state_flux_ppm_60s": 89.64544505235494,
+          "variance_closure_relative_residual": 0.0
+        }
+      },
+      "pandexo_warnings": {
+        "Group Number Too Low?": "All good",
+        "Group Number Too High?": "All good",
+        "Non linear?": "All good",
+        "Saturated?": "All good",
+        "% full well high?": "All good (79% < 80%)",
+        "Num Groups Reset?": "All good",
+        "Minimum Integrations?": "All good"
+      },
+      "engine_result": {
+        "pickle": "UNITY_Theory/data/expected_noise_calculations/online/wasp12.p",
+        "calculation_id": "e6cec414-76cf-48f5-a6a0-fcf80f8e3784e",
+        "result_url": "https://exoctk.stsci.edu/pandexo/calculation/view/e6cec414-76cf-48f5-a6a0-fcf80f8e3784e",
+        "calculation": "fml; online engine/reference-data version is not exposed by the saved result"
+      }
+    }
+  ]
+}

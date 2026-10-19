@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "expected_draws": 100,
+  "quantile_probabilities": {
+    "one_sigma_lower": 0.158655,
+    "one_sigma_upper": 0.841345,
+    "two_sigma_lower": 0.02275,
+    "two_sigma_upper": 0.97725
+  },
+  "slope_units": "degrees per 1000 K",
+  "scopes": {
+    "full_window": {
+      "unweighted": {
+        "n_realizations": 100,
+        "median_slope_deg_per_1000k": -32.314551999345476,
+        "one_sigma_range_deg_per_1000k": [
+          -36.48711936860226,
+          -27.491773124041536
+        ],
+        "two_sigma_range_deg_per_1000k": [
+          -42.29734303838053,
+          -24.681310722054583
+        ],
+        "fraction_negative": 1.0,
+        "negative_realization_count": 100,
+        "available": true
+      },
+      "weighted": {
+        "n_realizations": 100,
+        "median_slope_deg_per_1000k": -21.324646483034165,
+        "one_sigma_range_deg_per_1000k": [
+          -24.22655218552694,
+          -18.573285910733482
+        ],
+        "two_sigma_range_deg_per_1000k": [
+          -27.368431117034046,
+          -16.405752063755518
+        ],
+        "fraction_negative": 1.0,
+        "negative_realization_count": 100,
+        "available": true
+      },
+      "input_unweighted_slope_deg_per_1000k": -30.90761297007813,
+      "interpretation": "Ranges and negative fractions describe finite noise realizations. The weighted fit uses each target's per-realization profile-interval halfwidth; this is a descriptive summary, not a posterior detection probability."
+    },
+    "eclipse_only": {
+      "unweighted": {
+        "n_realizations": 100,
+        "median_slope_deg_per_1000k": -31.60275617551757,
+        "one_sigma_range_deg_per_1000k": [
+          -37.50373300970499,
+          -28.146474945392537
+        ],
+        "two_sigma_range_deg_per_1000k": [
+          -43.82961638002487,
+          -22.032662147703043
+        ],
+        "fraction_negative": 1.0,
+        "negative_realization_count": 100,
+        "available": true
+      },
+      "weighted": {
+        "n_realizations": 100,
+        "median_slope_deg_per_1000k": -28.359083772770312,
+        "one_sigma_range_deg_per_1000k": [
+          -34.10811818851149,
+          -22.999321038449217
+        ],
+        "two_sigma_range_deg_per_1000k": [
+          -39.490826189602586,
+          -18.30091423738806
+        ],
+        "fraction_negative": 1.0,
+        "negative_realization_count": 100,
+        "available": true
+      },
+      "input_unweighted_slope_deg_per_1000k": -30.90761297007813,
+      "interpretation": "Ranges and negative fractions describe finite noise realizations. The weighted fit uses each target's per-realization profile-interval halfwidth; this is a descriptive summary, not a posterior detection probability."
+    }
+  }
+}

@@ -5,6 +5,10 @@ maps. It contains the map physics, NumPyro inference, data preparation,
 reference checks, and reports. It has no runtime dependency on `starry`,
 PyMC3, Theano, or Docker.
 
+The [UNITY theory study](UNITY_Theory/README.md) contains the six-target
+injection–recovery simulations, frozen PandExo noise calculations, saved
+fit profiles, and commands to reproduce the results and figures.
+
 The current student task is **WASP-121b white-light analysis**. Start with
 NIRSpec NRS1 and NRS2, then MIRI/LRS. The other instruments and spectral maps
 need further checks. See the [handoff audit](docs/student_handoff_audit.md)

@@ -1,0 +1,30 @@
+{
+  "note": "Legacy scripts delegate to the canonical code in UNITY_Theory. Original source hashes describe the untracked scripts used for the October 9 study.",
+  "files": [
+    {
+      "legacy_path": "tools/compute_unity_expected_noise.py",
+      "original_source_sha256": "38df6ff389fdcfef70c28dc31d111725d6c435ac3536a987523645fdff5d95d4",
+      "canonical_path": "UNITY_Theory/code/compute_unity_expected_noise.py"
+    },
+    {
+      "legacy_path": "tools/plot_unity_expected_ensemble.py",
+      "original_source_sha256": "7913e5c0f4d7e270e48995b87f9d6fdf2e261a240f3ba9f53c16746cf91418d0",
+      "canonical_path": "UNITY_Theory/code/plot_unity_expected_ensemble.py"
+    },
+    {
+      "legacy_path": "tools/plot_unity_expected_noise.py",
+      "original_source_sha256": "5422a395e60fd9568297320bdf534e5659d407087f8601b210f6ff14366dcc21",
+      "canonical_path": "UNITY_Theory/code/plot_unity_expected_noise.py"
+    },
+    {
+      "legacy_path": "tools/plot_unity_recovery.py",
+      "original_source_sha256": "f298796a793654f259f9ffaf27a697e3d6cc243ddc14d1cce1132817dbba3bca",
+      "canonical_path": "UNITY_Theory/code/plot_unity_recovery.py"
+    },
+    {
+      "legacy_path": "tools/unity_injection_recovery.py",
+      "original_source_sha256": "a1d8f11e0a7e25696bdeef7954c3bbabb4e6d1bb06fac872d0790aa5aec4ccc9",
+      "canonical_path": "UNITY_Theory/code/unity_injection_recovery.py"
+    }
+  ]
+}

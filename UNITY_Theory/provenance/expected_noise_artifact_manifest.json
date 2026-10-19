@@ -1,0 +1,187 @@
+[
+  {
+    "path": "UNITY_Theory/code/compute_unity_expected_noise.py",
+    "bytes": 24984,
+    "sha256": "38df6ff389fdcfef70c28dc31d111725d6c435ac3536a987523645fdff5d95d4"
+  },
+  {
+    "path": "UNITY_Theory/code/plot_unity_expected_noise.py",
+    "bytes": 17393,
+    "sha256": "5422a395e60fd9568297320bdf534e5659d407087f8601b210f6ff14366dcc21"
+  },
+  {
+    "path": "UNITY_Theory/code/unity_injection_recovery.py",
+    "bytes": 79477,
+    "sha256": "a1d8f11e0a7e25696bdeef7954c3bbabb4e6d1bb06fac872d0790aa5aec4ccc9"
+  },
+  {
+    "path": "UNITY_Theory/data/inputs/unity_expected_noise.json",
+    "bytes": 12674,
+    "sha256": "516233423cc44e05dd1e7db2a3cb3433b2116d54d8f32a4733fc636071edfe7d"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/expected_noise_report.txt",
+    "bytes": 3226,
+    "sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/expected_noise.json",
+    "bytes": 51208,
+    "sha256": "6b22bbf49c7a7e9f5fbaa3389c3e72f72ca9179e8c43b992b60363db8466d18c"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/checks/expected_noise_verification_report.txt",
+    "bytes": 3226,
+    "sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/checks/expected_noise_verification.json",
+    "bytes": 34617,
+    "sha256": "89e1d67f6d52a5fbbf996130b4f2b6e8495d6249f302b5e7ce6de6b11d9e5bf3"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp13.p",
+    "bytes": 1325706,
+    "sha256": "ad5ef64f65e07c1af92f0849166a036cdc850a3332b45270e985469b15308d14"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/online/wasp12.p",
+    "bytes": 3293257,
+    "sha256": "1caeb98bddb6f6ae51556be6488e937cffd46b5f2b8a417201771d00e04de34f"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/online/wasp178.p",
+    "bytes": 3293251,
+    "sha256": "20b7be5df001d012321579f8ee97afdd098ffe39be30df9b29779caf7adfb2bd"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp1.p",
+    "bytes": 3293251,
+    "sha256": "f01420d90abeeeff626e8a24a6e74212e5f7434465c1493bb2d790e3b18a2f46"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp30.p",
+    "bytes": 3293258,
+    "sha256": "1979fe9aa037a42b6b81c7889d330c88aa6abe1cbab65cd65f1de87c228aa2f2"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/online/manifest.json",
+    "bytes": 8527,
+    "sha256": "eb6367ef4899825bc9fe084d779bc3319d4ba68f3e1db6baaa532a972252e950"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_calculations/online/kelt7.p",
+    "bytes": 5289276,
+    "sha256": "ca309776626c439414f1c057c872531eac84af894c7f7368125dcf28d258298d"
+  },
+  {
+    "path": "UNITY_Theory/data/expected_noise_inputs/pid10786_detector_magnitudes_evidence.json",
+    "bytes": 24457,
+    "sha256": "8a9c8a2aab2f11c9d422a4aa4b142e60cc26c7dabcec80cb1565cb7a8eb638a4"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/summary.json",
+    "bytes": 26886,
+    "sha256": "01810eca36a9b9fba24083573f8571390319ef9db011e05a3fc1c6d30c2c7f7e"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/recovery_trials.csv",
+    "bytes": 10610,
+    "sha256": "d37fa32ba06e70ce79f5584c17084274bb1bee25a03c55c929daf8368865d271"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/run_inputs.json",
+    "bytes": 26615,
+    "sha256": "b167acb1152213e843d6e4cf2885e6791d4f4f38c330663ab82270841ac8c81d"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/profiles.npz",
+    "bytes": 1556601,
+    "sha256": "ef208cac007d99a5f2ef5f6939d9994c484b2757a586e81c78f4d78fc68f593d"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/examples/hat_p_13_b_curves.csv",
+    "bytes": 480754,
+    "sha256": "9c10cfa8dce77983b36c74a86b330fbe2f07e3cc5fdd33aa39194c84426bc6f6"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/examples/kelt_7_b_curves.csv",
+    "bytes": 265757,
+    "sha256": "4c58285a51e7ef85d63061e5213c8ce90cc4f2505d55c63ee1373dfe4fda4c62"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/examples/hat_p_30_b_curves.csv",
+    "bytes": 173974,
+    "sha256": "8959de558c418f8cb2f18befaa491a7ee95988f74a587a2083bf93e1afa71e6c"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/examples/hat_p_1_b_curves.csv",
+    "bytes": 221388,
+    "sha256": "f77b610a8a24d346d482ee82088f40ecdfc233bc0894294f23d7e62c936bfed0"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/examples/wasp_178_b_curves.csv",
+    "bytes": 267313,
+    "sha256": "96b0c7fc22469f5e6e9fe31492cd3b55c26dd898bd82972bf649a68511b756cf"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_study/examples/wasp_12_b_curves.csv",
+    "bytes": 231511,
+    "sha256": "a6c336763a5d54355c10dfaeaafc56bc33b9febabd5011ab1f456c1f3ef35e1b"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_deliverables/figure_caption.txt",
+    "bytes": 987,
+    "sha256": "b50c87c9249feb60744321d207a3b3a927ddb4ae1b7084ebbefe7fd41bfe9770"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_deliverables/expected_noise_methodology.txt",
+    "bytes": 4713,
+    "sha256": "0cda6c989c3dfff792bd16732ff4a81c005cd03b24e5c74a950a73391d96d65e"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise.pdf",
+    "bytes": 19953,
+    "sha256": "cdbe3e7690bb63efa40306c20f4cc42de23f2a3f00e087114b2e214ba29fd263"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise.png",
+    "bytes": 110237,
+    "sha256": "308435819efa5917b52f2c6e1e85bd45d48a273cbf29014e65c540483560eb7c"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise.svg",
+    "bytes": 29128,
+    "sha256": "12a5e442189f5d2b894a453a923ed8f4c7ec18127188ba87bec66bd780450219"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise_results.csv",
+    "bytes": 3773,
+    "sha256": "d7c75ed7d83b6343d2a08e5ec36bce4ed5f7b1038ed31d40cc1a6327ea31edd9"
+  },
+  {
+    "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise_report.txt",
+    "bytes": 3771,
+    "sha256": "d72fd4ca4ac01a2a58b588a069dd58b6cc9727942e32384261d30761aef3161f"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/expected_noise_final_checks.json",
+    "bytes": 729,
+    "sha256": "4d87e9f9c333beff8731da5462c07d3e2d3663fd49297cc020236484489a3126"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/expected_noise_verification.txt",
+    "bytes": 3226,
+    "sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/expected_noise_trend_check.json",
+    "bytes": 518,
+    "sha256": "0ba934443e10c62dee5a69a834892fee64aae2d66a1b1685b4d51fad3ca5b8e3"
+  },
+  {
+    "path": "UNITY_Theory/provenance/checks/expected_noise_verification.json",
+    "bytes": 34617,
+    "sha256": "89e1d67f6d52a5fbbf996130b4f2b6e8495d6249f302b5e7ce6de6b11d9e5bf3"
+  }
+]

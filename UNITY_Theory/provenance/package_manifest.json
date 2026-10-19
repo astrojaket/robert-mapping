@@ -1,0 +1,1262 @@
+{
+  "schema_version": 1,
+  "source_snapshot": "results/unity_erc_20261009",
+  "scope": "UNITY_Theory data, reference, archive, and provenance files",
+  "hash_algorithm": "SHA-256",
+  "historical_hash_note": "original_sha256 hashes source snapshot bytes; packaged_sha256 hashes bytes in this package. Embedded hashes in copied historical records may refer to pre-cleanup bytes.",
+  "self_hash_excluded": true,
+  "files": [
+    {
+      "path": "UNITY_Theory/archive/expected_noise_ensemble/profiles.npz.part001",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "packaged_sha256": "5bd85b623ec9f014f089cd0a940f56b6174e6336170f9951e7c2365be28e4981",
+      "source_file_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/expected_noise_ensemble/profiles.npz.part002",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "packaged_sha256": "fd846674c3e33a7566e527b3d4e4234629132ce8d0e82f840e7942eee9f41e80",
+      "source_file_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/expected_noise_ensemble/profiles.npz.part003",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "packaged_sha256": "a5560ecc68c55e769625e7acc36ccf7b791e7a4181e9945ea8874621308d1243",
+      "source_file_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/expected_noise_ensemble/profiles.npz.part004",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "packaged_sha256": "c9372b9828fdf0e222c9d5a984726c389efacb39bf028c128b57df88e275ba0a",
+      "source_file_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/expected_noise_ensemble/profiles.npz.part005",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/profiles.npz",
+      "bytes": 20845681,
+      "original_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "packaged_sha256": "9c584ddbc855567c147711e66404507c32369259c33ab37fde90f1bb03a893ae",
+      "source_file_sha256": "4b3d5d0a820c6acc7e439164dace1391dc2a90f28d77357c23ed852d903b65c5",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/expected_noise_study/profiles.npz.part001",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/profiles.npz",
+      "bytes": 1556601,
+      "original_sha256": "ef208cac007d99a5f2ef5f6939d9994c484b2757a586e81c78f4d78fc68f593d",
+      "packaged_sha256": "ef208cac007d99a5f2ef5f6939d9994c484b2757a586e81c78f4d78fc68f593d",
+      "source_file_sha256": "ef208cac007d99a5f2ef5f6939d9994c484b2757a586e81c78f4d78fc68f593d",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/profiles_manifest.json",
+      "source_path": null,
+      "bytes": 4803,
+      "original_sha256": null,
+      "packaged_sha256": "6ada1ce537478f6d29fa26e927067a9544e6e3e565181911adc4898fcb239513",
+      "transformations": [
+        "generated lossless profile archive manifest"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part001",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "79df0946c4d463521de537023d3d5e51c3982e6b4e7651c08c40b5b81af38b66",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part002",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "fbaf17fe1d4fb1c5cc384c338810b96b07132013d4daf9a345e0be9f7080db9b",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part003",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "c0273bb975099f9a97093f01add4f32a6c83d521c930e439bac56c66c402fab0",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part004",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "a7f3da05146c9b46b058e754b6b919c2895510197d9e102eeee91079ac5e3ece",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part005",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "16d2a33cdd280d8bfce74b077bae683612cd829209b76135998a86011fa6bd74",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part006",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "4cb697601728db143d523f68a5efd42b7575a5ce7fc6d5a6794e2c60e570d1ac",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part007",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "52b0b9dba95a0bd8510479c8e83d87f0d5c181893c7ccf584333af8efaa0c0a2",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part008",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "5d13cc8b69716864e4b719a040e1949a9e0c3bd17d64a9d12ce65ac5fafe2ee1",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/study/profiles.npz.part009",
+      "source_path": "results/unity_erc_20261009/study/profiles.npz",
+      "bytes": 26837768,
+      "original_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "packaged_sha256": "663806ea2f327961c2ac54962f9b95497cfdc65d5afb8435111025e9aa910b4f",
+      "source_file_sha256": "bc05da35af1a809551a74a279366dc8eb7bf3c877dd00ed8d39530b99a17f4b3",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/wasp12_finegrid/profiles.npz.part001",
+      "source_path": "results/unity_erc_20261009/wasp12_finegrid/profiles.npz",
+      "bytes": 33554432,
+      "original_sha256": "25540341835072b75ce85d5b9c5ec7a6326c443ab7edc2508d9298e739438e78",
+      "packaged_sha256": "c4c10356179edd0d8ae7b1e71fcee776d755bb29a0e631336a038e35cf3c525e",
+      "source_file_sha256": "25540341835072b75ce85d5b9c5ec7a6326c443ab7edc2508d9298e739438e78",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive/wasp12_finegrid/profiles.npz.part002",
+      "source_path": "results/unity_erc_20261009/wasp12_finegrid/profiles.npz",
+      "bytes": 17362148,
+      "original_sha256": "25540341835072b75ce85d5b9c5ec7a6326c443ab7edc2508d9298e739438e78",
+      "packaged_sha256": "3639bc65c43fedbf1df58692f99c8395a713d1f4e93525194f78fb0f99cef3e1",
+      "source_file_sha256": "25540341835072b75ce85d5b9c5ec7a6326c443ab7edc2508d9298e739438e78",
+      "transformations": [
+        "lossless numbered binary profile archive part"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/archive_profiles.py",
+      "source_path": null,
+      "bytes": 7136,
+      "original_sha256": null,
+      "packaged_sha256": "e98fd1c19b013313a8b4c18c85adab9c0ee1462c16632cb456ea2965f4b17ec5",
+      "transformations": [
+        "generated standard-library archive and restore CLI"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/checks/expected_noise_verification.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/checks/expected_noise_verification.json",
+      "bytes": 34306,
+      "original_sha256": "89e1d67f6d52a5fbbf996130b4f2b6e8495d6249f302b5e7ce6de6b11d9e5bf3",
+      "packaged_sha256": "033b0c0e1ff095b4b8e0396bb8d98db17914e2f5204121a9f293293a2c277593",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/checks/expected_noise_verification_report.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/checks/expected_noise_verification_report.txt",
+      "bytes": 3226,
+      "original_sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd",
+      "packaged_sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/expected_noise.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/expected_noise.json",
+      "bytes": 50897,
+      "original_sha256": "6b22bbf49c7a7e9f5fbaa3389c3e72f72ca9179e8c43b992b60363db8466d18c",
+      "packaged_sha256": "789fcd2b52e1d990285b51a8de4e364d7c36db9ad237e38375a47d96f8d0ba37",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/expected_noise_report.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/expected_noise_report.txt",
+      "bytes": 3226,
+      "original_sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd",
+      "packaged_sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp1.p",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/online/hatp1.p",
+      "bytes": 3293251,
+      "original_sha256": "f01420d90abeeeff626e8a24a6e74212e5f7434465c1493bb2d790e3b18a2f46",
+      "packaged_sha256": "f01420d90abeeeff626e8a24a6e74212e5f7434465c1493bb2d790e3b18a2f46",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp13.p",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/online/hatp13.p",
+      "bytes": 1325706,
+      "original_sha256": "ad5ef64f65e07c1af92f0849166a036cdc850a3332b45270e985469b15308d14",
+      "packaged_sha256": "ad5ef64f65e07c1af92f0849166a036cdc850a3332b45270e985469b15308d14",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/hatp30.p",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/online/hatp30.p",
+      "bytes": 3293258,
+      "original_sha256": "1979fe9aa037a42b6b81c7889d330c88aa6abe1cbab65cd65f1de87c228aa2f2",
+      "packaged_sha256": "1979fe9aa037a42b6b81c7889d330c88aa6abe1cbab65cd65f1de87c228aa2f2",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/kelt7.p",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/online/kelt7.p",
+      "bytes": 5289276,
+      "original_sha256": "ca309776626c439414f1c057c872531eac84af894c7f7368125dcf28d258298d",
+      "packaged_sha256": "ca309776626c439414f1c057c872531eac84af894c7f7368125dcf28d258298d",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/manifest.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/online/manifest.json",
+      "bytes": 7903,
+      "original_sha256": "eb6367ef4899825bc9fe084d779bc3319d4ba68f3e1db6baaa532a972252e950",
+      "packaged_sha256": "3c4a73f1014d132cd228cb35d55f24d2954d59ab08f6ca8ae77768a0b7d688a4",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON",
+        "stored pickle_path as basename relative to this manifest directory"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/wasp12.p",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/online/wasp12.p",
+      "bytes": 3293257,
+      "original_sha256": "1caeb98bddb6f6ae51556be6488e937cffd46b5f2b8a417201771d00e04de34f",
+      "packaged_sha256": "1caeb98bddb6f6ae51556be6488e937cffd46b5f2b8a417201771d00e04de34f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_calculations/online/wasp178.p",
+      "source_path": "results/unity_erc_20261009/expected_noise_calculations/online/wasp178.p",
+      "bytes": 3293251,
+      "original_sha256": "20b7be5df001d012321579f8ee97afdd098ffe39be30df9b29779caf7adfb2bd",
+      "packaged_sha256": "20b7be5df001d012321579f8ee97afdd098ffe39be30df9b29779caf7adfb2bd",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/expected_noise_inputs/pid10786_detector_magnitudes_evidence.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_inputs/pid10786_detector_magnitudes_evidence.json",
+      "bytes": 24252,
+      "original_sha256": "8a9c8a2aab2f11c9d422a4aa4b142e60cc26c7dabcec80cb1565cb7a8eb638a4",
+      "packaged_sha256": "736ee9d015db3bae8d3175fb83cb3de7f6234d7d2e9bc22426cc242c4d78e7f4",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/data/inputs/nasa_ps_default.json",
+      "source_path": "results/unity_erc_20261009/inputs/nasa_ps_default.json",
+      "bytes": 2397,
+      "original_sha256": "c8a4d17a2714d9a8fcb79eb557bd1935bc32be2a6339e6b901b592976a0dfdd7",
+      "packaged_sha256": "484db6a34b1dea5fb5b25fd8c9b8ca078782cbc62cd8121518a5661b59f6f6b0",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/data/inputs/nasa_query_url.txt",
+      "source_path": "results/unity_erc_20261009/inputs/nasa_query_url.txt",
+      "bytes": 357,
+      "original_sha256": "6ef5c96e77ae0edd84a0bba9316cfa9ecb865f3279411472f2d3867176da1e11",
+      "packaged_sha256": "6ef5c96e77ae0edd84a0bba9316cfa9ecb865f3279411472f2d3867176da1e11",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/data/inputs/unity_expected_noise.json",
+      "source_path": "results/unity_erc_20261009/inputs/unity_expected_noise.json",
+      "bytes": 12476,
+      "original_sha256": "516233423cc44e05dd1e7db2a3cb3433b2116d54d8f32a4733fc636071edfe7d",
+      "packaged_sha256": "375061d7123badf8f0cae77f6049d0607fd409ee7aeccf5ef635373044a01e73",
+      "transformations": [
+        "replaced stale single_realization documentation with primary 100-seed ensemble context",
+        "sanitized absolute local paths and serialized JSON",
+        "documented 100-trial expected-noise ensemble with fixed noise index 0"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/data/inputs/unity_inputs.json",
+      "source_path": "results/unity_erc_20261009/inputs/unity_inputs.json",
+      "bytes": 6423,
+      "original_sha256": "e1a4dc4dffbe80740bfa01102cc6350b96ddc494e1491ada68c08c505641a783",
+      "packaged_sha256": "8acfd4b399128883771e670c059b4dc85dde44bd5d60cdd729155e6a30303421",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/data/inputs/wasp12_finegrid.json",
+      "source_path": "results/unity_erc_20261009/inputs/wasp12_finegrid.json",
+      "bytes": 3412,
+      "original_sha256": "37771d83db2026b84e8aa8fa1588184f224b81cbc35b4f6159df27d388b9272f",
+      "packaged_sha256": "dfd9f8da6a0e1c620f104b5fbfe355e3ea3720ec7c87ff60ba1815fdad0ef9f0",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/README.md",
+      "source_path": null,
+      "bytes": 1260,
+      "original_sha256": null,
+      "packaged_sha256": "6fad85e595fd3425afe1bdc43ce2286560cbdb8113fd61f1692d6d7b70ecac52",
+      "transformations": [
+        "generated provenance note"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/artifact_manifest.json",
+      "source_path": "results/unity_erc_20261009/artifact_manifest.json",
+      "bytes": 11368,
+      "original_sha256": "8e73e25cac68a65719788681808d8d5249faffac998963c8806c2836634f0720",
+      "packaged_sha256": "5f9e4e092f85b5f8f7c1c2b6e79404230abf986789639029bd9594845842a914",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/constrained_solver.json",
+      "source_path": "results/unity_erc_20261009/checks/constrained_solver.json",
+      "bytes": 374,
+      "original_sha256": "743b43694b211354aa8ebb84c67a04c4ddfbab634518b0b1a7a86a6c831e874c",
+      "packaged_sha256": "370809aa737c2cffdfea4ced921b5ea6770862da66aed89075bd89a5ccd5851f",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/environment.json",
+      "source_path": "results/unity_erc_20261009/checks/environment.json",
+      "bytes": 848,
+      "original_sha256": "c89eee37281943b8807334861f2008ebb945e83db40a6ff2715b8d03c28ce2ef",
+      "packaged_sha256": "1b9f04d5cb06daa1140ef81998f6af28a50ab6bdad640796b440d0f5963e506a",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/expected_ensemble_root_verification.json",
+      "source_path": "results/unity_erc_20261009/checks/expected_ensemble_root_verification.json",
+      "bytes": 4220,
+      "original_sha256": "0f8094f355808ff146c24f35d04e64650f2ef499550ba6bee7f54d55c2a91d1f",
+      "packaged_sha256": "b075a4c62c1de49e387acf1ea02fa0ab339dd0ea943825c1415a8cdfa1b0086f",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/expected_noise_final_checks.json",
+      "source_path": "results/unity_erc_20261009/checks/expected_noise_final_checks.json",
+      "bytes": 729,
+      "original_sha256": "4d87e9f9c333beff8731da5462c07d3e2d3663fd49297cc020236484489a3126",
+      "packaged_sha256": "4d87e9f9c333beff8731da5462c07d3e2d3663fd49297cc020236484489a3126",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/expected_noise_trend_check.json",
+      "source_path": "results/unity_erc_20261009/checks/expected_noise_trend_check.json",
+      "bytes": 518,
+      "original_sha256": "0ba934443e10c62dee5a69a834892fee64aae2d66a1b1685b4d51fad3ca5b8e3",
+      "packaged_sha256": "0ba934443e10c62dee5a69a834892fee64aae2d66a1b1685b4d51fad3ca5b8e3",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/expected_noise_verification.json",
+      "source_path": "results/unity_erc_20261009/checks/expected_noise_verification.json",
+      "bytes": 34306,
+      "original_sha256": "89e1d67f6d52a5fbbf996130b4f2b6e8495d6249f302b5e7ce6de6b11d9e5bf3",
+      "packaged_sha256": "033b0c0e1ff095b4b8e0396bb8d98db17914e2f5204121a9f293293a2c277593",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/expected_noise_verification.txt",
+      "source_path": "results/unity_erc_20261009/checks/expected_noise_verification.txt",
+      "bytes": 3226,
+      "original_sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd",
+      "packaged_sha256": "67754686c6206192676984167707760bab1ebbc3fe869014d290b0a81af455fd",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/final_checks.json",
+      "source_path": "results/unity_erc_20261009/checks/final_checks.json",
+      "bytes": 604,
+      "original_sha256": "e4b8838156da9df328724b91b6b3a1e6e397e120a564bb5f87947c99ab4f3217",
+      "packaged_sha256": "e4b8838156da9df328724b91b6b3a1e6e397e120a564bb5f87947c99ab4f3217",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/grid_convergence.json",
+      "source_path": "results/unity_erc_20261009/checks/grid_convergence.json",
+      "bytes": 2639,
+      "original_sha256": "b71159b9ef8408f38534818188fcab02a3cf414a5b17c705d10b82c63527d594",
+      "packaged_sha256": "b71159b9ef8408f38534818188fcab02a3cf414a5b17c705d10b82c63527d594",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/provenance/checks/noiseless_sign_recovery.json",
+      "source_path": "results/unity_erc_20261009/checks/noiseless_sign_recovery.json",
+      "bytes": 610,
+      "original_sha256": "cc4cd40c6e024bb89e1f3c1fc5840912a652542bddb4bf815869d0cc1d79ebb1",
+      "packaged_sha256": "93d7b274d8e8d0c82c5d6efdc5ec2aa4108da31a29b2540d8cb743cde030a396",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/expected_noise_artifact_manifest.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_artifact_manifest.json",
+      "bytes": 7152,
+      "original_sha256": "d6af1feb669073c97684c24c9469f21d0772ccf3484d69e7d11f9d1a034aa9f6",
+      "packaged_sha256": "55ecc01efc4831740462caad42c5506d96dcf43816283b5b3de0aa8f43567c14",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/provenance/operator_convergence.json",
+      "source_path": "results/unity_erc_20261009/operator_convergence.json",
+      "bytes": 2348,
+      "original_sha256": "e6bb72cf3c7b754bcbe3eb757c12254eea6e796530bd7818c50e53445f48faa5",
+      "packaged_sha256": "3ca493c838aa58f17635bd43bfd2090fd37728d753e02688dc7264173b7e9a5c",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/grant_methodology.txt",
+      "source_path": "results/unity_erc_20261009/deliverables/grant_methodology.txt",
+      "bytes": 4065,
+      "original_sha256": "0ca524ba1b983d9127d4653cbc26df552fde9499ad98df860997b7220102e405",
+      "packaged_sha256": "0ca524ba1b983d9127d4653cbc26df552fde9499ad98df860997b7220102e405",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/map_delta_bic_eclipse_only.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/map_delta_bic_eclipse_only.pdf",
+      "bytes": 80680,
+      "original_sha256": "eef64f438eadd4265879b1a7fdce9392b50e5d93ef4aa19d00843e3d61e48e33",
+      "packaged_sha256": "eef64f438eadd4265879b1a7fdce9392b50e5d93ef4aa19d00843e3d61e48e33",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/map_delta_bic_eclipse_only.png",
+      "source_path": "results/unity_erc_20261009/deliverables/map_delta_bic_eclipse_only.png",
+      "bytes": 355679,
+      "original_sha256": "e61356ce802825151d9e1eafb19e70444fee00714e644f35f48a290789b0d047",
+      "packaged_sha256": "e61356ce802825151d9e1eafb19e70444fee00714e644f35f48a290789b0d047",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/map_delta_bic_eclipse_only.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/map_delta_bic_eclipse_only.svg",
+      "bytes": 616526,
+      "original_sha256": "fd12ede18f63b6f07c38799386ab45fee6f3b582552b7e575ec4043425bc0049",
+      "packaged_sha256": "fd12ede18f63b6f07c38799386ab45fee6f3b582552b7e575ec4043425bc0049",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/map_delta_bic_full_window.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/map_delta_bic_full_window.pdf",
+      "bytes": 80088,
+      "original_sha256": "1718a37b20eb7a18f7f0f8ad195c15b347440e8c1aa0d6d731253480b36bc003",
+      "packaged_sha256": "1718a37b20eb7a18f7f0f8ad195c15b347440e8c1aa0d6d731253480b36bc003",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/map_delta_bic_full_window.png",
+      "source_path": "results/unity_erc_20261009/deliverables/map_delta_bic_full_window.png",
+      "bytes": 306601,
+      "original_sha256": "caa9b2a8fedaac9fa8568b872f85b4ff446970fd214c56e9b751bd8efdac7678",
+      "packaged_sha256": "caa9b2a8fedaac9fa8568b872f85b4ff446970fd214c56e9b751bd8efdac7678",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/map_delta_bic_full_window.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/map_delta_bic_full_window.svg",
+      "bytes": 621146,
+      "original_sha256": "c4600858cb2496e30ca927dfd72d4c5672e0999c79a5fb7a8f6387f6fe871fe7",
+      "packaged_sha256": "c4600858cb2496e30ca927dfd72d4c5672e0999c79a5fb7a8f6387f6fe871fe7",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/methodology.txt",
+      "source_path": "results/unity_erc_20261009/deliverables/methodology.txt",
+      "bytes": 13150,
+      "original_sha256": "42fe16b4d1b27fcf8b2ff44d9a4577eb441e7ebc351418a6999dafee29eb0451",
+      "packaged_sha256": "1b2e0a20072df2c44cacc0e211d16d9e73659a2a2f97794f86ed3888130d1794",
+      "transformations": [
+        "sanitized absolute local paths"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/offset_recovery_eclipse_only.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/offset_recovery_eclipse_only.pdf",
+      "bytes": 30647,
+      "original_sha256": "e45ff6e60df93c4badf3b4e4ab4c3099f371174255d76c9d200fb271f901bd05",
+      "packaged_sha256": "e45ff6e60df93c4badf3b4e4ab4c3099f371174255d76c9d200fb271f901bd05",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/offset_recovery_eclipse_only.png",
+      "source_path": "results/unity_erc_20261009/deliverables/offset_recovery_eclipse_only.png",
+      "bytes": 194545,
+      "original_sha256": "0fdfcf168b458e3ad93a875dc1172c5deb509f0b21c30940c9152776ee00ab93",
+      "packaged_sha256": "0fdfcf168b458e3ad93a875dc1172c5deb509f0b21c30940c9152776ee00ab93",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/offset_recovery_eclipse_only.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/offset_recovery_eclipse_only.svg",
+      "bytes": 138282,
+      "original_sha256": "82c2a4be404232d66b6bf9259d812057813d72719a31a038f074b9bd0f40eeab",
+      "packaged_sha256": "82c2a4be404232d66b6bf9259d812057813d72719a31a038f074b9bd0f40eeab",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/offset_recovery_full_window.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/offset_recovery_full_window.pdf",
+      "bytes": 30592,
+      "original_sha256": "2e434cb803d2b7cad539445242896346e92b5df71842446cf8407eef9588f072",
+      "packaged_sha256": "2e434cb803d2b7cad539445242896346e92b5df71842446cf8407eef9588f072",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/offset_recovery_full_window.png",
+      "source_path": "results/unity_erc_20261009/deliverables/offset_recovery_full_window.png",
+      "bytes": 192577,
+      "original_sha256": "c2bde361495ae8992f9852021dc9c788b1fdf7858ff1fec7bf35b1529b032e8a",
+      "packaged_sha256": "c2bde361495ae8992f9852021dc9c788b1fdf7858ff1fec7bf35b1529b032e8a",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/offset_recovery_full_window.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/offset_recovery_full_window.svg",
+      "bytes": 138307,
+      "original_sha256": "f16ff195ecbd4bd0da194d286bb59d1085cdbb6de525a158a22b7ac934cb043f",
+      "packaged_sha256": "f16ff195ecbd4bd0da194d286bb59d1085cdbb6de525a158a22b7ac934cb043f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/population_slope_recovery.csv",
+      "source_path": "results/unity_erc_20261009/deliverables/population_slope_recovery.csv",
+      "bytes": 251246,
+      "original_sha256": "81cd48684aadec1b80635e709ddb5418aba5dbfdd3b844ecc1d46ac81e4ce48c",
+      "packaged_sha256": "81cd48684aadec1b80635e709ddb5418aba5dbfdd3b844ecc1d46ac81e4ce48c",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_eclipse_only.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/population_slope_recovery_eclipse_only.pdf",
+      "bytes": 30278,
+      "original_sha256": "2cf951797ab438dfaa5cd20937e65a5519b94826d9ec31a6df8f6d1663765a2f",
+      "packaged_sha256": "2cf951797ab438dfaa5cd20937e65a5519b94826d9ec31a6df8f6d1663765a2f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_eclipse_only.png",
+      "source_path": "results/unity_erc_20261009/deliverables/population_slope_recovery_eclipse_only.png",
+      "bytes": 152508,
+      "original_sha256": "0c92f442cc5150b254509f93cf1fec64051049edccc6b980d87ff06a807407d6",
+      "packaged_sha256": "0c92f442cc5150b254509f93cf1fec64051049edccc6b980d87ff06a807407d6",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_eclipse_only.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/population_slope_recovery_eclipse_only.svg",
+      "bytes": 130181,
+      "original_sha256": "34aefdea9668ae9c87c2e468c5f8256353552bc4eace234601576784a80452f4",
+      "packaged_sha256": "34aefdea9668ae9c87c2e468c5f8256353552bc4eace234601576784a80452f4",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_full_window.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/population_slope_recovery_full_window.pdf",
+      "bytes": 29926,
+      "original_sha256": "aad2ddd3a69771f7281149dfd55bbc99d2deada368884f61c9bce88835fcfadd",
+      "packaged_sha256": "aad2ddd3a69771f7281149dfd55bbc99d2deada368884f61c9bce88835fcfadd",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_full_window.png",
+      "source_path": "results/unity_erc_20261009/deliverables/population_slope_recovery_full_window.png",
+      "bytes": 145418,
+      "original_sha256": "a8de90e6fb7366813ed0ecfe021821da04ea65633d7273aa12a57f7b1333fecd",
+      "packaged_sha256": "a8de90e6fb7366813ed0ecfe021821da04ea65633d7273aa12a57f7b1333fecd",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/population_slope_recovery_full_window.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/population_slope_recovery_full_window.svg",
+      "bytes": 128842,
+      "original_sha256": "05d5f1e89c972ed7e2f0393c1b19fb605278b1fa7fdeb159d0eefc145ba0a1c2",
+      "packaged_sha256": "05d5f1e89c972ed7e2f0393c1b19fb605278b1fa7fdeb159d0eefc145ba0a1c2",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/population_slope_summary.csv",
+      "source_path": "results/unity_erc_20261009/deliverables/population_slope_summary.csv",
+      "bytes": 3902,
+      "original_sha256": "cf0837c1f73cea752b2d15bbd5a46d762fcba6895d325dc3203205689aba9f6b",
+      "packaged_sha256": "cf0837c1f73cea752b2d15bbd5a46d762fcba6895d325dc3203205689aba9f6b",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/recovery_bias_eclipse_only.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/recovery_bias_eclipse_only.pdf",
+      "bytes": 91495,
+      "original_sha256": "36d6a8ba10e25a73381777dc3825d2cf1f2c2db1c2ea2f03f98b16a8c2cf263c",
+      "packaged_sha256": "36d6a8ba10e25a73381777dc3825d2cf1f2c2db1c2ea2f03f98b16a8c2cf263c",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/recovery_bias_eclipse_only.png",
+      "source_path": "results/unity_erc_20261009/deliverables/recovery_bias_eclipse_only.png",
+      "bytes": 357233,
+      "original_sha256": "6d81b020c32e56cb3e213cac05c8092843cdee393d9057a9386c7c5fc4a99741",
+      "packaged_sha256": "6d81b020c32e56cb3e213cac05c8092843cdee393d9057a9386c7c5fc4a99741",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/recovery_bias_eclipse_only.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/recovery_bias_eclipse_only.svg",
+      "bytes": 513782,
+      "original_sha256": "a19a7aa81baf45f6f18c489ae27a45943e3c2931acb88765fbffd4695bb58912",
+      "packaged_sha256": "a19a7aa81baf45f6f18c489ae27a45943e3c2931acb88765fbffd4695bb58912",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/recovery_bias_full_window.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/recovery_bias_full_window.pdf",
+      "bytes": 91230,
+      "original_sha256": "0a5980983a5e05283b3ed237abc2a19b8c7bfc5a379ac2a34517fd063cc7689d",
+      "packaged_sha256": "0a5980983a5e05283b3ed237abc2a19b8c7bfc5a379ac2a34517fd063cc7689d",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/recovery_bias_full_window.png",
+      "source_path": "results/unity_erc_20261009/deliverables/recovery_bias_full_window.png",
+      "bytes": 338702,
+      "original_sha256": "850c166622cd2bb8a0598d8372104719297de205e4d63a1f4da804fa46da4e7b",
+      "packaged_sha256": "850c166622cd2bb8a0598d8372104719297de205e4d63a1f4da804fa46da4e7b",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/recovery_bias_full_window.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/recovery_bias_full_window.svg",
+      "bytes": 510490,
+      "original_sha256": "5de4e5fcea7eb922d8341c32a59482c4e7d0e7bd1cd1a0ec2eebdc89c4b4e9c4",
+      "packaged_sha256": "5de4e5fcea7eb922d8341c32a59482c4e7d0e7bd1cd1a0ec2eebdc89c4b4e9c4",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/representative_trials_eclipse_only.csv",
+      "source_path": "results/unity_erc_20261009/deliverables/representative_trials_eclipse_only.csv",
+      "bytes": 34603,
+      "original_sha256": "a9a543fe0281fc564adc439838f89401f434681d9b48a7c24ccadcd98d9249ad",
+      "packaged_sha256": "a9a543fe0281fc564adc439838f89401f434681d9b48a7c24ccadcd98d9249ad",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/representative_trials_full_window.csv",
+      "source_path": "results/unity_erc_20261009/deliverables/representative_trials_full_window.csv",
+      "bytes": 34539,
+      "original_sha256": "16e37f09d212003b772cb051d1fcfe9352228711f2b5cc1c666e1fe15f14e906",
+      "packaged_sha256": "16e37f09d212003b772cb051d1fcfe9352228711f2b5cc1c666e1fe15f14e906",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/reproduce.txt",
+      "source_path": "results/unity_erc_20261009/deliverables/reproduce.txt",
+      "bytes": 1500,
+      "original_sha256": "d91048d30082e4d4b55347d0454c4bfb6cdc29d25b0206999f938d241971ee6b",
+      "packaged_sha256": "4e06b8e9b81ba04fa920b565c021e3c4c04530fc04ef3466f7f7205804314167",
+      "transformations": [
+        "sanitized absolute local paths"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/target_recovery_summary.csv",
+      "source_path": "results/unity_erc_20261009/deliverables/target_recovery_summary.csv",
+      "bytes": 25048,
+      "original_sha256": "9ba14ed045b3f4d16d17a4241edd4ca7108ea6e0373e223bfe7b67dfd48c2955",
+      "packaged_sha256": "9ba14ed045b3f4d16d17a4241edd4ca7108ea6e0373e223bfe7b67dfd48c2955",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/unity_hotspot_trend.pdf",
+      "source_path": "results/unity_erc_20261009/deliverables/unity_hotspot_trend.pdf",
+      "bytes": 21899,
+      "original_sha256": "4ab2c2601b3e3f98ebe0dba19e6a90525f2a1d0a81b1391f8ffb61102537aab7",
+      "packaged_sha256": "4ab2c2601b3e3f98ebe0dba19e6a90525f2a1d0a81b1391f8ffb61102537aab7",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/unity_hotspot_trend.png",
+      "source_path": "results/unity_erc_20261009/deliverables/unity_hotspot_trend.png",
+      "bytes": 137650,
+      "original_sha256": "88ae1dd324ce270a779d8f5cd1d22fe3e2a20c7123df7a8e857907f335eb413f",
+      "packaged_sha256": "88ae1dd324ce270a779d8f5cd1d22fe3e2a20c7123df7a8e857907f335eb413f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/deliverables/unity_hotspot_trend.svg",
+      "source_path": "results/unity_erc_20261009/deliverables/unity_hotspot_trend.svg",
+      "bytes": 37686,
+      "original_sha256": "7abccff65d190451669cabb7ac3e5e400af9f804d5fe119da992d2b088ef1f5f",
+      "packaged_sha256": "7abccff65d190451669cabb7ac3e5e400af9f804d5fe119da992d2b088ef1f5f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_deliverables/expected_noise_methodology.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_deliverables/expected_noise_methodology.txt",
+      "bytes": 4684,
+      "original_sha256": "0cda6c989c3dfff792bd16732ff4a81c005cd03b24e5c74a950a73391d96d65e",
+      "packaged_sha256": "e3f2fde6591f3797db18534cf55ae19675729583195b0d57899ba5b5dfd745b8",
+      "transformations": [
+        "sanitized absolute local paths"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_deliverables/figure_caption.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_deliverables/figure_caption.txt",
+      "bytes": 987,
+      "original_sha256": "b50c87c9249feb60744321d207a3b3a927ddb4ae1b7084ebbefe7fd41bfe9770",
+      "packaged_sha256": "b50c87c9249feb60744321d207a3b3a927ddb4ae1b7084ebbefe7fd41bfe9770",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise.pdf",
+      "source_path": "results/unity_erc_20261009/expected_noise_deliverables/unity_expected_noise.pdf",
+      "bytes": 19953,
+      "original_sha256": "cdbe3e7690bb63efa40306c20f4cc42de23f2a3f00e087114b2e214ba29fd263",
+      "packaged_sha256": "cdbe3e7690bb63efa40306c20f4cc42de23f2a3f00e087114b2e214ba29fd263",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise.png",
+      "source_path": "results/unity_erc_20261009/expected_noise_deliverables/unity_expected_noise.png",
+      "bytes": 110237,
+      "original_sha256": "308435819efa5917b52f2c6e1e85bd45d48a273cbf29014e65c540483560eb7c",
+      "packaged_sha256": "308435819efa5917b52f2c6e1e85bd45d48a273cbf29014e65c540483560eb7c",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise.svg",
+      "source_path": "results/unity_erc_20261009/expected_noise_deliverables/unity_expected_noise.svg",
+      "bytes": 29128,
+      "original_sha256": "12a5e442189f5d2b894a453a923ed8f4c7ec18127188ba87bec66bd780450219",
+      "packaged_sha256": "12a5e442189f5d2b894a453a923ed8f4c7ec18127188ba87bec66bd780450219",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise_report.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_deliverables/unity_expected_noise_report.txt",
+      "bytes": 3771,
+      "original_sha256": "d72fd4ca4ac01a2a58b588a069dd58b6cc9727942e32384261d30761aef3161f",
+      "packaged_sha256": "d72fd4ca4ac01a2a58b588a069dd58b6cc9727942e32384261d30761aef3161f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_deliverables/unity_expected_noise_results.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_deliverables/unity_expected_noise_results.csv",
+      "bytes": 3773,
+      "original_sha256": "d7c75ed7d83b6343d2a08e5ec36bce4ed5f7b1038ed31d40cc1a6327ea31edd9",
+      "packaged_sha256": "d7c75ed7d83b6343d2a08e5ec36bce4ed5f7b1038ed31d40cc1a6327ea31edd9",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/ensemble_metadata_addendum.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/ensemble_metadata_addendum.json",
+      "bytes": 2327,
+      "original_sha256": "06c1bac538b444679b26dc56b9bef27552a4a95d65a212d522a28c6d13bc7942",
+      "packaged_sha256": "0a82ef0b1451e5604fd0cfc9e51f6ab310a5066f96de0f530bcea821f2714d81",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/ensemble_run_check.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/ensemble_run_check.json",
+      "bytes": 2942,
+      "original_sha256": "6d89e23cfbb75cacf0ebebbb2d45f53de02aff640e9c7b5b3a8824495f813db0",
+      "packaged_sha256": "0dd7d9e94e01792f205f4c6aa35559de13a05d9ed7170d209f8651a59cf792e5",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/examples/hat_p_13_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/examples/hat_p_13_b_curves.csv",
+      "bytes": 480754,
+      "original_sha256": "9c10cfa8dce77983b36c74a86b330fbe2f07e3cc5fdd33aa39194c84426bc6f6",
+      "packaged_sha256": "9c10cfa8dce77983b36c74a86b330fbe2f07e3cc5fdd33aa39194c84426bc6f6",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/examples/hat_p_1_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/examples/hat_p_1_b_curves.csv",
+      "bytes": 221388,
+      "original_sha256": "f77b610a8a24d346d482ee82088f40ecdfc233bc0894294f23d7e62c936bfed0",
+      "packaged_sha256": "f77b610a8a24d346d482ee82088f40ecdfc233bc0894294f23d7e62c936bfed0",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/examples/hat_p_30_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/examples/hat_p_30_b_curves.csv",
+      "bytes": 173974,
+      "original_sha256": "8959de558c418f8cb2f18befaa491a7ee95988f74a587a2083bf93e1afa71e6c",
+      "packaged_sha256": "8959de558c418f8cb2f18befaa491a7ee95988f74a587a2083bf93e1afa71e6c",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/examples/kelt_7_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/examples/kelt_7_b_curves.csv",
+      "bytes": 265757,
+      "original_sha256": "4c58285a51e7ef85d63061e5213c8ce90cc4f2505d55c63ee1373dfe4fda4c62",
+      "packaged_sha256": "4c58285a51e7ef85d63061e5213c8ce90cc4f2505d55c63ee1373dfe4fda4c62",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/examples/wasp_12_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/examples/wasp_12_b_curves.csv",
+      "bytes": 231511,
+      "original_sha256": "a6c336763a5d54355c10dfaeaafc56bc33b9febabd5011ab1f456c1f3ef35e1b",
+      "packaged_sha256": "a6c336763a5d54355c10dfaeaafc56bc33b9febabd5011ab1f456c1f3ef35e1b",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/examples/wasp_178_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/examples/wasp_178_b_curves.csv",
+      "bytes": 267313,
+      "original_sha256": "96b0c7fc22469f5e6e9fe31492cd3b55c26dd898bd82972bf649a68511b756cf",
+      "packaged_sha256": "96b0c7fc22469f5e6e9fe31492cd3b55c26dd898bd82972bf649a68511b756cf",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/recovery_trials.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/recovery_trials.csv",
+      "bytes": 925796,
+      "original_sha256": "4232e603055d7d1e5db08ba8b25e63f00a3449e03f7f814c7a56e80cc4d16fa4",
+      "packaged_sha256": "4232e603055d7d1e5db08ba8b25e63f00a3449e03f7f814c7a56e80cc4d16fa4",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/run_inputs.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/run_inputs.json",
+      "bytes": 26243,
+      "original_sha256": "43cba785c315e00324c85b89a785a77a499ff2b527bac1e0277cec988b0c917b",
+      "packaged_sha256": "72e4cf87764d12c86d554c36e067d2ce9f46b17e0860986a6a48b1f4eb2a8679",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble/summary.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble/summary.json",
+      "bytes": 26672,
+      "original_sha256": "1937c97d21f414f4c68b4e000d636cb2fd3e3ef53647a37a19c72c728f4c4aea",
+      "packaged_sha256": "7a8be590a07540e3d4764f0301e86d08a0487d06f30301f9b5a87dabefbdb008",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/caption_ensemble.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/caption_ensemble.txt",
+      "bytes": 757,
+      "original_sha256": "72c84b3edb16e08aff3ed6310a8165e069f39753a79cfe38c07639fcdb91ae37",
+      "packaged_sha256": "72c84b3edb16e08aff3ed6310a8165e069f39753a79cfe38c07639fcdb91ae37",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/caption_marginalised.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/caption_marginalised.txt",
+      "bytes": 814,
+      "original_sha256": "e0e1c3ecfbae36a9a218c5acb2d347c4aa864cfa7e7d2364e182181a74c2992b",
+      "packaged_sha256": "e0e1c3ecfbae36a9a218c5acb2d347c4aa864cfa7e7d2364e182181a74c2992b",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/ensemble_metadata.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/ensemble_metadata.json",
+      "bytes": 3758,
+      "original_sha256": "1444c6bb675c007931ae6cb8c6e24967a850debed86660058e3eb5707716d207",
+      "packaged_sha256": "a45aa55954459f32400b07a5424726e5f7c4d4debdd0f91f9eec76b936adb772",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/ensemble_report.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/ensemble_report.txt",
+      "bytes": 3923,
+      "original_sha256": "628f8eb8b34523c340152fc4e99d9bbf510f91e3248ee0db148591b9096eedc7",
+      "packaged_sha256": "d7c8c192e07349c06e531e915bff26e695dfad77ef5a1e16772d79d36ebcfe32",
+      "transformations": [
+        "sanitized absolute local paths"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/equal_weight_profile_mixture.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/equal_weight_profile_mixture.csv",
+      "bytes": 2515,
+      "original_sha256": "079e1dedb675c756d029e8e0e1f37c853ffa2a0f606d2c92dc676d1d1dbc9f4e",
+      "packaged_sha256": "079e1dedb675c756d029e8e0e1f37c853ffa2a0f606d2c92dc676d1d1dbc9f4e",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/methodology.txt",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/methodology.txt",
+      "bytes": 1362,
+      "original_sha256": "d012c86a25221f2234ef4ee2cd511b8463197346646cb1244db6281da8309b81",
+      "packaged_sha256": "d012c86a25221f2234ef4ee2cd511b8463197346646cb1244db6281da8309b81",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/recovery_draws.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/recovery_draws.csv",
+      "bytes": 329049,
+      "original_sha256": "3e44ba089bbc61226ef75979ee863d00bbbd799784636447d8b192541176bf7f",
+      "packaged_sha256": "3e44ba089bbc61226ef75979ee863d00bbbd799784636447d8b192541176bf7f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/target_summary.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/target_summary.csv",
+      "bytes": 4218,
+      "original_sha256": "c5970a64a36ad266d38e7ec66be467650d3d2f709fdf38cb6d70894cca4b13ef",
+      "packaged_sha256": "c5970a64a36ad266d38e7ec66be467650d3d2f709fdf38cb6d70894cca4b13ef",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/trend_per_realization.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/trend_per_realization.csv",
+      "bytes": 36447,
+      "original_sha256": "3385dbbaa21b8bc5aec682ae84901dc4799545b5eeda52895a7a5f7713565193",
+      "packaged_sha256": "3385dbbaa21b8bc5aec682ae84901dc4799545b5eeda52895a7a5f7713565193",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/trend_summary.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/trend_summary.json",
+      "bytes": 2749,
+      "original_sha256": "b618f57245dc032abb2013e7f498c10277d30679f77ad0ab3eefb42ea420b99d",
+      "packaged_sha256": "b618f57245dc032abb2013e7f498c10277d30679f77ad0ab3eefb42ea420b99d",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.pdf",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.pdf",
+      "bytes": 16658,
+      "original_sha256": "3ff39a34c4f4f8fb78786ef16031d94d619823f4437f6ce40d800630fa92923a",
+      "packaged_sha256": "3ff39a34c4f4f8fb78786ef16031d94d619823f4437f6ce40d800630fa92923a",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.png",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.png",
+      "bytes": 209514,
+      "original_sha256": "416109714b20d1e5cf499496b45e83ea1a15a4709caffd7055bb5384ce654024",
+      "packaged_sha256": "416109714b20d1e5cf499496b45e83ea1a15a4709caffd7055bb5384ce654024",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.svg",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/unity_expected_noise_ensemble.svg",
+      "bytes": 30623,
+      "original_sha256": "a8bad621e503c7ee1130509c370b6d71245f9b3f8c3e560be9d9b6c3557a2d0f",
+      "packaged_sha256": "a8bad621e503c7ee1130509c370b6d71245f9b3f8c3e560be9d9b6c3557a2d0f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.pdf",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.pdf",
+      "bytes": 17294,
+      "original_sha256": "e34f79ccfe72696f24636a7812c0f86649ba1fe6642acd001a565b763eea4805",
+      "packaged_sha256": "e34f79ccfe72696f24636a7812c0f86649ba1fe6642acd001a565b763eea4805",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.png",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.png",
+      "bytes": 212331,
+      "original_sha256": "9772745e2e18bf39bde3d4874c9a5453702337b59ba1dbf0ff81a02c79a488d0",
+      "packaged_sha256": "9772745e2e18bf39bde3d4874c9a5453702337b59ba1dbf0ff81a02c79a488d0",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.svg",
+      "source_path": "results/unity_erc_20261009/expected_noise_ensemble_deliverables/unity_expected_noise_marginalised.svg",
+      "bytes": 32046,
+      "original_sha256": "299ba02672fec5c5da9f46da0d110b0cd88facf5e08bc808f4cbb8817e8402ec",
+      "packaged_sha256": "299ba02672fec5c5da9f46da0d110b0cd88facf5e08bc808f4cbb8817e8402ec",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/examples/hat_p_13_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/examples/hat_p_13_b_curves.csv",
+      "bytes": 480754,
+      "original_sha256": "9c10cfa8dce77983b36c74a86b330fbe2f07e3cc5fdd33aa39194c84426bc6f6",
+      "packaged_sha256": "9c10cfa8dce77983b36c74a86b330fbe2f07e3cc5fdd33aa39194c84426bc6f6",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/examples/hat_p_1_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/examples/hat_p_1_b_curves.csv",
+      "bytes": 221388,
+      "original_sha256": "f77b610a8a24d346d482ee82088f40ecdfc233bc0894294f23d7e62c936bfed0",
+      "packaged_sha256": "f77b610a8a24d346d482ee82088f40ecdfc233bc0894294f23d7e62c936bfed0",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/examples/hat_p_30_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/examples/hat_p_30_b_curves.csv",
+      "bytes": 173974,
+      "original_sha256": "8959de558c418f8cb2f18befaa491a7ee95988f74a587a2083bf93e1afa71e6c",
+      "packaged_sha256": "8959de558c418f8cb2f18befaa491a7ee95988f74a587a2083bf93e1afa71e6c",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/examples/kelt_7_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/examples/kelt_7_b_curves.csv",
+      "bytes": 265757,
+      "original_sha256": "4c58285a51e7ef85d63061e5213c8ce90cc4f2505d55c63ee1373dfe4fda4c62",
+      "packaged_sha256": "4c58285a51e7ef85d63061e5213c8ce90cc4f2505d55c63ee1373dfe4fda4c62",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/examples/wasp_12_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/examples/wasp_12_b_curves.csv",
+      "bytes": 231511,
+      "original_sha256": "a6c336763a5d54355c10dfaeaafc56bc33b9febabd5011ab1f456c1f3ef35e1b",
+      "packaged_sha256": "a6c336763a5d54355c10dfaeaafc56bc33b9febabd5011ab1f456c1f3ef35e1b",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/examples/wasp_178_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/examples/wasp_178_b_curves.csv",
+      "bytes": 267313,
+      "original_sha256": "96b0c7fc22469f5e6e9fe31492cd3b55c26dd898bd82972bf649a68511b756cf",
+      "packaged_sha256": "96b0c7fc22469f5e6e9fe31492cd3b55c26dd898bd82972bf649a68511b756cf",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/recovery_trials.csv",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/recovery_trials.csv",
+      "bytes": 10610,
+      "original_sha256": "d37fa32ba06e70ce79f5584c17084274bb1bee25a03c55c929daf8368865d271",
+      "packaged_sha256": "d37fa32ba06e70ce79f5584c17084274bb1bee25a03c55c929daf8368865d271",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/run_inputs.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/run_inputs.json",
+      "bytes": 26239,
+      "original_sha256": "b167acb1152213e843d6e4cf2885e6791d4f4f38c330663ab82270841ac8c81d",
+      "packaged_sha256": "9f058b7dc9c58dad7183724e0dc4d5790a49f7a4b53b66e350415238e40c4e6b",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/expected_noise_study/summary.json",
+      "source_path": "results/unity_erc_20261009/expected_noise_study/summary.json",
+      "bytes": 26464,
+      "original_sha256": "01810eca36a9b9fba24083573f8571390319ef9db011e05a3fc1c6d30c2c7f7e",
+      "packaged_sha256": "d720be91fc8f46a788e909a5a848bd328000fd98879ff4b6cae97ded24be6d26",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/study/examples/hat_p_13_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/study/examples/hat_p_13_b_curves.csv",
+      "bytes": 3168016,
+      "original_sha256": "4aa99b2422290ec97b7546f1b99bb9dc5c566474a46ada5d7a4943e6c22b0a86",
+      "packaged_sha256": "4aa99b2422290ec97b7546f1b99bb9dc5c566474a46ada5d7a4943e6c22b0a86",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/study/examples/hat_p_1_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/study/examples/hat_p_1_b_curves.csv",
+      "bytes": 1452994,
+      "original_sha256": "f7f34d6dc958249454b40cbd433dc2d1bd90901e9fcdada06c3b56cbd721052a",
+      "packaged_sha256": "f7f34d6dc958249454b40cbd433dc2d1bd90901e9fcdada06c3b56cbd721052a",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/study/examples/hat_p_30_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/study/examples/hat_p_30_b_curves.csv",
+      "bytes": 1146924,
+      "original_sha256": "1afbd38071c5c16582e48bf8e911fcf78b2de7ee349f058c15177939b65e334f",
+      "packaged_sha256": "1afbd38071c5c16582e48bf8e911fcf78b2de7ee349f058c15177939b65e334f",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/study/examples/kelt_7_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/study/examples/kelt_7_b_curves.csv",
+      "bytes": 1749646,
+      "original_sha256": "a98c61d8f63345ab3e22f33ed5bb047026c7b013581e332fb41f62839a9e0e8e",
+      "packaged_sha256": "a98c61d8f63345ab3e22f33ed5bb047026c7b013581e332fb41f62839a9e0e8e",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/study/examples/wasp_12_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/study/examples/wasp_12_b_curves.csv",
+      "bytes": 1523692,
+      "original_sha256": "6fada79c2c2fa0327b347dc0624e5a830a491d8a5dffb1bd50c43d95340eb718",
+      "packaged_sha256": "6fada79c2c2fa0327b347dc0624e5a830a491d8a5dffb1bd50c43d95340eb718",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/study/examples/wasp_178_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/study/examples/wasp_178_b_curves.csv",
+      "bytes": 1762314,
+      "original_sha256": "4128b8b14ffc9519e6628ef91c3e6f85a064d3e8a2a0f823f4485ccaf4b17c8b",
+      "packaged_sha256": "4128b8b14ffc9519e6628ef91c3e6f85a064d3e8a2a0f823f4485ccaf4b17c8b",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/study/recovery_trials.csv",
+      "source_path": "results/unity_erc_20261009/study/recovery_trials.csv",
+      "bytes": 6652771,
+      "original_sha256": "67bc6baa55fabff959d1bfaea76164f179b6f5e6a8cb04bf904fb8f96bd3bcf6",
+      "packaged_sha256": "67bc6baa55fabff959d1bfaea76164f179b6f5e6a8cb04bf904fb8f96bd3bcf6",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/study/run_inputs.json",
+      "source_path": "results/unity_erc_20261009/study/run_inputs.json",
+      "bytes": 12900,
+      "original_sha256": "4ca6dd00547e6481c55fa10a159b0ca62f75d8239e8fb6de90f94c596844400b",
+      "packaged_sha256": "baad418b248353a851b5fc949867a0e47574d365c6c4a4adb0f743b716e2ea26",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/study/summary.json",
+      "source_path": "results/unity_erc_20261009/study/summary.json",
+      "bytes": 55335,
+      "original_sha256": "0eefc56994d9d1769527807636aebcd61739e3fe0c2b716b041ea13d94b0b728",
+      "packaged_sha256": "88285c4f62ef0294726b2b51b904598891f2387d8dd46b1228afed0a2a74b481",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/wasp12_finegrid/examples/wasp_12_b_curves.csv",
+      "source_path": "results/unity_erc_20261009/wasp12_finegrid/examples/wasp_12_b_curves.csv",
+      "bytes": 389244,
+      "original_sha256": "be6b340cf69e029cec2cc366d9d2ad049052d265da4fd39bfe327089650bb5e7",
+      "packaged_sha256": "be6b340cf69e029cec2cc366d9d2ad049052d265da4fd39bfe327089650bb5e7",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/wasp12_finegrid/recovery_trials.csv",
+      "source_path": "results/unity_erc_20261009/wasp12_finegrid/recovery_trials.csv",
+      "bytes": 294230,
+      "original_sha256": "1fa0a1cdbfd00cefd93064506117fd2040cf104d950a7cf24b4b04c627f49c47",
+      "packaged_sha256": "1fa0a1cdbfd00cefd93064506117fd2040cf104d950a7cf24b4b04c627f49c47",
+      "transformations": []
+    },
+    {
+      "path": "UNITY_Theory/reference/wasp12_finegrid/run_inputs.json",
+      "source_path": "results/unity_erc_20261009/wasp12_finegrid/run_inputs.json",
+      "bytes": 16506,
+      "original_sha256": "6e93b68eed774d57a2274f38456495c7619003ee9729b0f835b59e3e0ea6011f",
+      "packaged_sha256": "de6135d6fd85c46fcc23822c5828ffc199ad679484c7c35945c9f5cc0ead48a9",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    },
+    {
+      "path": "UNITY_Theory/reference/wasp12_finegrid/summary.json",
+      "source_path": "results/unity_erc_20261009/wasp12_finegrid/summary.json",
+      "bytes": 18021,
+      "original_sha256": "de9dc058f542fd4a182d6d5d9d2c5a8492cfef23431cbf2e8a72a755a1f313e1",
+      "packaged_sha256": "c3190cb2222fb7b6433e91da17c37937a2c6258f1077ad300432f15b72d58c87",
+      "transformations": [
+        "sanitized absolute local paths and serialized JSON"
+      ]
+    }
+  ],
+  "seed_pairing_note": "The standardized 50 and 100 ppm sensitivity runs pair trial seeds by target. Both levels use the same deterministic seed, with noise index fixed at 0 and seed derivation based on master seed, target index, and trial index. This pairing note is separate from the expected-noise input, which stores one PandExo-derived noise level per target.",
+  "historical_notes_warning": "Some copied historical text describes an earlier one-draw run or an older seed description. Use the packaged inputs and current run metadata to interpret current ensemble scope."
+}
