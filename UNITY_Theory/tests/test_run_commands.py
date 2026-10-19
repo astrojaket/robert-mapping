@@ -76,6 +76,43 @@ def test_cli_rejects_nonpositive_trial_count(monkeypatch: pytest.MonkeyPatch) ->
     assert error.value.code == 2
 
 
+def test_study_yaml_and_cli_precedence(tmp_path, monkeypatch):
+    path = tmp_path / "study.yml"
+    path.write_text("case: baseline\ntrials: 8\ncompute:\n  max_cpus: 4\n  workers: 2\n  threads: 1\n")
+    calls = []
+    monkeypatch.setattr(run, "simulate", lambda *args, **kwargs: calls.append((args, kwargs)))
+    monkeypatch.setattr(sys, "argv", [str(RUN_PATH), "simulate", "--config", str(path),
+                                     "--trials", "2", "--cores", "6", "--dry-run"])
+    run.main()
+    assert calls == [(("baseline", 2), {"compute": {"max_cpus": 6, "workers": 2, "threads": 1},
+                                      "numerics": None, "dry_run": True})]
+
+
+@pytest.mark.parametrize("text", ["trials: 1\ntrials: 2", "compute:\n  worker: 2",
+                                   "compute:\n  workers: true", "case: typo", "trials: 0"])
+def test_study_yaml_rejects_inactive_or_invalid_options(tmp_path, text):
+    path = tmp_path / "study.yml"
+    path.write_text(text)
+    with pytest.raises(ValueError):
+        run.study_settings(path)
+
+
+def test_compute_options_do_not_silently_apply_to_other_commands(monkeypatch):
+    monkeypatch.setattr(sys, "argv", [str(RUN_PATH), "figures", "--workers", "2"])
+    with pytest.raises(SystemExit) as error:
+        run.main()
+    assert error.value.code == 2
+
+
+@pytest.mark.parametrize("arguments", [["simulate", "--source", "reference"],
+                                       ["verify", "--case", "baseline"]])
+def test_wrapper_rejects_options_that_would_be_ignored(arguments, monkeypatch):
+    monkeypatch.setattr(sys, "argv", [str(RUN_PATH), *arguments])
+    with pytest.raises(SystemExit) as error:
+        run.main()
+    assert error.value.code == 2
+
+
 @pytest.mark.parametrize(
     "arguments",
     [["all", "--trials", "1"], ["all", "--case", "baseline"]],

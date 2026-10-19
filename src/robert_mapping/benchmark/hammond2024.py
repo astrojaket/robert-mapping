@@ -9,12 +9,20 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import json
+import os
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy.optimize import minimize
 
+from robert_mapping.compute import (
+    ComputePlan,
+    apply_environment,
+    ordered_map,
+    resolve_plan,
+)
 from robert_mapping.inference.linear import fit_linear_gaussian
 from robert_mapping.model_selection.cross_validation import (
     CVComparison,
@@ -43,6 +51,7 @@ class QuickHammondResult:
     map_pointwise_elpd: NDArray[np.float64]
     fourier_pointwise_elpd: NDArray[np.float64]
     folds: tuple[NDArray[np.int64], ...]
+    worker_process_ids: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -52,6 +61,7 @@ class EntropySelection:
     alpha: NDArray[np.float64]
     score: NDArray[np.float64]
     selected_alpha: float
+    worker_process_ids: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -82,6 +92,87 @@ class Hammond2024Report:
     selected_entropy_alpha: float
     injection_correlation: float
     notes: tuple[str, ...]
+    execution_plan: dict[str, Any]
+
+
+def _quick_fold_score(job: dict[str, Any]) -> dict[str, Any]:
+    """Fit and score one map/Fourier held-out fold."""
+
+    y = job["observed"]
+    error = job["sigma"]
+    map_matrix = job["map_design"]
+    fourier_matrix = job["fourier_design"]
+    held_out = np.asarray(job["held_out"], dtype=int)
+    if held_out.ndim != 1 or held_out.size == 0:
+        raise ValueError("each fold must be a non-empty one-dimensional array")
+    train = np.ones(y.size, dtype=bool)
+    train[held_out] = False
+    map_fit = fit_linear_gaussian(
+        map_matrix[train], y[train], error[train], prior_scale=job["map_prior_scale"]
+    )
+    fourier_fit = fit_linear_gaussian(
+        fourier_matrix[train],
+        y[train],
+        error[train],
+        prior_scale=job["fourier_prior_scale"],
+    )
+    map_mean = map_fit.predict(map_matrix[held_out])
+    fourier_mean = fourier_fit.predict(fourier_matrix[held_out])
+    map_variance = np.einsum(
+        "ij,jk,ik->i",
+        map_matrix[held_out],
+        map_fit.covariance,
+        map_matrix[held_out],
+    )
+    fourier_variance = np.einsum(
+        "ij,jk,ik->i",
+        fourier_matrix[held_out],
+        fourier_fit.covariance,
+        fourier_matrix[held_out],
+    )
+    return {
+        "fold_index": int(job["fold_index"]),
+        "held_out": held_out,
+        "map_elpd": _normal_log_likelihood(
+            y[held_out], map_mean, error[held_out], map_variance
+        ),
+        "fourier_elpd": _normal_log_likelihood(
+            y[held_out], fourier_mean, error[held_out], fourier_variance
+        ),
+        "process_id": os.getpid(),
+    }
+
+
+def _entropy_fold_scores(job: dict[str, Any]) -> dict[str, Any]:
+    """Fit each entropy weight on one held-out fold."""
+
+    y = job["observed"]
+    error = job["sigma"]
+    design = job["map_design"]
+    held_out = np.asarray(job["held_out"], dtype=int)
+    if held_out.ndim != 1 or held_out.size == 0:
+        raise ValueError("each fold must be a non-empty one-dimensional array")
+    train = np.ones(y.size, dtype=bool)
+    train[held_out] = False
+    scores = np.zeros(len(job["alpha_values"]))
+    for alpha_index, alpha in enumerate(job["alpha_values"]):
+        pixels = _positive_map_fit(
+            design[train],
+            y[train],
+            error[train],
+            float(alpha),
+            float(job["prior_mean"]),
+            float(job["prior_log_sigma"]),
+        )
+        prediction = design[held_out] @ pixels
+        scores[alpha_index] = np.sum(
+            _normal_log_likelihood(y[held_out], prediction, error[held_out])
+        )
+    return {
+        "fold_index": int(job["fold_index"]),
+        "scores": scores,
+        "process_id": os.getpid(),
+    }
 
 
 def _arrays(
@@ -122,6 +213,7 @@ def quick_hammond_comparison(
     *,
     map_prior_scale: float = 1.0,
     fourier_prior_scale: float = 1.0,
+    compute_plan: ComputePlan | None = None,
 ) -> QuickHammondResult:
     """Run a small structured cross-validation comparison.
 
@@ -132,50 +224,41 @@ def quick_hammond_comparison(
     y, error, map_matrix, fourier_matrix = _arrays(
         observed, sigma, map_design, fourier_design
     )
+    plan = compute_plan or resolve_plan(max_cpus=1, threads=1, workers=1)
+    apply_environment(plan)
+    jobs = [
+        {
+            "fold_index": index,
+            "held_out": np.asarray(fold, dtype=int),
+            "observed": y,
+            "sigma": error,
+            "map_design": map_matrix,
+            "fourier_design": fourier_matrix,
+            "map_prior_scale": map_prior_scale,
+            "fourier_prior_scale": fourier_prior_scale,
+        }
+        for index, fold in enumerate(folds)
+    ]
+    fold_results = ordered_map(_quick_fold_score, jobs, plan)
     map_elpd = np.full(y.size, np.nan)
     fourier_elpd = np.full(y.size, np.nan)
-
-    for fold in folds:
-        held_out = np.asarray(fold, dtype=int)
-        if held_out.ndim != 1 or held_out.size == 0:
-            raise ValueError("each fold must be a non-empty one-dimensional array")
-        train = np.ones(y.size, dtype=bool)
-        train[held_out] = False
-        map_fit = fit_linear_gaussian(
-            map_matrix[train], y[train], error[train], prior_scale=map_prior_scale
-        )
-        fourier_fit = fit_linear_gaussian(
-            fourier_matrix[train],
-            y[train],
-            error[train],
-            prior_scale=fourier_prior_scale,
-        )
-        map_mean = map_fit.predict(map_matrix[held_out])
-        fourier_mean = fourier_fit.predict(fourier_matrix[held_out])
-        map_variance = np.einsum(
-            "ij,jk,ik->i",
-            map_matrix[held_out],
-            map_fit.covariance,
-            map_matrix[held_out],
-        )
-        fourier_variance = np.einsum(
-            "ij,jk,ik->i",
-            fourier_matrix[held_out],
-            fourier_fit.covariance,
-            fourier_matrix[held_out],
-        )
-        map_elpd[held_out] = _normal_log_likelihood(
-            y[held_out], map_mean, error[held_out], map_variance
-        )
-        fourier_elpd[held_out] = _normal_log_likelihood(
-            y[held_out], fourier_mean, error[held_out], fourier_variance
-        )
+    # Ordered results preserve the serial overwrite rule for overlapping folds.
+    for result in fold_results:
+        held_out = result["held_out"]
+        map_elpd[held_out] = result["map_elpd"]
+        fourier_elpd[held_out] = result["fourier_elpd"]
 
     evaluated = np.isfinite(map_elpd) & np.isfinite(fourier_elpd)
     if not np.any(evaluated):
         raise ValueError("the folds did not evaluate any observations")
     comparison = compare_pointwise_elpd(map_elpd[evaluated], fourier_elpd[evaluated])
-    return QuickHammondResult(comparison, map_elpd, fourier_elpd, folds)
+    return QuickHammondResult(
+        comparison,
+        map_elpd,
+        fourier_elpd,
+        folds,
+        tuple(sorted({int(result["process_id"]) for result in fold_results})),
+    )
 
 
 def _positive_map_fit(design, y, sigma, alpha, prior_mean, prior_log_sigma):
@@ -222,6 +305,7 @@ def select_entropy_alpha(
     *,
     prior_mean: float,
     prior_log_sigma: float = np.sqrt(10.0),
+    compute_plan: ComputePlan | None = None,
 ) -> EntropySelection:
     """Select a positive-map entropy weight with fast block CV."""
 
@@ -238,26 +322,34 @@ def select_entropy_alpha(
     if prior_mean <= 0.0 or prior_log_sigma <= 0.0:
         raise ValueError("prior values must be positive")
 
+    plan = compute_plan or resolve_plan(max_cpus=1, threads=1, workers=1)
+    apply_environment(plan)
+    jobs = [
+        {
+            "fold_index": fold_index,
+            "alpha_values": alpha_values,
+            "held_out": np.asarray(fold, dtype=int),
+            "observed": y,
+            "sigma": error,
+            "map_design": design,
+            "prior_mean": prior_mean,
+            "prior_log_sigma": prior_log_sigma,
+        }
+        for fold_index, fold in enumerate(folds)
+    ]
+    fold_results = ordered_map(_entropy_fold_scores, jobs, plan)
     scores = np.zeros(alpha_values.size)
-    for alpha_index, alpha in enumerate(alpha_values):
-        for fold in folds:
-            held_out = np.asarray(fold, dtype=int)
-            train = np.ones(y.size, dtype=bool)
-            train[held_out] = False
-            pixels = _positive_map_fit(
-                design[train],
-                y[train],
-                error[train],
-                float(alpha),
-                prior_mean,
-                prior_log_sigma,
-            )
-            prediction = design[held_out] @ pixels
-            scores[alpha_index] += np.sum(
-                _normal_log_likelihood(y[held_out], prediction, error[held_out])
-            )
+    # Summation follows the original alpha-major, fold-minor order.
+    for alpha_index in range(alpha_values.size):
+        for result in fold_results:
+            scores[alpha_index] += result["scores"][alpha_index]
     selected = float(alpha_values[int(np.argmax(scores))])
-    return EntropySelection(alpha_values, scores, selected)
+    return EntropySelection(
+        alpha_values,
+        scores,
+        selected,
+        tuple(sorted({int(result["process_id"]) for result in fold_results})),
+    )
 
 
 def _contact_intervals(period: float, a_over_rstar: float, inclination: float, radius_ratio: float):
@@ -326,6 +418,14 @@ def run_benchmark(config) -> Hammond2024Report:
     not intended to reproduce the published numerical scores.
     """
 
+    plan = resolve_plan(
+        max_cpus=config.compute.max_cpus,
+        threads=config.compute.threads,
+        workers=config.compute.workers,
+    )
+    apply_environment(plan)
+    worker_process_ids: set[int] = set()
+    actual_workers = 1
     system = config.system
     period = float(system.period_days)
     inclination = np.deg2rad(float(system.inclination_degrees))
@@ -422,7 +522,7 @@ def run_benchmark(config) -> Hammond2024Report:
                 visibility=shifted_visibility,
                 degree=int(config.model.fourier_degree),
             )
-        comparison = quick_hammond_comparison(
+        cv_result = quick_hammond_comparison(
             observed,
             sigma,
             candidate_design,
@@ -430,7 +530,11 @@ def run_benchmark(config) -> Hammond2024Report:
             folds,
             map_prior_scale=0.05,
             fourier_prior_scale=0.05,
-        ).comparison
+            compute_plan=plan,
+        )
+        worker_process_ids.update(cv_result.worker_process_ids)
+        actual_workers = max(actual_workers, len(cv_result.worker_process_ids))
+        comparison = cv_result.comparison
         map_coefficients = np.linalg.lstsq(
             candidate_design / sigma[:, None], observed / sigma, rcond=None
         )[0]
@@ -481,7 +585,10 @@ def run_benchmark(config) -> Hammond2024Report:
         entropy_folds,
         np.array([0.0, 1.0e3, 1.0e5]),
         prior_mean=float(system.planet_flux_ratio) / np.pi,
+        compute_plan=plan,
     )
+    worker_process_ids.update(selection.worker_process_ids)
+    actual_workers = max(actual_workers, len(selection.worker_process_ids))
     fitted_pixels = _positive_map_fit(
         pixel_flux_design,
         high_observed,
@@ -500,6 +607,12 @@ def run_benchmark(config) -> Hammond2024Report:
     injection_correlation = float(np.corrcoef(truth_at_fit_pixels, recovered_at_fit_pixels)[0, 1])
 
     status = "passed" if all(case.passed for case in cases) and injection_correlation > 0.5 else "failed"
+    execution_plan = {
+        **plan.to_dict(),
+        "parent_process_id": os.getpid(),
+        "worker_process_ids": sorted(worker_process_ids),
+        "actual_workers": actual_workers,
+    }
     report = Hammond2024Report(
         status=status,
         seed=int(config.project.seed),
@@ -514,6 +627,7 @@ def run_benchmark(config) -> Hammond2024Report:
             "The positive l=4 check uses three entropy values and two folds.",
             "Cross-validation cases use fixed seed 5 for a stable regression test.",
         ),
+        execution_plan=execution_plan,
     )
     output = Path(config.output.directory)
     output.mkdir(parents=True, exist_ok=True)

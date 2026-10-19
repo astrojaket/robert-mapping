@@ -17,6 +17,27 @@ def test_default_config_has_safe_quick_profile() -> None:
     assert config.compute.threads == 2
 
 
+def test_compute_budget_and_chain_count_are_not_fixed_to_three() -> None:
+    config = mapping_config_from_dict(
+        {
+            "inference": {"chains": 72},
+            "compute": {"max_cpus": 8, "threads": 4, "workers": 2},
+        }
+    )
+
+    assert config.inference.chains == 72
+    assert config.compute.max_cpus == 8
+    assert config.compute.threads == 4
+    assert config.compute.workers == 2
+
+
+def test_compute_config_rejects_worker_thread_oversubscription() -> None:
+    with pytest.raises(ConfigError, match=r"workers \* threads"):
+        mapping_config_from_dict(
+            {"compute": {"max_cpus": 5, "threads": 2, "workers": 3}}
+        )
+
+
 def test_unknown_keys_have_an_actionable_message() -> None:
     with pytest.raises(ConfigError, match="unknown setting.*Allowed settings"):
         mapping_config_from_dict({"project": {"naem": "typo"}})

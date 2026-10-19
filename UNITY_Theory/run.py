@@ -25,15 +25,63 @@ CASES = {
     "finegrid": ("wasp12_finegrid.json", "wasp12_finegrid", 100),
 }
 
+NUMERICS = {"exposure_subsamples": 8, "disk_radial": 32,
+            "disk_azimuth": 128, "chunk_size": 128}
+
+
+def study_settings(path: Path) -> dict:
+    """Read the small run file. Paths for scientific inputs remain case-defined."""
+    import yaml
+
+    class UniqueLoader(yaml.SafeLoader):
+        pass
+
+    def mapping(loader, node):
+        result = {}
+        for key_node, value_node in node.value:
+            key = loader.construct_object(key_node)
+            if key in result:
+                raise ValueError(f"Duplicate setting: {key}")
+            result[key] = loader.construct_object(value_node)
+        return result
+
+    UniqueLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, mapping)
+    try:
+        settings = yaml.load(path.read_text(), Loader=UniqueLoader)
+    except yaml.YAMLError as exc:
+        raise ValueError(f"Invalid study YAML: {exc}") from exc
+    if not isinstance(settings, dict):
+        raise ValueError("Study YAML must contain a mapping")
+    unknown = set(settings) - {"case", "trials", "compute", "numerics"}
+    if unknown:
+        raise ValueError(f"Unknown study setting(s): {', '.join(sorted(unknown))}")
+    if settings.get("case", "ensemble") not in CASES:
+        raise ValueError(f"case must be one of {', '.join(CASES)}")
+    for section, allowed in (("compute", {"max_cpus", "workers", "threads"}),
+                             ("numerics", set(NUMERICS))):
+        values = settings.get(section, {})
+        if not isinstance(values, dict) or set(values) - allowed:
+            raise ValueError(f"{section} must contain only {', '.join(sorted(allowed))}")
+        for key, value in values.items():
+            if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+                raise ValueError(f"{section}.{key} must be a positive integer")
+    if "trials" in settings and (isinstance(settings["trials"], bool)
+            or not isinstance(settings["trials"], int) or settings["trials"] < 1):
+        raise ValueError("trials must be a positive integer")
+    for key, minimum in (("disk_radial", 2), ("disk_azimuth", 4)):
+        if settings.get("numerics", {}).get(key, NUMERICS[key]) < minimum:
+            raise ValueError(f"numerics.{key} must be at least {minimum}")
+    return settings
+
 
 def child(script: Path, *arguments: object) -> None:
     env = os.environ.copy()
     for key, value in {
         "JAX_PLATFORMS": "cpu", "JAX_ENABLE_X64": "true",
-        "XLA_PYTHON_CLIENT_PREALLOCATE": "false", "OMP_NUM_THREADS": "3",
-        "OPENBLAS_NUM_THREADS": "3", "MKL_NUM_THREADS": "3",
-        "VECLIB_MAXIMUM_THREADS": "3", "NUMEXPR_NUM_THREADS": "3",
-        "XLA_FLAGS": "--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=3",
+        "XLA_PYTHON_CLIENT_PREALLOCATE": "false", "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1",
+        "XLA_FLAGS": "--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1",
         "MPLBACKEND": "Agg", "MPLCONFIGDIR": str(GENERATED / ".matplotlib"),
     }.items():
         env.setdefault(key, value)
@@ -100,12 +148,27 @@ def noise() -> None:
     print("Verified: computed white noise matches all six frozen target inputs.")
 
 
-def simulate(case: str, trials: int | None = None) -> None:
+def simulate(case: str, trials: int | None = None, *, compute: dict | None = None,
+             numerics: dict | None = None, dry_run: bool = False) -> None:
     filename, study, count = CASES[case]
+    options = {**NUMERICS, **(numerics or {})}
+    cpu_args: list[object] = []
+    if compute is not None or dry_run:
+        from robert_mapping.compute import apply_environment, resolve_plan
+        plan = resolve_plan(**(compute or {}))
+        print(json.dumps({"case": case, "inputs": str(DATA / "inputs" / filename),
+                          "output": str(GENERATED / study), "trials": trials or count,
+                          "compute": plan.to_dict(), "numerics": options}, indent=2))
+        if dry_run:
+            return
+        apply_environment(plan)
+        cpu_args = ["--max-cpus", plan.max_cpus, "--workers", plan.workers,
+                    "--threads", plan.threads]
     child(CODE / "unity_injection_recovery.py", "--inputs", DATA / "inputs" / filename,
           "--output", GENERATED / study, "--trials", trials or count,
-          "--exposure-subsamples", 8, "--disk-radial", 32, "--disk-azimuth", 128,
-          "--chunk-size", 128)
+          "--exposure-subsamples", options["exposure_subsamples"],
+          "--disk-radial", options["disk_radial"], "--disk-azimuth", options["disk_azimuth"],
+          "--chunk-size", options["chunk_size"], *cpu_args)
     figures(case, "generated", trials or count)
 
 
@@ -172,14 +235,40 @@ def verify() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("verify", "noise", "figures", "organize", "smoke", "simulate", "all"))
-    parser.add_argument("--case", choices=(*CASES, "all"), default="ensemble")
-    parser.add_argument("--source", choices=("reference", "generated"), default="reference",
+    parser.add_argument("--case", choices=(*CASES, "all"))
+    parser.add_argument("--config", type=Path, help="Study YAML for simulate; command options override YAML.")
+    parser.add_argument("--cores", type=int, help="Total CPU budget for simulate.")
+    parser.add_argument("--workers", type=int, help="Independent target processes for simulate.")
+    parser.add_argument("--threads", type=int, help="Numerical threads per process for simulate.")
+    parser.add_argument("--dry-run", action="store_true", help="Print the simulate plan without running.")
+    parser.add_argument("--source", choices=("reference", "generated"),
                         help="Saved run source for figures or organize.")
     parser.add_argument("--noise-case", choices=("JWST_Noise", "50ppm", "100ppm"), action="append",
                         help="Case folder for organize; repeat to select several (default: all three).")
     parser.add_argument("--trials", type=int,
                         help="Draw count for simulate, figures, or organize; default matches reference.")
     args = parser.parse_args()
+    if args.source is not None and args.command not in {"figures", "organize"}:
+        parser.error("--source applies only to figures or organize")
+    args.source = args.source or "reference"
+    if args.case is not None and args.command not in {"simulate", "figures", "all", "organize"}:
+        parser.error("--case applies only to simulate or figures")
+    execution_options = (args.config is not None or args.cores is not None
+                         or args.workers is not None or args.threads is not None or args.dry_run)
+    if execution_options and args.command != "simulate":
+        parser.error("--config, --cores, --workers, --threads, and --dry-run apply only to simulate")
+    settings = {}
+    if args.config is not None:
+        try:
+            settings = study_settings(args.config)
+        except (OSError, ValueError) as exc:
+            parser.error(str(exc))
+    args.case = args.case or settings.get("case", "ensemble")
+    args.trials = args.trials if args.trials is not None else settings.get("trials")
+    compute = dict(settings.get("compute", {}))
+    for key, value in (("max_cpus", args.cores), ("workers", args.workers), ("threads", args.threads)):
+        if value is not None:
+            compute[key] = value
     if args.trials is not None and args.trials < 1:
         parser.error("--trials must be positive")
     if args.command == "all" and (args.trials is not None or args.case != "ensemble"):
@@ -209,7 +298,11 @@ def main() -> None:
             figures(case, args.source, args.trials)
     elif args.command == "simulate":
         for case in cases:
-            simulate(case, args.trials)
+            try:
+                simulate(case, args.trials, compute=compute if execution_options else None,
+                         numerics=settings.get("numerics"), dry_run=args.dry_run)
+            except ValueError as exc:
+                parser.error(str(exc))
     else:
         verify()
         noise()

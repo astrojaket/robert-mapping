@@ -13,7 +13,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
-import os
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +20,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..config import MappingConfig, write_resolved_config
+from ..compute import ComputePlan, apply_environment, resolve_plan
 from ..data import LightCurve, load_light_curve
 from ..physics import (
     disk_quadrature,
@@ -29,6 +29,7 @@ from ..physics import (
     pixels_to_harmonics,
     rank_revealing_anchor_transform,
     starry_pixel_transforms,
+    longitude_eclipse_design_matrix,
     secondary_eclipse_design_matrix,
     stellar_transit_flux,
 )
@@ -79,28 +80,29 @@ class _DesignBundle:
     systematics_mode: str
 
 
-def _set_thread_limits(config: MappingConfig) -> int:
-    """Apply the hard three-CPU limit before importing numerical backends."""
+def _set_thread_limits(config: MappingConfig) -> ComputePlan:
+    """Resolve and apply the configured CPU plan for this fit."""
 
     compute = config.compute
-    requested = min(3, int(compute.max_cpus), int(compute.threads))
-    threads = max(1, requested)
-    value = str(threads)
-    for name in (
-        "OMP_NUM_THREADS",
-        "OPENBLAS_NUM_THREADS",
-        "MKL_NUM_THREADS",
-        "VECLIB_MAXIMUM_THREADS",
-        "NUMEXPR_NUM_THREADS",
-    ):
-        os.environ[name] = value
-    # Do not append duplicate XLA flags.  The CLI sets this variable before
-    # loading the fit engine; a default is enough for direct Python use.
-    os.environ.setdefault(
-        "XLA_FLAGS",
-        f"--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads={threads}",
+    plan = resolve_plan(
+        max_cpus=int(compute.max_cpus),
+        threads=int(compute.threads),
+        workers=int(compute.workers),
     )
-    return threads
+    chains = int(config.inference.chains)
+    host_devices = (
+        chains
+        if chains > 1 and chains * plan.threads <= plan.max_cpus
+        else 1
+    )
+    apply_environment(
+        plan,
+        jax_platform=str(compute.jax_platform),
+        x64=bool(compute.x64),
+        jit=bool(compute.jit),
+        host_devices=host_devices,
+    )
+    return plan
 
 
 def _time_days(curve: LightCurve) -> NDArray[np.float64]:
@@ -139,11 +141,33 @@ def _noise_diagnostics(
         ),
         "ou_timescale_prior_sigma_ln": float(config.model.ou_timescale_prior_sigma_ln),
         "jitter_prior_scale_ppm": float(config.model.jitter_prior_scale_ppm),
+        "gp_kernel": (
+            str(config.model.gp_kernel)
+            if noise_model == "gp"
+            else None
+        ),
+        "gp_amplitude_prior_scale_ppm": float(
+            config.model.gp_amplitude_prior_scale_ppm
+        ),
+        "gp_timescale_prior_median_seconds": float(
+            config.model.gp_timescale_prior_median_seconds
+        ),
+        "gp_timescale_prior_sigma_ln": float(
+            config.model.gp_timescale_prior_sigma_ln
+        ),
+        "gp_max_points": int(config.model.gp_max_points),
         "maximum_noise_rhat": None,
         "minimum_noise_effective_sample_size": None,
     }
     finite_names: list[str] = []
-    for name in ("ou_amplitude", "ou_timescale", "jitter", "white_jitter"):
+    for name in (
+        "ou_amplitude",
+        "ou_timescale",
+        "gp_amplitude",
+        "gp_timescale",
+        "jitter",
+        "white_jitter",
+    ):
         values = run.samples.get(name)
         if values is None:
             summary[f"{name}_mean"] = None
@@ -183,7 +207,14 @@ def _add_noise_samples(
 ) -> None:
     """Add sampled time-correlated-noise values to the samples archive."""
 
-    for name in ("ou_amplitude", "ou_timescale", "jitter", "white_jitter"):
+    for name in (
+        "ou_amplitude",
+        "ou_timescale",
+        "gp_amplitude",
+        "gp_timescale",
+        "jitter",
+        "white_jitter",
+    ):
         if name in run.samples:
             payload[name] = np.asarray(run.samples[name])
         if run.grouped_samples is not None and name in run.grouped_samples:
@@ -206,6 +237,7 @@ def _secondary_design(config: MappingConfig, curve: LightCurve) -> _DesignBundle
     inclination = float(system.inclination_degrees)
     radius_ratio = float(system.radius_ratio)
     ydeg = int(config.map.harmonic_degree)
+    map_representation = str(config.map.representation).lower()
     time_days = _time_days(curve)
     quadrature = disk_quadrature(
         n_radial=int(config.compute.quadrature_radial),
@@ -220,9 +252,14 @@ def _secondary_design(config: MappingConfig, curve: LightCurve) -> _DesignBundle
         # keeps a full 8000-point light curve safe on a laptop.
         for start in range(0, flat_time.size, 256):
             chunk_time = flat_time[start : start + 256]
+            design_operator = (
+                longitude_eclipse_design_matrix
+                if map_representation == "longitude"
+                else secondary_eclipse_design_matrix
+            )
             chunks.append(
                 np.asarray(
-                    secondary_eclipse_design_matrix(
+                    design_operator(
                         chunk_time,
                         period,
                         float(system.a_over_rstar),
@@ -390,8 +427,16 @@ def _linear_fit(
             "Joint systematics fitting currently requires inference.sampler: nuts."
         )
 
-    design = np.column_stack((np.ones(curve.n_observations), bundle.map_design))
-    prior_mean, prior_scale = _linear_prior(config, bundle.map_design.shape[1])
+    is_direct_harmonics = (
+        str(config.map.representation).lower() == "direct_harmonics"
+    )
+    if is_direct_harmonics and config.map.active_harmonic_indices:
+        active_indices = np.asarray(config.map.active_harmonic_indices, dtype=int)
+    else:
+        active_indices = np.arange(bundle.map_design.shape[1], dtype=int)
+    selected_map_design = bundle.map_design[:, active_indices]
+    design = np.column_stack((np.ones(curve.n_observations), selected_map_design))
+    prior_mean, prior_scale = _linear_prior(config, selected_map_design.shape[1])
     adjusted_flux = np.asarray(curve.flux, dtype=float) - bundle.stellar_flux + 1.0
     posterior = fit_linear_gaussian(
         design,
@@ -404,8 +449,27 @@ def _linear_fit(
     residual = np.asarray(curve.flux, dtype=float) - model_flux
     chi2 = float(np.sum((residual / curve.flux_err) ** 2))
     dof = max(1, curve.n_observations - design.shape[1])
-    map_mean = np.asarray(posterior.mean[1:], dtype=float)
-    map_covariance = np.asarray(posterior.covariance[1:, 1:], dtype=float)
+    selected_map_mean = np.asarray(posterior.mean[1:], dtype=float)
+    selected_map_covariance = np.asarray(posterior.covariance[1:, 1:], dtype=float)
+    map_mean = np.zeros(bundle.map_design.shape[1], dtype=float)
+    map_mean[active_indices] = selected_map_mean
+    map_covariance = np.zeros(
+        (bundle.map_design.shape[1], bundle.map_design.shape[1]), dtype=float
+    )
+    map_covariance[np.ix_(active_indices, active_indices)] = selected_map_covariance
+    full_posterior_mean = np.zeros(1 + bundle.map_design.shape[1], dtype=float)
+    full_posterior_mean[0] = posterior.mean[0]
+    full_posterior_mean[1 + active_indices] = selected_map_mean
+    full_posterior_covariance = np.zeros(
+        (1 + bundle.map_design.shape[1], 1 + bundle.map_design.shape[1]),
+        dtype=float,
+    )
+    full_posterior_covariance[0, 0] = posterior.covariance[0, 0]
+    full_posterior_covariance[0, 1 + active_indices] = posterior.covariance[0, 1:]
+    full_posterior_covariance[1 + active_indices, 0] = posterior.covariance[1:, 0]
+    full_posterior_covariance[
+        np.ix_(1 + active_indices, 1 + active_indices)
+    ] = posterior.covariance[1:, 1:]
     summary = {
         "baseline": float(posterior.mean[0]),
         "baseline_standard_deviation": float(np.sqrt(max(posterior.covariance[0, 0], 0.0))),
@@ -415,14 +479,20 @@ def _linear_fit(
         "chi_squared": chi2,
         "reduced_chi_squared": chi2 / dof,
         "degrees_of_freedom": dof,
+        "n_parameters": int(design.shape[1] - 1),
         "design_shape": [int(value) for value in design.shape],
+        **(
+            {"active_harmonic_indices": active_indices.tolist()}
+            if is_direct_harmonics
+            else {}
+        ),
     }
     return posterior, model_flux, {
         **summary,
         "map_coefficients": map_mean,
         "map_covariance": map_covariance,
-        "full_posterior_mean": np.asarray(posterior.mean, dtype=float),
-        "full_posterior_covariance": np.asarray(posterior.covariance, dtype=float),
+        "full_posterior_mean": full_posterior_mean,
+        "full_posterior_covariance": full_posterior_covariance,
         "residuals": residual,
     }
 
@@ -432,38 +502,43 @@ def _harmonic_nuts_fit(
     curve: LightCurve,
     bundle: _DesignBundle,
     *,
-    threads: int,
+    plan: ComputePlan,
 ) -> tuple[NumpyroRun, NDArray[np.float64], dict[str, Any]]:
-    """Run the direct harmonic-coefficient NumPyro model.
+    """Run a direct signed-coefficient NumPyro model.
 
-    This branch deliberately keeps the positive-map policy separate from the
-    parameterization. Harmonic coefficients may be negative; positivity is a
-    diagnostic-only property for this future model.
+    Harmonic and longitude Fourier representations share the same coefficient
+    sampler. The longitude branch keeps its ``1 + 2 * degree`` coefficients
+    as longitude coefficients and never pads them into a spherical-harmonic
+    vector.
     """
 
-    ncoefficients = ncoeff(bundle.harmonic_degree)
-    active_indices = np.asarray(
-        config.map.active_harmonic_indices
-        if config.map.active_harmonic_indices
-        else tuple(range(ncoefficients)),
-        dtype=int,
-    )
+    is_longitude = str(config.map.representation).lower() == "longitude"
+    if is_longitude:
+        ncoefficients = int(bundle.map_design.shape[1])
+        active_indices = np.arange(ncoefficients, dtype=int)
+    else:
+        ncoefficients = ncoeff(bundle.harmonic_degree)
+        active_indices = np.asarray(
+            config.map.active_harmonic_indices
+            if config.map.active_harmonic_indices
+            else tuple(range(ncoefficients)),
+            dtype=int,
+        )
     active_design = np.asarray(bundle.map_design, dtype=float)[:, active_indices]
     n_active = int(active_indices.size)
     planet_scale = max(float(config.system.planet_flux_ratio), 1.0e-8)
     prior_mean = np.zeros(n_active, dtype=float)
-    prior_mean[0] = float(config.system.planet_flux_ratio)
     prior_sigma = np.full(
         n_active,
         float(config.map.pixel_log_sigma) * planet_scale,
         dtype=float,
     )
-    prior_sigma[0] = 0.5 * planet_scale
-    effective_chains = min(
-        3, int(config.inference.chains), int(config.compute.max_cpus), threads
-    )
-    if effective_chains < 1:
-        raise ValueError("At least one CPU is required for NumPyro sampling.")
+    monopole_position = np.flatnonzero(active_indices == 0)
+    if monopole_position.size:
+        position = int(monopole_position[0])
+        prior_mean[position] = float(config.system.planet_flux_ratio)
+        prior_sigma[position] = 0.5 * planet_scale
+    effective_chains = int(config.inference.chains)
     if int(config.inference.warmup) < 1:
         raise ValueError("inference.warmup must be at least one when sampler is nuts.")
 
@@ -517,25 +592,43 @@ def _harmonic_nuts_fit(
         ),
         ou_timescale_prior_sigma_ln=float(config.model.ou_timescale_prior_sigma_ln),
         jitter_prior_scale=float(config.model.jitter_prior_scale_ppm) * 1.0e-6,
+        gp_kernel=str(config.model.gp_kernel),
+        gp_amplitude_prior_scale=(
+            float(config.model.gp_amplitude_prior_scale_ppm) * 1.0e-6
+        ),
+        gp_timescale_prior_median=float(
+            config.model.gp_timescale_prior_median_seconds
+        ),
+        gp_timescale_prior_sigma_ln=float(
+            config.model.gp_timescale_prior_sigma_ln
+        ),
+        gp_max_points=int(config.model.gp_max_points),
         fit_white_jitter=bool(config.model.fit_white_jitter),
+        compute_plan=plan,
+        jax_platform=str(config.compute.jax_platform),
+        x64=bool(config.compute.x64),
+        jit=bool(config.compute.jit),
     )
-    raw_coefficients = run.samples.get("harmonic_coefficients")
-    if raw_coefficients is None:
-        raw_coefficients = run.samples.get("coefficients")
+    raw_coefficients = run.samples.get("coefficients")
+    if raw_coefficients is None and not is_longitude:
+        raw_coefficients = run.samples.get("harmonic_coefficients")
     if raw_coefficients is None:
         raise ValueError(
-            "sample_harmonic_map must return harmonic_coefficients or coefficients"
+            "The direct-coefficient sampler must return coefficients"
         )
     active_samples = np.asarray(raw_coefficients, dtype=float)
     if active_samples.ndim != 2 or active_samples.shape[1] != n_active:
         raise ValueError(
-            "Direct harmonic samples must have shape "
+            "Direct map samples must have shape "
             f"(draw, {n_active})"
         )
-    harmonic_samples = np.zeros(
-        (active_samples.shape[0], ncoefficients), dtype=float
-    )
-    harmonic_samples[:, active_indices] = active_samples
+    if is_longitude:
+        harmonic_samples = active_samples
+    else:
+        harmonic_samples = np.zeros(
+            (active_samples.shape[0], ncoefficients), dtype=float
+        )
+        harmonic_samples[:, active_indices] = active_samples
     fallback_flux = (
         bundle.stellar_flux[None, :]
         + harmonic_samples @ np.asarray(bundle.map_design, dtype=float).T
@@ -573,25 +666,28 @@ def _harmonic_nuts_fit(
     minimum_systematics_effective_sample_size = None
     harmonic_by_chain = None
     if run.grouped_samples is not None:
-        grouped = run.grouped_samples.get("harmonic_coefficients")
-        if grouped is None:
-            grouped = run.grouped_samples.get("coefficients")
+        grouped = run.grouped_samples.get("coefficients")
+        if grouped is None and not is_longitude:
+            grouped = run.grouped_samples.get("harmonic_coefficients")
         if grouped is not None:
             active_by_chain = np.asarray(grouped, dtype=float)
             if active_by_chain.ndim != 3 or active_by_chain.shape[-1] != n_active:
-                raise ValueError("Grouped direct harmonic samples have an invalid shape")
-            harmonic_by_chain = np.zeros(
-                active_by_chain.shape[:-1] + (ncoefficients,), dtype=float
-            )
-            harmonic_by_chain[..., active_indices] = active_by_chain
+                raise ValueError("Grouped direct map samples have an invalid shape")
+            if is_longitude:
+                harmonic_by_chain = active_by_chain
+            else:
+                harmonic_by_chain = np.zeros(
+                    active_by_chain.shape[:-1] + (ncoefficients,), dtype=float
+                )
+                harmonic_by_chain[..., active_indices] = active_by_chain
             if active_by_chain.shape[0] > 1:
                 from numpyro.diagnostics import summary as diagnostic_summary
 
                 diagnostics = diagnostic_summary(
-                    {"harmonics": active_by_chain},
+                    {"map_coefficients": active_by_chain},
                     prob=0.68,
                     group_by_chain=True,
-                )["harmonics"]
+                )["map_coefficients"]
                 finite_rhat = np.asarray(diagnostics["r_hat"], dtype=float)
                 finite_rhat = finite_rhat[np.isfinite(finite_rhat)]
                 finite_ess = np.asarray(diagnostics["n_eff"], dtype=float)
@@ -624,18 +720,14 @@ def _harmonic_nuts_fit(
         "baseline": 1.0,
         "coefficient_mean": np.mean(harmonic_samples, axis=0).tolist(),
         "coefficient_standard_deviation": np.std(harmonic_samples, axis=0).tolist(),
-        "harmonic_coefficient_mean": np.mean(harmonic_samples, axis=0).tolist(),
-        "harmonic_coefficient_standard_deviation": np.std(
-            harmonic_samples, axis=0
-        ).tolist(),
         "coefficient_prior_mean": prior_mean.tolist(),
         "coefficient_prior_sigma": prior_sigma.tolist(),
         "residual_rms": float(np.sqrt(np.mean(residual**2))),
         "chi_squared": float(np.sum((residual / effective_error) ** 2)),
         "n_parameters": int(n_active),
-        "active_harmonic_indices": active_indices.tolist(),
         "n_samples": int(harmonic_samples.shape[0]),
         "chains": effective_chains,
+        "chain_method": str(run.chain_method or "unknown"),
         "warmup": int(config.inference.warmup),
         "draws": int(config.inference.draws),
         "dense_mass": bool(config.inference.dense_mass),
@@ -650,11 +742,17 @@ def _harmonic_nuts_fit(
         ),
         "mean_entropy": None,
         "design_shape": [int(value) for value in active_design.shape],
-        "threads": int(threads),
+        "threads": int(plan.threads),
+        "compute_plan": plan.to_dict(),
         "pixel_transform_shape": [0, 0],
         "pixel_grid": "none",
-        "parameterization": "direct_harmonics",
-        "positivity_policy": "diagnostic_only",
+        "parameterization": (
+            "longitude_fourier" if is_longitude else "direct_harmonics"
+        ),
+        "map_representation": "longitude" if is_longitude else "direct_harmonics",
+        "positivity_policy": (
+            "not_imposed_signed_coefficients" if is_longitude else "diagnostic_only"
+        ),
         "anchor_indices": [],
         "anchor_longitude_degrees": [],
         "anchor_latitude_degrees": [],
@@ -678,11 +776,56 @@ def _harmonic_nuts_fit(
             else []
         ),
         **_noise_diagnostics(run, config),
-        "harmonic_samples": harmonic_samples,
+        "map_samples": harmonic_samples,
         "flux_samples": flux_samples,
         "residuals": residual,
-        "harmonic_by_chain": harmonic_by_chain,
+        "map_coefficients_by_chain": harmonic_by_chain,
     }
+    if is_longitude:
+        summary.update(
+            {
+                "longitude_degree": int(bundle.harmonic_degree),
+                "longitude_coefficient_mean": np.mean(
+                    harmonic_samples, axis=0
+                ).tolist(),
+                "longitude_coefficient_standard_deviation": np.std(
+                    harmonic_samples, axis=0
+                ).tolist(),
+                "coefficient_prior": {
+                    "distribution": "independent Gaussian in real longitude Fourier coefficients",
+                    "mean": prior_mean.tolist(),
+                    "standard_deviation": prior_sigma.tolist(),
+                    "positivity": "unconstrained signed coefficients; positivity is not imposed",
+                },
+                "map_basis": {
+                    "name": "latitude-flat real Fourier basis",
+                    "coefficient_order": "constant, cos(m longitude), sin(m longitude), m=1..degree",
+                    "normalization": "each map-intensity column is divided by pi; a unit constant coefficient has unit disk flux",
+                    "degree": int(bundle.harmonic_degree),
+                },
+            }
+        )
+        summary.pop("harmonic_coefficient_mean", None)
+        summary.pop("harmonic_coefficient_standard_deviation", None)
+        summary.pop("active_harmonic_indices", None)
+    else:
+        summary.update(
+            {
+                "harmonic_coefficient_mean": np.mean(
+                    harmonic_samples, axis=0
+                ).tolist(),
+                "harmonic_coefficient_standard_deviation": np.std(
+                    harmonic_samples, axis=0
+                ).tolist(),
+                "active_harmonic_indices": active_indices.tolist(),
+            }
+        )
+    if is_longitude:
+        summary.pop("harmonic_by_chain", None)
+        summary["longitude_coefficients_by_chain"] = harmonic_by_chain
+    else:
+        summary["harmonic_samples"] = harmonic_samples
+        summary["harmonic_by_chain"] = harmonic_by_chain
     return run, harmonic_samples, {**summary, "model_flux": mean_flux}
 
 
@@ -691,7 +834,7 @@ def _pixel_fit(
     curve: LightCurve,
     bundle: _DesignBundle,
     *,
-    threads: int,
+    plan: ComputePlan,
 ) -> tuple[NumpyroRun, NDArray[np.float64], NDArray[np.float64], dict[str, Any]]:
     """Run the small positive-pixel NumPyro model."""
 
@@ -722,9 +865,7 @@ def _pixel_fit(
             ).T
             pixel_grid = "fibonacci_fallback"
     pixel_design = np.asarray(bundle.map_design @ transform, dtype=float)
-    effective_chains = min(3, int(config.inference.chains), int(config.compute.max_cpus), threads)
-    if effective_chains < 1:
-        raise ValueError("At least one CPU is required for NumPyro sampling.")
+    effective_chains = int(config.inference.chains)
     if int(config.inference.warmup) < 1:
         raise ValueError("inference.warmup must be at least one when sampler is nuts.")
     if config.map.pixel_prior_mean_ppm is not None:
@@ -803,6 +944,17 @@ def _pixel_fit(
         ),
         ou_timescale_prior_sigma_ln=float(config.model.ou_timescale_prior_sigma_ln),
         jitter_prior_scale=float(config.model.jitter_prior_scale_ppm) * 1.0e-6,
+        gp_kernel=str(config.model.gp_kernel),
+        gp_amplitude_prior_scale=(
+            float(config.model.gp_amplitude_prior_scale_ppm) * 1.0e-6
+        ),
+        gp_timescale_prior_median=float(
+            config.model.gp_timescale_prior_median_seconds
+        ),
+        gp_timescale_prior_sigma_ln=float(
+            config.model.gp_timescale_prior_sigma_ln
+        ),
+        gp_max_points=int(config.model.gp_max_points),
         sample_ramp_rate=bool(config.systematics.fit_ramp_rate),
         ramp_rate_prior_mean_per_day=float(
             config.systematics.ramp_rate_prior_mean_per_day
@@ -820,6 +972,10 @@ def _pixel_fit(
             config.systematics.multiplicative_composition
         ),
         systematics_names=bundle.systematics_names,
+        compute_plan=plan,
+        jax_platform=str(config.compute.jax_platform),
+        x64=bool(config.compute.x64),
+        jit=bool(config.compute.jit),
     )
     pixel_samples = np.asarray(run.samples["pixels"], dtype=float)
     harmonic_samples = pixel_samples @ transform.T
@@ -889,6 +1045,7 @@ def _pixel_fit(
         "n_pixels": npixels,
         "n_samples": int(pixel_samples.shape[0]),
         "chains": effective_chains,
+        "chain_method": str(run.chain_method or "unknown"),
         "warmup": int(config.inference.warmup),
         "draws": int(config.inference.draws),
         "dense_mass": bool(config.inference.dense_mass),
@@ -901,7 +1058,8 @@ def _pixel_fit(
         "minimum_systematics_effective_sample_size": minimum_systematics_ess,
         "mean_entropy": float(np.nanmean(entropy_samples)) if np.any(np.isfinite(entropy_samples)) else None,
         "design_shape": [int(value) for value in pixel_design.shape],
-        "threads": int(threads),
+        "threads": int(plan.threads),
+        "compute_plan": plan.to_dict(),
         "pixel_transform_shape": [int(value) for value in transform.shape],
         "pixel_grid": pixel_grid,
         "parameterization": (
@@ -1020,10 +1178,14 @@ def _write_common_outputs(
     """Write arrays and the JSON summary shared by both branches."""
 
     output.mkdir(parents=True, exist_ok=True)
+    representation = str(config.map.representation).lower()
     coefficients_path = output / "coefficients.npy"
     np.save(coefficients_path, np.asarray(coefficients, dtype=float))
-    # These named copies make the files self-explanatory in a results folder.
-    np.save(output / "harmonic_coefficients.npy", np.asarray(coefficients, dtype=float))
+    if representation == "longitude":
+        named_coefficients = "longitude_coefficients.npy"
+    else:
+        named_coefficients = "harmonic_coefficients.npy"
+    np.save(output / named_coefficients, np.asarray(coefficients, dtype=float))
     np.save(output / "model_flux.npy", np.asarray(model_flux, dtype=float))
     np.save(output / "stellar_flux.npy", np.asarray(bundle.stellar_flux, dtype=float))
     np.save(output / "residuals.npy", np.asarray(curve.flux, dtype=float) - np.asarray(model_flux, dtype=float))
@@ -1035,7 +1197,21 @@ def _write_common_outputs(
         "sampler": sampler,
         "project": config.project.name,
         "n_observations": int(curve.n_observations),
-        "harmonic_degree": int(bundle.harmonic_degree),
+        "map_representation": representation,
+        **(
+            {
+                "longitude_degree": int(bundle.harmonic_degree),
+                "parameterization": "longitude_fourier",
+                "map_basis": {
+                    "name": "latitude-flat real Fourier basis",
+                    "coefficient_order": "constant, cos(m longitude), sin(m longitude), m=1..degree",
+                    "normalization": "each map-intensity column is divided by pi; a unit constant coefficient has unit disk flux",
+                    "degree": int(bundle.harmonic_degree),
+                },
+            }
+            if representation == "longitude"
+            else {"harmonic_degree": int(bundle.harmonic_degree)}
+        ),
         "theta0_radians": float(np.pi),
         "quadrature": {
             "n_radial": int(bundle.quadrature_radial),
@@ -1050,6 +1226,7 @@ def _write_common_outputs(
         },
         "files": {
             "coefficients": coefficients_path.name,
+            "named_coefficients": named_coefficients,
             "model_flux": "model_flux.npy",
             "stellar_flux": "stellar_flux.npy",
             "residuals": "residuals.npy",
@@ -1070,7 +1247,7 @@ def run_fit(config: MappingConfig) -> FitResult:
     :class:`FitResult` points to all machine-readable output files.
     """
 
-    threads = _set_thread_limits(config)
+    plan = _set_thread_limits(config)
     curve = load_light_curve(config)
     bundle = _secondary_design(config, curve)
     output = Path(config.output.directory).expanduser()
@@ -1083,17 +1260,47 @@ def run_fit(config: MappingConfig) -> FitResult:
     sampler = str(config.inference.sampler).lower()
     if sampler in {"map", "none"}:
         posterior, model_flux, details = _linear_fit(config, curve, bundle)
+        linear_summary = {
+            key: value
+            for key, value in details.items()
+            if key
+            not in {
+                "map_coefficients",
+                "map_covariance",
+                "full_posterior_mean",
+                "full_posterior_covariance",
+                "residuals",
+            }
+        }
+        if str(config.map.representation).lower() == "longitude":
+            _, linear_prior_scale = _linear_prior(
+                config, bundle.map_design.shape[1]
+            )
+            linear_summary.update(
+                {
+                    "parameterization": "longitude_fourier",
+                    "map_representation": "longitude",
+                    "longitude_degree": int(bundle.harmonic_degree),
+                    "coefficient_prior": {
+                        "distribution": "independent Gaussian in real longitude Fourier coefficients",
+                        "mean": np.zeros(bundle.map_design.shape[1]).tolist(),
+                        "standard_deviation": linear_prior_scale[1:].tolist(),
+                        "positivity": "unconstrained signed coefficients; positivity is not imposed",
+                    },
+                    "baseline_prior": {
+                        "distribution": "Gaussian",
+                        "mean": 1.0,
+                        "standard_deviation": 0.05,
+                    },
+                }
+            )
         summary_path, coefficients_path = _write_common_outputs(
             output,
             config,
             bundle,
             curve,
             sampler=sampler,
-            summary={
-                key: value
-                for key, value in details.items()
-                if key not in {"map_coefficients", "map_covariance", "full_posterior_mean", "full_posterior_covariance", "residuals"}
-            },
+            summary=linear_summary,
             model_flux=model_flux,
             coefficients=details["map_coefficients"],
             covariance=details["map_covariance"],
@@ -1104,7 +1311,7 @@ def run_fit(config: MappingConfig) -> FitResult:
             status="complete",
             sampler=sampler,
             n_observations=curve.n_observations,
-            n_parameters=int(bundle.map_design.shape[1]),
+            n_parameters=int(details["n_parameters"]),
             output_directory=output,
             summary_path=summary_path,
             coefficients_path=coefficients_path,
@@ -1119,9 +1326,9 @@ def run_fit(config: MappingConfig) -> FitResult:
     if sampler != "nuts":
         raise ValueError(f"Unsupported sampler {sampler!r}; use nuts, map, or none.")
 
-    if str(config.map.representation).lower() == "direct_harmonics":
+    if str(config.map.representation).lower() in {"direct_harmonics", "longitude"}:
         run, harmonic_samples, details = _harmonic_nuts_fit(
-            config, curve, bundle, threads=threads
+            config, curve, bundle, plan=plan
         )
         mean_harmonics = np.mean(harmonic_samples, axis=0)
         summary_path, coefficients_path = _write_common_outputs(
@@ -1140,22 +1347,32 @@ def run_fit(config: MappingConfig) -> FitResult:
                     "residuals",
                     "model_flux",
                     "harmonic_by_chain",
+                    "map_coefficients_by_chain",
+                    "longitude_coefficients_by_chain",
+                    "map_samples",
                 }
             },
             model_flux=details["model_flux"],
             coefficients=mean_harmonics,
         )
         samples_path = output / "samples.npz"
+        is_longitude = str(config.map.representation).lower() == "longitude"
+        coefficient_key = (
+            "longitude_coefficients" if is_longitude else "harmonic_coefficients"
+        )
+        chain_key = (
+            "longitude_coefficients_by_chain"
+            if is_longitude
+            else "harmonic_coefficients_by_chain"
+        )
         sample_payload: dict[str, Any] = {
-            "harmonic_coefficients": harmonic_samples,
+            coefficient_key: harmonic_samples,
             "flux": details["flux_samples"],
         }
         _add_noise_samples(sample_payload, run)
-        harmonic_by_chain = details.get("harmonic_by_chain")
+        harmonic_by_chain = details.get("map_coefficients_by_chain")
         if harmonic_by_chain is not None:
-            sample_payload["harmonic_coefficients_by_chain"] = np.asarray(
-                harmonic_by_chain
-            )
+            sample_payload[chain_key] = np.asarray(harmonic_by_chain)
             if run.grouped_samples is not None and "flux" in run.grouped_samples:
                 sample_payload["flux_by_chain"] = np.asarray(
                     run.grouped_samples["flux"]
@@ -1208,7 +1425,7 @@ def run_fit(config: MappingConfig) -> FitResult:
         )
 
     run, pixel_samples, harmonic_samples, details = _pixel_fit(
-        config, curve, bundle, threads=threads
+        config, curve, bundle, plan=plan
     )
     mean_pixels = np.mean(pixel_samples, axis=0)
     mean_harmonics = np.mean(harmonic_samples, axis=0)

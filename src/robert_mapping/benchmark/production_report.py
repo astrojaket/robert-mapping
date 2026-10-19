@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,7 @@ import numpy as np
 from robert_mapping.config import MappingConfig
 from robert_mapping.data import load_light_curve
 from robert_mapping.physics import render_map
+from robert_mapping.physics.longitude import evaluate_longitude_map
 
 from .diagnostic_plots import (
     plot_brightness_map,
@@ -41,6 +43,10 @@ _WASP121_NRS2_HOTSPOT_SIGMA_DEGREES = 0.12
 _WASP121_MIRI_HOTSPOT_DEGREES = 4.8
 _WASP121_MIRI_HOTSPOT_LOWER_DEGREES = 2.0
 _WASP121_MIRI_HOTSPOT_UPPER_DEGREES = 7.5
+_SIGMA_INTERVAL_QUANTILES = {
+    "1sigma": (0.158655253931457, 0.841344746068543),
+    "2sigma": (0.022750131948179, 0.977249868051821),
+}
 
 
 def _wasp18_input_path(
@@ -224,6 +230,53 @@ def _temperature_converter(config: MappingConfig) -> tuple[BandpassTemperatureCo
     )
 
 
+def _noise_report(summary: dict[str, Any]) -> dict[str, Any]:
+    """Collect configured OU/GP priors and sampled noise values."""
+
+    posterior: dict[str, Any] = {}
+    for name in (
+        "ou_amplitude",
+        "ou_timescale",
+        "gp_amplitude",
+        "gp_timescale",
+        "jitter",
+        "white_jitter",
+    ):
+        posterior[name] = {
+            "mean": summary.get(f"{name}_mean"),
+            "standard_deviation": summary.get(f"{name}_standard_deviation"),
+        }
+    return {
+        "model": summary.get("noise_model", "white"),
+        "ou_amplitude_prior_scale_ppm": summary.get(
+            "ou_amplitude_prior_scale_ppm"
+        ),
+        "ou_timescale_prior_median_seconds": summary.get(
+            "ou_timescale_prior_median_seconds"
+        ),
+        "ou_timescale_prior_sigma_ln": summary.get(
+            "ou_timescale_prior_sigma_ln"
+        ),
+        "gp_kernel": summary.get("gp_kernel"),
+        "gp_amplitude_prior_scale_ppm": summary.get(
+            "gp_amplitude_prior_scale_ppm"
+        ),
+        "gp_timescale_prior_median_seconds": summary.get(
+            "gp_timescale_prior_median_seconds"
+        ),
+        "gp_timescale_prior_sigma_ln": summary.get(
+            "gp_timescale_prior_sigma_ln"
+        ),
+        "gp_max_points": summary.get("gp_max_points"),
+        "jitter_prior_scale_ppm": summary.get("jitter_prior_scale_ppm"),
+        "posterior": posterior,
+        "maximum_rhat": summary.get("maximum_noise_rhat"),
+        "minimum_effective_sample_size": summary.get(
+            "minimum_noise_effective_sample_size"
+        ),
+    }
+
+
 def _save_trace_plot(
     harmonic_by_chain: np.ndarray, output: Path, color: str
 ) -> None:
@@ -346,6 +399,729 @@ def _save_systematics_plot(
     plt.close(figure)
 
 
+def _style_longitude_figure() -> Any:
+    """Apply the local WASP-15b style and return its axis formatter."""
+
+    import matplotlib
+
+    style_path = Path.home() / ".codex" / "plotting" / "wasp15b_plot_style.py"
+    if style_path.is_file():
+        spec = importlib.util.spec_from_file_location(
+            "_robert_mapping_wasp15b_plot_style", style_path
+        )
+        if spec is not None and spec.loader is not None:
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            module.apply_style()
+            return module.style_axis
+
+    # Keep the report portable when the optional user-level helper is absent.
+    from matplotlib.ticker import AutoMinorLocator
+
+    matplotlib.rcParams.update(
+        {
+            "font.family": "DejaVu Sans",
+            "mathtext.fontset": "stix",
+            "font.size": 8.0,
+            "axes.labelsize": 8.0,
+            "xtick.labelsize": 7.0,
+            "ytick.labelsize": 7.0,
+            "legend.fontsize": 7.5,
+            "axes.linewidth": 0.7,
+            "axes.edgecolor": "black",
+            "text.color": "black",
+            "axes.labelcolor": "black",
+            "xtick.color": "black",
+            "ytick.color": "black",
+            "xtick.major.width": 0.7,
+            "ytick.major.width": 0.7,
+            "xtick.minor.width": 0.5,
+            "ytick.minor.width": 0.5,
+            "xtick.direction": "in",
+            "ytick.direction": "in",
+            "xtick.top": True,
+            "ytick.right": True,
+            "axes.grid": False,
+            "legend.frameon": False,
+            "figure.facecolor": "white",
+            "axes.facecolor": "white",
+            "savefig.facecolor": "white",
+            "pdf.fonttype": 42,
+            "ps.fonttype": 42,
+            "svg.fonttype": "none",
+        }
+    )
+
+    def style_axis(axis: Any) -> None:
+        axis.grid(False)
+        for spine in axis.spines.values():
+            spine.set_visible(True)
+            spine.set_color("black")
+            spine.set_linewidth(0.7)
+        axis.tick_params(
+            which="both", direction="in", top=True, right=True, pad=2.0
+        )
+        axis.tick_params(which="major", length=3.0, width=0.7)
+        axis.tick_params(which="minor", length=1.5, width=0.5)
+        axis.xaxis.set_minor_locator(AutoMinorLocator(2))
+        axis.yaxis.set_minor_locator(AutoMinorLocator(2))
+
+    return style_axis
+
+
+def _save_longitude_light_curve(
+    time_hours: np.ndarray,
+    observed: np.ndarray,
+    error: np.ndarray,
+    median_model: np.ndarray,
+    output: Path,
+) -> None:
+    """Save a WASP-15b-style light-curve and residual figure."""
+
+    import matplotlib.pyplot as plt
+
+    style_axis = _style_longitude_figure()
+    order = np.argsort(np.asarray(time_hours, dtype=float))
+    time = np.asarray(time_hours, dtype=float)
+    data = np.asarray(observed, dtype=float)
+    sigma = np.asarray(error, dtype=float)
+    model = np.asarray(median_model, dtype=float)
+    figure, axes = plt.subplots(
+        2, 1, figsize=(6.7, 4.5), sharex=True, constrained_layout=True,
+        gridspec_kw={"height_ratios": (2.3, 1.0)},
+    )
+    axes[0].errorbar(
+        time,
+        data,
+        yerr=sigma,
+        fmt="o",
+        markersize=2.0,
+        markerfacecolor="#111111",
+        markeredgecolor="#111111",
+        ecolor="#111111",
+        elinewidth=0.45,
+        capsize=0.0,
+        linestyle="none",
+        label="Observed data",
+        zorder=3,
+    )
+    axes[0].plot(
+        time[order],
+        model[order],
+        color="#6F3CC3",
+        linewidth=1.2,
+        label="Posterior median model",
+        zorder=2,
+    )
+    axes[0].set_ylabel("Relative flux")
+    axes[0].legend(frameon=False, loc="best")
+    axes[1].axhline(0.0, color="#777777", linewidth=0.65)
+    axes[1].errorbar(
+        time,
+        (data - model) * 1.0e6,
+        yerr=sigma * 1.0e6,
+        fmt="o",
+        markersize=1.8,
+        markerfacecolor="#111111",
+        markeredgecolor="#111111",
+        ecolor="#111111",
+        elinewidth=0.4,
+        capsize=0.0,
+        linestyle="none",
+    )
+    axes[1].set_ylabel("Residual (ppm)")
+    axes[1].set_xlabel("Time from median epoch (hours)")
+    for axis in axes:
+        style_axis(axis)
+    figure.savefig(output / "white_light_curve.png", dpi=300, bbox_inches="tight")
+    figure.savefig(output / "white_light_curve.pdf", bbox_inches="tight")
+    plt.close(figure)
+
+
+def _save_longitude_map(
+    longitude_degrees: np.ndarray,
+    latitude_degrees: np.ndarray,
+    contrast_ppm: np.ndarray,
+    output: Path,
+    *,
+    stem: str,
+    colorbar_label: str,
+) -> None:
+    """Save one latitude-flat map with the report's scientific style."""
+
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import LinearSegmentedColormap
+
+    style_axis = _style_longitude_figure()
+    cmap = LinearSegmentedColormap.from_list(
+        "robert_mapping_longitude",
+        ["#20102c", "#542b73", "#6F3CC3", "#d8bde9", "#f7f3fb"],
+    )
+    figure, axis = plt.subplots(
+        figsize=(6.6, 3.5), constrained_layout=True
+    )
+    image = axis.pcolormesh(
+        longitude_degrees,
+        latitude_degrees,
+        np.asarray(contrast_ppm, dtype=float),
+        shading="auto",
+        cmap=cmap,
+    )
+    axis.set_xlabel("Longitude (degrees east)")
+    axis.set_ylabel("Latitude (fixed by model)")
+    axis.set_xlim(float(longitude_degrees[0]), float(longitude_degrees[-1]))
+    axis.set_ylim(float(latitude_degrees[0]), float(latitude_degrees[-1]))
+    style_axis(axis)
+    colorbar = figure.colorbar(image, ax=axis, pad=0.02)
+    colorbar.set_label(colorbar_label)
+    figure.savefig(output / f"{stem}.png", dpi=300, bbox_inches="tight")
+    figure.savefig(output / f"{stem}.pdf", bbox_inches="tight")
+    plt.close(figure)
+
+
+def _save_longitude_profile(
+    longitude_degrees: np.ndarray,
+    median: np.ndarray,
+    lower_1sigma: np.ndarray,
+    upper_1sigma: np.ndarray,
+    lower_2sigma: np.ndarray,
+    upper_2sigma: np.ndarray,
+    output: Path,
+    *,
+    stem: str = "longitude_profile",
+) -> None:
+    """Save the median Fourier profile and exact central 1σ and 2σ ranges."""
+
+    import matplotlib.pyplot as plt
+
+    style_axis = _style_longitude_figure()
+    figure, axis = plt.subplots(
+        figsize=(3.3, 3.3), constrained_layout=True
+    )
+    axis.fill_between(
+        longitude_degrees,
+        lower_2sigma * 1.0e6,
+        upper_2sigma * 1.0e6,
+        color="mediumpurple",
+        alpha=0.12,
+        linewidth=0.0,
+        label="2σ range",
+        zorder=1,
+    )
+    axis.fill_between(
+        longitude_degrees,
+        lower_1sigma * 1.0e6,
+        upper_1sigma * 1.0e6,
+        color="mediumpurple",
+        alpha=0.25,
+        linewidth=0.0,
+        label="1σ range",
+        zorder=1,
+    )
+    axis.plot(
+        longitude_degrees,
+        median * 1.0e6,
+        color="#6F3CC3",
+        linewidth=1.3,
+        label="Posterior median model",
+        zorder=2,
+    )
+    axis.set_xlabel("Longitude (degrees east)")
+    axis.set_ylabel("Planet-to-star contrast (ppm)")
+    axis.set_xlim(-180.0, 180.0)
+    axis.legend(frameon=False, loc="best")
+    style_axis(axis)
+    figure.savefig(output / f"{stem}.png", dpi=300, bbox_inches="tight")
+    figure.savefig(output / f"{stem}.pdf", bbox_inches="tight")
+    plt.close(figure)
+
+
+def _save_longitude_trace(
+    coefficients_by_chain: np.ndarray,
+    output: Path,
+) -> None:
+    """Save trace panels with labels for constant/cosine/sine coefficients."""
+
+    import matplotlib.pyplot as plt
+
+    style_axis = _style_longitude_figure()
+    values = np.asarray(coefficients_by_chain, dtype=float)
+    if values.ndim != 3 or values.shape[-1] % 2 != 1:
+        raise ValueError(
+            "longitude_coefficients_by_chain must have shape (chain, draw, 1 + 2 * degree)"
+        )
+    count = int(values.shape[-1])
+    names = ["Constant coefficient"]
+    for order in range(1, (count + 1) // 2):
+        names.extend((f"Cosine coefficient, m={order}", f"Sine coefficient, m={order}"))
+    ncols = min(3, count)
+    nrows = int(np.ceil(count / ncols))
+    figure, axes = plt.subplots(
+        nrows,
+        ncols,
+        figsize=(6.8, max(2.0, 1.75 * nrows)),
+        squeeze=False,
+        constrained_layout=True,
+    )
+    chain_colors = ("#6F3CC3", "#111111", "mediumpurple")
+    chain_styles = ("-", "--", ":")
+    for index, axis in enumerate(axes.ravel()):
+        if index >= count:
+            axis.set_visible(False)
+            continue
+        for chain in range(values.shape[0]):
+            axis.plot(
+                values[chain, :, index] * 1.0e6,
+                color=chain_colors[chain % len(chain_colors)],
+                linestyle=chain_styles[chain % len(chain_styles)],
+                linewidth=0.55,
+                alpha=0.85,
+                label=f"Chain {chain + 1}",
+            )
+        axis.set_ylabel(names[index] + " (ppm)")
+        axis.set_xlabel("Draw")
+        style_axis(axis)
+    if values.shape[0] > 1:
+        axes[0, 0].legend(frameon=False, loc="best")
+    figure.savefig(output / "posterior_trace.png", dpi=300, bbox_inches="tight")
+    figure.savefig(output / "posterior_trace.pdf", bbox_inches="tight")
+    plt.close(figure)
+
+
+def _save_longitude_systematics_plot(
+    time_hours: np.ndarray,
+    nuisance_samples: np.ndarray,
+    coefficient_samples: np.ndarray,
+    coefficient_names: list[str],
+    output: Path,
+) -> None:
+    """Save systematics diagnostics with the longitude report style."""
+
+    import matplotlib.pyplot as plt
+
+    style_axis = _style_longitude_figure()
+    lower_1sigma, upper_1sigma = _SIGMA_INTERVAL_QUANTILES["1sigma"]
+    lower_2sigma, upper_2sigma = _SIGMA_INTERVAL_QUANTILES["2sigma"]
+    q2_lower, median, q2_upper = np.quantile(
+        nuisance_samples, [lower_2sigma, 0.50, upper_2sigma], axis=0
+    )
+    q1_lower, _, q1_upper = np.quantile(
+        nuisance_samples, [lower_1sigma, 0.50, upper_1sigma], axis=0
+    )
+    figure, axes = plt.subplots(
+        2, 1, figsize=(6.7, 4.5), constrained_layout=True
+    )
+    axes[0].fill_between(
+        time_hours,
+        q2_lower * 1.0e6,
+        q2_upper * 1.0e6,
+        color="mediumpurple",
+        alpha=0.12,
+        linewidth=0.0,
+        label="2σ range",
+    )
+    axes[0].fill_between(
+        time_hours,
+        q1_lower * 1.0e6,
+        q1_upper * 1.0e6,
+        color="mediumpurple",
+        alpha=0.25,
+        linewidth=0.0,
+        label="1σ range",
+    )
+    axes[0].plot(
+        time_hours,
+        median * 1.0e6,
+        color="#6F3CC3",
+        linewidth=1.2,
+        label="Posterior median model",
+    )
+    axes[0].axhline(0.0, color="#111111", linewidth=0.65)
+    axes[0].set_ylabel("Systematics (ppm)")
+    axes[0].set_xlabel("Time from median epoch (hours)")
+    axes[0].legend(frameon=False, loc="best")
+    positions = np.arange(coefficient_samples.shape[1])
+    coefficient_lower, coefficient_median, coefficient_upper = np.quantile(
+        coefficient_samples,
+        [lower_1sigma, 0.50, upper_1sigma],
+        axis=0,
+    )
+    axes[1].errorbar(
+        positions,
+        coefficient_median,
+        yerr=(
+            coefficient_median - coefficient_lower,
+            coefficient_upper - coefficient_median,
+        ),
+        color="#111111",
+        marker="o",
+        markerfacecolor="#111111",
+        markeredgecolor="#111111",
+        linestyle="none",
+        capsize=2,
+        linewidth=0.65,
+    )
+    axes[1].axhline(0.0, color="#111111", linewidth=0.65)
+    axes[1].set_xticks(positions, coefficient_names, rotation=25, ha="right")
+    axes[1].set_ylabel("Coefficient")
+    for axis in axes:
+        style_axis(axis)
+    figure.savefig(output / "systematics_model.png", dpi=300, bbox_inches="tight")
+    figure.savefig(output / "systematics_model.pdf", bbox_inches="tight")
+    plt.close(figure)
+
+
+def _make_longitude_production_report(
+    config: MappingConfig,
+    output: Path,
+    summary: dict[str, Any],
+) -> dict[str, Any]:
+    """Build report products for the latitude-flat Fourier representation."""
+
+    samples_path = output / "samples.npz"
+    if not samples_path.is_file():
+        raise FileNotFoundError(
+            "The longitude production report needs posterior samples from a NUTS fit."
+        )
+    curve = load_light_curve(config)
+    with np.load(samples_path, allow_pickle=False) as archive:
+        if "longitude_coefficients" not in archive:
+            raise ValueError(
+                "The longitude fit samples must use the `longitude_coefficients` key."
+            )
+        coefficients = np.asarray(archive["longitude_coefficients"], dtype=float)
+        if "longitude_coefficients_by_chain" not in archive:
+            raise ValueError(
+                "The longitude fit samples must include `longitude_coefficients_by_chain`."
+            )
+        coefficients_by_chain = np.asarray(
+            archive["longitude_coefficients_by_chain"], dtype=float
+        )
+        flux_samples = (
+            np.asarray(archive["flux"], dtype=float)
+            if "flux" in archive
+            else None
+        )
+        nuisance_samples = (
+            np.asarray(archive["systematics_model"], dtype=float)
+            if "systematics_model" in archive
+            else None
+        )
+        nuisance_coefficient_samples = (
+            np.asarray(archive["systematics_coefficients"], dtype=float)
+            if "systematics_coefficients" in archive
+            else None
+        )
+
+    if flux_samples is None:
+        raise ValueError(
+            "The longitude production report requires posterior `flux` samples."
+        )
+    if coefficients.ndim != 2 or coefficients.shape[0] == 0:
+        raise ValueError("longitude_coefficients must have shape (draw, coefficient)")
+    if coefficients.shape[-1] % 2 != 1:
+        raise ValueError("longitude_coefficients must contain 1 + 2 * degree values")
+    if coefficients_by_chain.ndim != 3 or coefficients_by_chain.shape[-1] != coefficients.shape[-1]:
+        raise ValueError(
+            "longitude_coefficients_by_chain must have shape (chain, draw, coefficient)"
+        )
+    if flux_samples is not None and flux_samples.shape != (
+        coefficients.shape[0], curve.n_observations
+    ):
+        raise ValueError("The longitude fit flux samples have an invalid shape")
+    if coefficients_by_chain.shape[0] == 0 or coefficients_by_chain.shape[1] == 0:
+        raise ValueError("The longitude coefficient trace must contain draws")
+    if coefficients_by_chain.shape[0] * coefficients_by_chain.shape[1] != coefficients.shape[0]:
+        raise ValueError(
+            "The longitude coefficient chain and flat sample arrays do not match."
+        )
+
+    degree = (int(coefficients.shape[-1]) - 1) // 2
+    summary_degree = summary.get("longitude_degree", summary.get("map_degree"))
+    if summary_degree is not None and int(summary_degree) != degree:
+        raise ValueError(
+            "The longitude coefficient count does not match the fit summary degree."
+        )
+    if summary.get("parameterization") != "longitude_fourier":
+        raise ValueError(
+            "Longitude samples require fit_summary.json parameterization: longitude_fourier."
+        )
+
+    map_longitude_deg = np.linspace(-180.0, 180.0, 121)
+    map_latitude_deg = np.linspace(-90.0, 90.0, 61)
+    longitude_rad = np.deg2rad(map_longitude_deg)
+    profile_longitude_deg = np.linspace(-180.0, 180.0, 721)
+    profile_longitude_rad = np.deg2rad(profile_longitude_deg)
+    one_sigma_lower, one_sigma_upper = _SIGMA_INTERVAL_QUANTILES["1sigma"]
+    two_sigma_lower, two_sigma_upper = _SIGMA_INTERVAL_QUANTILES["2sigma"]
+    profile_draws = np.pi * np.asarray(
+        evaluate_longitude_map(coefficients, profile_longitude_rad), dtype=float
+    )
+    map_profile_draws = np.pi * np.asarray(
+        evaluate_longitude_map(coefficients, longitude_rad), dtype=float
+    )
+    profile_1sigma_lower, profile_median, profile_1sigma_upper = np.quantile(
+        profile_draws, [one_sigma_lower, 0.50, one_sigma_upper], axis=0
+    )
+    profile_2sigma_lower, _, profile_2sigma_upper = np.quantile(
+        profile_draws, [two_sigma_lower, 0.50, two_sigma_upper], axis=0
+    )
+    map_1sigma_lower, _, map_1sigma_upper = np.quantile(
+        map_profile_draws, [one_sigma_lower, 0.50, one_sigma_upper], axis=0
+    )
+    map_2sigma_lower, _, map_2sigma_upper = np.quantile(
+        map_profile_draws, [two_sigma_lower, 0.50, two_sigma_upper], axis=0
+    )
+    map_median_profile = np.quantile(map_profile_draws, 0.50, axis=0)
+
+    contrast_draws = map_profile_draws
+    minimum_contrast = np.min(contrast_draws, axis=-1)
+    nonnegative_draw_fraction = float(np.mean(minimum_contrast >= -1.0e-12))
+    negative_draw_fraction = float(np.mean(minimum_contrast < -1.0e-12))
+    min_1sigma_lower, min_median, min_1sigma_upper = np.quantile(
+        minimum_contrast, [one_sigma_lower, 0.50, one_sigma_upper]
+    )
+    min_2sigma_lower, _, min_2sigma_upper = np.quantile(
+        minimum_contrast, [two_sigma_lower, 0.50, two_sigma_upper]
+    )
+    dayside = (profile_longitude_deg >= -90.0) & (profile_longitude_deg <= 90.0)
+    hotspot_offsets = _profile_peak_longitudes(
+        profile_draws, profile_longitude_deg, dayside
+    )
+    _, longitude_comparison = _longitude_comparison_references(
+        hotspot_offsets,
+        include_hammond=(
+            "hammond" in config.project.name.lower()
+            or "wasp43" in config.project.name.lower()
+        ),
+        published_reference=_published_longitude_reference(config.project.name),
+        lower_quantile=one_sigma_lower,
+        upper_quantile=one_sigma_upper,
+    )
+
+    map_1sigma_lower_grid = np.broadcast_to(
+        map_1sigma_lower[None, :] * 1.0e6, (61, 121)
+    )
+    map_median_grid = np.broadcast_to(
+        map_median_profile[None, :] * 1.0e6, (61, 121)
+    )
+    map_1sigma_upper_grid = np.broadcast_to(
+        map_1sigma_upper[None, :] * 1.0e6, (61, 121)
+    )
+    map_2sigma_lower_grid = np.broadcast_to(
+        map_2sigma_lower[None, :] * 1.0e6, (61, 121)
+    )
+    map_2sigma_upper_grid = np.broadcast_to(
+        map_2sigma_upper[None, :] * 1.0e6, (61, 121)
+    )
+    target = config.project.name
+    for stem, values in (
+        ("brightness_map_1sigma_lower", map_1sigma_lower_grid),
+        ("brightness_map_median", map_median_grid),
+        ("brightness_map_1sigma_upper", map_1sigma_upper_grid),
+        ("brightness_map_2sigma_lower", map_2sigma_lower_grid),
+        ("brightness_map_2sigma_upper", map_2sigma_upper_grid),
+    ):
+        _save_longitude_map(
+            map_longitude_deg,
+            map_latitude_deg,
+            values,
+            output,
+            stem=stem,
+            colorbar_label="Planet-to-star contrast (ppm)",
+        )
+    _save_longitude_profile(
+        profile_longitude_deg,
+        profile_median,
+        profile_1sigma_lower,
+        profile_1sigma_upper,
+        profile_2sigma_lower,
+        profile_2sigma_upper,
+        output,
+    )
+    _save_longitude_trace(coefficients_by_chain, output)
+    median_model = np.quantile(flux_samples, 0.50, axis=0)
+    time_unit = str(curve.time_unit).lower()
+    time_hours_scale = {
+        "day": 24.0,
+        "days": 24.0,
+        "hour": 1.0,
+        "hours": 1.0,
+        "second": 1.0 / 3600.0,
+        "seconds": 1.0 / 3600.0,
+    }.get(time_unit)
+    if time_hours_scale is None:
+        raise ValueError(f"Unsupported light-curve time unit {curve.time_unit!r}.")
+    time_hours = (np.asarray(curve.time, dtype=float) - np.median(curve.time)) * time_hours_scale
+    _save_longitude_light_curve(
+        time_hours,
+        np.asarray(curve.flux, dtype=float),
+        np.asarray(curve.flux_err, dtype=float),
+        median_model,
+        output,
+    )
+    if nuisance_samples is not None and nuisance_coefficient_samples is not None:
+        _save_longitude_systematics_plot(
+            time_hours,
+            nuisance_samples,
+            nuisance_coefficient_samples,
+            list(summary.get("systematics_coefficient_names", [])),
+            output,
+        )
+
+    peak_longitude = _profile_peak_longitudes(
+        profile_draws, profile_longitude_deg, dayside
+    )
+    hotspot_1sigma_lower, hotspot_median, hotspot_1sigma_upper = np.quantile(
+        peak_longitude, [one_sigma_lower, 0.50, one_sigma_upper]
+    )
+    hotspot_2sigma_lower, _, hotspot_2sigma_upper = np.quantile(
+        peak_longitude, [two_sigma_lower, 0.50, two_sigma_upper]
+    )
+    chains = int(coefficients_by_chain.shape[0])
+    prior_mean = summary.get("coefficient_prior_mean")
+    prior_sigma = summary.get("coefficient_prior_sigma")
+    coefficient_prior = {
+        "distribution": "independent Gaussian in the real Fourier coefficients",
+        "mean": prior_mean,
+        "standard_deviation": prior_sigma,
+        "positivity": "unconstrained signed coefficients; positivity is not imposed",
+    }
+    basis_metadata = {
+        "name": "latitude-flat real Fourier basis",
+        "coefficient_order": "constant, cos(m longitude), sin(m longitude), m=1..degree",
+        "normalization": "each map-intensity column is divided by pi; a unit constant coefficient has unit disk flux",
+        "degree": degree,
+    }
+    model_flux_residual = np.asarray(curve.flux, dtype=float) - median_model
+    report: dict[str, Any] = {
+        "status": "complete",
+        "target": target,
+        "map_representation": "longitude",
+        "parameterization": "longitude_fourier",
+        "map_basis": basis_metadata,
+        "coefficient_prior": coefficient_prior,
+        "posterior_interval_bounds": {
+            "1sigma": {
+                "central_probability": 0.682689492137086,
+                "lower_quantile": one_sigma_lower,
+                "upper_quantile": one_sigma_upper,
+            },
+            "2sigma": {
+                "central_probability": 0.954499736103642,
+                "lower_quantile": two_sigma_lower,
+                "upper_quantile": two_sigma_upper,
+            },
+        },
+        "posterior_draws": int(coefficients.shape[0]),
+        "chains": chains,
+        "residual_rms_ppm": float(np.sqrt(np.mean(model_flux_residual**2)) * 1.0e6),
+        "divergences": int(summary.get("divergences", 0)),
+        "maximum_rhat": summary.get("maximum_rhat"),
+        "minimum_effective_sample_size": summary.get(
+            "minimum_effective_sample_size"
+        ),
+        "systematics": {
+            "mode": summary.get("systematics", {}).get("mode", "corrected"),
+            "coefficient_names": summary.get("systematics_coefficient_names", []),
+            "coefficient_mean": summary.get("systematics_coefficient_mean", []),
+            "maximum_rhat": summary.get("maximum_systematics_rhat"),
+            "minimum_effective_sample_size": summary.get(
+                "minimum_systematics_effective_sample_size"
+            ),
+        },
+        "noise": _noise_report(summary),
+        "hotspot_longitude_degrees_east": {
+            "lower_1sigma": float(hotspot_1sigma_lower),
+            "median": float(hotspot_median),
+            "upper_1sigma": float(hotspot_1sigma_upper),
+            "lower_2sigma": float(hotspot_2sigma_lower),
+            "upper_2sigma": float(hotspot_2sigma_upper),
+        },
+        "longitude_comparison": longitude_comparison,
+        "map_peak_2d": None,
+        "latitude_information": {
+            "status": "fixed_by_model",
+            "warning": (
+                "The map is constant with latitude by definition. This fit gives no evidence about latitude structure."
+            ),
+            "north_south_asymmetry": None,
+            "peak_latitude_degrees": None,
+        },
+        "contrast": {
+            "minimum_ppm": {
+                "lower_1sigma": float(min_1sigma_lower * 1.0e6),
+                "median": float(min_median * 1.0e6),
+                "upper_1sigma": float(min_1sigma_upper * 1.0e6),
+                "lower_2sigma": float(min_2sigma_lower * 1.0e6),
+                "upper_2sigma": float(min_2sigma_upper * 1.0e6),
+            },
+            "posterior_draw_nonnegative_fraction": nonnegative_draw_fraction,
+            "posterior_draw_with_negative_region_fraction": negative_draw_fraction,
+        },
+        "temperature": {
+            "status": "unavailable",
+            "reason": (
+                "The longitude fit does not include a configured stellar spectrum and instrumental bandpass. No brightness-temperature product was calculated."
+            ),
+        },
+        "positivity_conditioned": {
+            "status": "not_applied",
+            "warning": "The longitude Fourier coefficients are signed and have no positivity constraint.",
+        },
+        "files": {
+            "white_light": "white_light_curve.png",
+            "brightness_1sigma_lower": "brightness_map_1sigma_lower.png",
+            "brightness_median": "brightness_map_median.png",
+            "brightness_1sigma_upper": "brightness_map_1sigma_upper.png",
+            "brightness_2sigma_lower": "brightness_map_2sigma_lower.png",
+            "brightness_2sigma_upper": "brightness_map_2sigma_upper.png",
+            "longitude_profile": "longitude_profile.png",
+            "trace": "posterior_trace.png",
+            "map_arrays": "posterior_maps.npz",
+            **(
+                {"systematics": "systematics_model.png"}
+                if nuisance_samples is not None
+                and nuisance_coefficient_samples is not None
+                else {}
+            ),
+        },
+        "figure_captions": {
+            "brightness_map_1sigma_lower": "Lower bound of the central 1σ posterior contrast interval; the map is flat in latitude by construction.",
+            "brightness_map_median": "Pointwise posterior-median contrast map; the map is flat in latitude by construction.",
+            "brightness_map_1sigma_upper": "Upper bound of the central 1σ posterior contrast interval; the map is flat in latitude by construction.",
+            "brightness_map_2sigma_lower": "Lower bound of the central 2σ posterior contrast interval; the map is flat in latitude by construction.",
+            "brightness_map_2sigma_upper": "Upper bound of the central 2σ posterior contrast interval; the map is flat in latitude by construction.",
+            "longitude_profile": "Posterior median Fourier model with pointwise central 1σ and 2σ intervals.",
+            "white_light": "Observed light curve with the pointwise posterior median model and residuals.",
+            "systematics": "Posterior median systematics model with exact central 1σ and 2σ ranges.",
+            "trace": "Posterior draws for each signed longitude Fourier coefficient.",
+        },
+    }
+    map_arrays: dict[str, np.ndarray] = dict(
+        longitude_degrees=map_longitude_deg,
+        latitude_degrees=map_latitude_deg,
+        contrast_1sigma_lower=map_1sigma_lower_grid * 1.0e-6,
+        contrast_median=map_median_grid * 1.0e-6,
+        contrast_1sigma_upper=map_1sigma_upper_grid * 1.0e-6,
+        contrast_2sigma_lower=map_2sigma_lower_grid * 1.0e-6,
+        contrast_2sigma_upper=map_2sigma_upper_grid * 1.0e-6,
+        longitude_profile_longitude_degrees=profile_longitude_deg,
+        longitude_profile_1sigma_lower=profile_1sigma_lower,
+        longitude_profile_1sigma_upper=profile_1sigma_upper,
+        longitude_profile_2sigma_lower=profile_2sigma_lower,
+        longitude_profile_2sigma_upper=profile_2sigma_upper,
+        longitude_profile_median=profile_median,
+        hotspot_longitude_degrees=peak_longitude,
+        map_peak_longitude_degrees_east=peak_longitude,
+    )
+    np.savez_compressed(output / "posterior_maps.npz", **map_arrays)
+    (output / "production_report.json").write_text(
+        json.dumps(report, indent=2) + "\n", encoding="utf-8"
+    )
+    return report
+
+
 def _quantile_summary(values: np.ndarray) -> dict[str, float]:
     """Return the standard 16th, 50th, and 84th percentile summary."""
 
@@ -353,19 +1129,39 @@ def _quantile_summary(values: np.ndarray) -> dict[str, float]:
     return {"q16": float(q16), "median": float(median), "q84": float(q84)}
 
 
+def _sigma_quantile_summary(
+    values: np.ndarray,
+    lower_quantile: float,
+    upper_quantile: float,
+) -> dict[str, float]:
+    """Return an exact central interval with 1σ or 2σ percentile bounds."""
+
+    lower, median, upper = np.quantile(
+        np.asarray(values, dtype=float),
+        [lower_quantile, 0.5, upper_quantile],
+    )
+    return {
+        "lower": float(lower),
+        "median": float(median),
+        "upper": float(upper),
+    }
+
+
 def _longitude_comparison_references(
     offsets: np.ndarray,
     *,
     include_hammond: bool,
     published_reference: dict[str, Any] | None = None,
+    lower_quantile: float = 0.16,
+    upper_quantile: float = 0.84,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Build shared longitude markers and their machine-readable summary."""
 
-    q16, median, q84 = np.quantile(
-        np.asarray(offsets, dtype=float), [0.16, 0.50, 0.84]
+    lower, median, upper = np.quantile(
+        np.asarray(offsets, dtype=float), [lower_quantile, 0.50, upper_quantile]
     )
-    lower_error = float(median - q16)
-    upper_error = float(q84 - median)
+    lower_error = float(median - lower)
+    upper_error = float(upper - median)
     references: list[dict[str, Any]] = [
         {
             "kind": "substellar",
@@ -375,21 +1171,27 @@ def _longitude_comparison_references(
         {
             "kind": "robert",
             "longitude": float(median),
-            "lower": float(q16),
-            "upper": float(q84),
+            "lower": float(lower),
+            "upper": float(upper),
             "label": (
                 f"robert-mapping: {median:+.2f}° "
                 f"(−{lower_error:.2f}°/+{upper_error:.2f}°)"
             ),
         },
     ]
+    robert_interval = (
+        {
+            "lower_1sigma": float(lower),
+            "median": float(median),
+            "upper_1sigma": float(upper),
+        }
+        if lower_quantile == _SIGMA_INTERVAL_QUANTILES["1sigma"][0]
+        and upper_quantile == _SIGMA_INTERVAL_QUANTILES["1sigma"][1]
+        else {"q16": float(lower), "median": float(median), "q84": float(upper)}
+    )
     summary: dict[str, Any] = {
         "substellar_longitude_degrees": 0.0,
-        "robert_mapping": {
-            "q16": float(q16),
-            "median": float(median),
-            "q84": float(q84),
-        },
+        "robert_mapping": robert_interval,
         "hammond_et_al_2024": None,
         "published_reference": None,
     }
@@ -620,6 +1422,17 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
     if not summary_path.is_file() or not samples_path.is_file():
         raise FileNotFoundError("Run the configured fit before making its report.")
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    representation = str(config.map.representation).lower()
+    if representation == "longitude":
+        if summary.get("parameterization") != "longitude_fourier":
+            raise ValueError(
+                "The configured longitude fit does not have longitude Fourier samples."
+            )
+        return _make_longitude_production_report(config, output, summary)
+    if summary.get("parameterization") == "longitude_fourier":
+        raise ValueError(
+            "The fit summary uses longitude Fourier samples, but the configuration does not select map.representation: longitude."
+        )
     curve = load_light_curve(config)
     model = np.load(output / "model_flux.npy", allow_pickle=False)
     residual = np.load(output / "residuals.npy", allow_pickle=False)
@@ -1039,6 +1852,7 @@ def make_production_report(config: MappingConfig) -> dict[str, Any]:
                 "minimum_systematics_effective_sample_size"
             ),
         },
+        "noise": _noise_report(summary),
         "hotspot_longitude_degrees_east": {
             "q16": float(hotspot_q16),
             "median": float(hotspot_median),

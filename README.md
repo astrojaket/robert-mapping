@@ -9,6 +9,11 @@ The [UNITY theory study](UNITY_Theory/README.md) contains the six-target
 injection–recovery simulations, frozen PandExo noise calculations, saved
 fit profiles, and commands to reproduce the results and figures.
 
+Use the [execution guide](docs/parallel_execution.md) for CPU controls,
+longitude-only maps, and K-fold validation on supplied data. The
+[noise-model guide](docs/noise_models.md) gives your student a GP kernel
+interface, a seeded injection example, and reference tests.
+
 The current student task is **WASP-121b white-light analysis**. Start with
 NIRSpec NRS1 and NRS2, then MIRI/LRS. The other instruments and spectral maps
 need further checks. See the [handoff audit](docs/student_handoff_audit.md)
@@ -34,7 +39,9 @@ source profiles/laptop.env
 # Linux: source profiles/glamdring.env instead.
 ```
 
-Run one analysis at a time. Load the profile before Python starts. See
+Set the CPU budget for each analysis before you run it. See
+[parallel execution and the parameter audit](docs/parallel_execution.md). Load
+the profile before Python starts. See
 [compute profiles](profiles/README.md) for SLURM and environment locking.
 The environment files are dependency specifications, not exact version locks.
 

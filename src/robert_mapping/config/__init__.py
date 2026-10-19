@@ -14,6 +14,7 @@ do not need special handling.
 from .models import (
     ConfigError,
     ComputeConfig,
+    CrossValidationConfig,
     DataConfig,
     InferenceConfig,
     MapConfig,
@@ -37,6 +38,7 @@ from .models import (
 __all__ = [
     "ConfigError",
     "ComputeConfig",
+    "CrossValidationConfig",
     "DataConfig",
     "InferenceConfig",
     "MapConfig",

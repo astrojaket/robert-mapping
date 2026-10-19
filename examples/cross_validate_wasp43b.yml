@@ -1,0 +1,41 @@
+# Explicit held-out prediction on the supplied CV-derived light curve.
+# robert-mapping cross-validate examples/cross_validate_wasp43b.yml --dry-run
+schema_version: 1
+project:
+  name: WASP-43b held-out map test
+  seed: 42
+data:
+  file: ../data/hammond2024_wasp43b.npz
+  format: npz
+  exposure_seconds: 10.34
+  normalize: none
+system:
+  period_days: 0.8134740621723353
+  transit_time: 59913.80739501201
+  a_over_rstar: 4.859
+  radius_ratio: 0.15839
+  inclination_degrees: 82.106
+  planet_flux_ratio: 0.005
+  stellar_radius_rsun: 0.665
+  limb_darkening_u1: 0.160539777
+  limb_darkening_u2: -0.02563240137
+map:
+  representation: direct_harmonics
+  harmonic_degree: 2
+  positive: false
+  regularization: none
+inference:
+  sampler: map  # Exact Gaussian linear posterior; change to nuts for posterior samples.
+cross_validation:
+  n_folds: 5
+  strategy: eclipse_blocks
+  null_model: fourier
+  prior_scale: 0.05
+compute:
+  max_cpus: 3
+  workers: 3
+  threads: 1
+  quadrature_radial: 16
+  quadrature_azimuth: 64
+output:
+  directory: ../results/cross_validate_wasp43b

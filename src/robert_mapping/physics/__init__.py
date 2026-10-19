@@ -14,6 +14,7 @@ from .harmonics import (
     real_sph_harm_all,
     evaluate_map,
 )
+from .longitude import longitude_basis, evaluate_longitude_map, longitude_eclipse_design_matrix
 from .orbit import (
     orbital_phase,
     sky_position,
@@ -50,6 +51,9 @@ from .lightcurve import (
 )
 
 __all__ = [
+    "longitude_basis",
+    "evaluate_longitude_map",
+    "longitude_eclipse_design_matrix",
     "lm_from_index",
     "index_from_lm",
     "ncoeff",

@@ -34,5 +34,5 @@ else
     OUTPUT_ARGS=()
 fi
 
-srun --ntasks=1 --cpus-per-task=3 robert-mapping doctor "$CONFIG"
-srun --ntasks=1 --cpus-per-task=3 robert-mapping fit "$CONFIG" "${OUTPUT_ARGS[@]}"
+srun --ntasks=1 --cpus-per-task="${SLURM_CPUS_PER_TASK}" robert-mapping doctor "$CONFIG"
+srun --ntasks=1 --cpus-per-task="${SLURM_CPUS_PER_TASK}" robert-mapping fit "$CONFIG" --cores "${SLURM_CPUS_PER_TASK}" "${OUTPUT_ARGS[@]}"

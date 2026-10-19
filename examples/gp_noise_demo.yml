@@ -1,0 +1,44 @@
+# First run: python tools/make_gp_noise_demo.py
+# Then: robert-mapping fit examples/gp_noise_demo.yml --dry-run
+schema_version: 1
+project:
+  name: Seeded longitude-map GP noise test
+  seed: 42
+data:
+  file: ../results/gp_noise_demo/input.npz
+  format: npz
+  exposure_seconds: 60
+  normalize: none
+system:
+  period_days: 0.813474
+  transit_time: 0.0
+  a_over_rstar: 4.859
+  radius_ratio: 0.15839
+  inclination_degrees: 82.106
+  planet_flux_ratio: 0.005
+map:
+  representation: longitude
+  harmonic_degree: 2
+  positive: false
+  regularization: none
+model:
+  noise_model: gp
+  gp_kernel: matern32
+  gp_amplitude_prior_scale_ppm: 80
+  gp_timescale_prior_median_seconds: 300
+  gp_timescale_prior_sigma_ln: 0.5
+  gp_max_points: 2000
+  jitter_prior_scale_ppm: 30
+inference:
+  sampler: nuts
+  chains: 2
+  warmup: 100
+  draws: 100
+compute:
+  max_cpus: 2
+  workers: 1
+  threads: 1
+  quadrature_radial: 16
+  quadrature_azimuth: 64
+output:
+  directory: ../results/gp_noise_demo/fit

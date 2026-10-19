@@ -34,19 +34,40 @@ import csv
 from datetime import datetime, timezone
 import json
 import math
+import os
 from pathlib import Path
 import re
 import sys
 from typing import Any
-
-import numpy as np
-from numpy.typing import NDArray
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STUDY_ROOT = PROJECT_ROOT / "UNITY_Theory"
 SOURCE_ROOT = PROJECT_ROOT / "src"
 if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
+
+from robert_mapping.compute import apply_environment, ordered_map, resolve_plan  # noqa: E402
+
+
+def _bootstrap_cli_compute_environment() -> None:
+    """Set CPU limits before NumPy loads in direct script use."""
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--max-cpus", type=int, default=3)
+    parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--threads", type=int, default=1)
+    args, _unknown = parser.parse_known_args()
+    plan = resolve_plan(
+        max_cpus=args.max_cpus, threads=args.threads, workers=args.workers
+    )
+    apply_environment(plan)
+
+
+if __name__ == "__main__":
+    _bootstrap_cli_compute_environment()
+
+import numpy as np  # noqa: E402 - CLI CPU setup must precede numerical imports.
+from numpy.typing import NDArray  # noqa: E402
 
 from robert_mapping.benchmark.recovery_cases import (  # noqa: E402
     _hotspot_coefficients,
@@ -967,6 +988,535 @@ def _effective_input_assumptions(
     return assumptions
 
 
+
+def _run_target_study(job: dict[str, Any]) -> dict[str, Any]:
+    """Run all noise, trial, scenario, and scope work for one target."""
+
+    target_index = int(job["target_index"])
+    target = job["target"]
+    analysis = job["analysis"]
+    effective_trials = int(job["effective_trials"])
+    master_seed = int(job["master_seed"])
+    scenario_names = job["scenario_names"]
+    exposure_subsamples = int(job["exposure_subsamples"])
+    disk_radial = int(job["disk_radial"])
+    disk_azimuth = int(job["disk_azimuth"])
+    chunk_size = int(job["chunk_size"])
+    check_convergence = bool(job["check_convergence"])
+    convergence_tolerance_ppm = float(job["convergence_tolerance_ppm"])
+    quick = bool(job["quick"])
+    rows: list[dict[str, Any]] = []
+    profile_records: list[dict[str, Any]] = []
+    examples_by_target: dict[str, list[dict[str, Any]]] = {}
+    target_summaries: list[dict[str, Any]] = []
+    numerical_checks: list[dict[str, Any]] = []
+    quadrature = disk_quadrature(disk_radial, disk_azimuth)
+    harmonic_degree = 2
+
+    name = str(target["name"])
+    time_days, exposure_seconds = _make_visit(target)
+    cadence_seconds = float(target["cadence_seconds"])
+    subobserver_latitude = np.deg2rad(90.0 - float(target["inclination_degrees"]))
+    uniform_coefficients = _uniform_coefficients(harmonic_degree)
+    uniform_visible = float(
+        np.asarray(
+            map_design_matrix(0.0, subobserver_latitude, harmonic_degree), dtype=float
+        )
+        @ uniform_coefficients
+    )
+    uniform_coefficients = np.asarray(uniform_coefficients / uniform_visible, dtype=float)
+    # The nuisance basis uses the full visit coordinates for both fit
+    # scopes. This makes eclipse-only baseline fits comparable and lets
+    # their curves be evaluated across the full visit.
+    nuisance_full = _nuisance_design(time_days, int(analysis["baseline_order"]))
+    injection_nuisance = _nuisance_design(time_days, 2)
+    injection_baseline = (
+        float(analysis["baseline_intercept_ppm"])
+        + float(analysis["baseline_slope_ppm"]) * injection_nuisance[:, 1]
+        + float(analysis["baseline_curvature_ppm"]) * injection_nuisance[:, 2]
+    )
+    timing_values = np.asarray(analysis["timing_grid_seconds"], dtype=float)
+    operators: dict[float, FloatArray] = {}
+    for timing in timing_values:
+        operators[float(timing)] = _operator_for_visit(
+            time_days,
+            target,
+            float(timing),
+            quadrature,
+            exposure_subsamples,
+            chunk_size,
+        )
+
+    if check_convergence:
+        offset = _temperature_offset(float(target["teq_k"]))
+        truth_coefficients = _mixture_coefficients(
+            offset,
+            float(analysis["injected_width_degrees"]),
+            float(analysis["injected_latitude_degrees"]),
+            float(analysis["injection_fraction"]),
+            harmonic_degree,
+            subobserver_latitude,
+        )
+        fine_operator = _operator_for_visit(
+            time_days,
+            target,
+            float(analysis["injected_timing_seconds"]),
+            disk_quadrature(disk_radial * 2, disk_azimuth * 2),
+            exposure_subsamples * 2,
+            chunk_size,
+        )
+        coarse_operator = _operator_for_visit(
+            time_days,
+            target,
+            float(analysis["injected_timing_seconds"]),
+            quadrature,
+            exposure_subsamples,
+            chunk_size,
+        )
+        max_difference = float(
+            np.max(
+                np.abs(
+                    (fine_operator @ truth_coefficients - coarse_operator @ truth_coefficients)
+                    * float(target["depth_ppm"])
+                )
+            )
+        )
+        numerical_checks.append(
+            {
+                "target": name,
+                "base_exposure_subsamples": exposure_subsamples,
+                "fine_exposure_subsamples": exposure_subsamples * 2,
+                "base_disk_quadrature": [disk_radial, disk_azimuth],
+                "fine_disk_quadrature": [disk_radial * 2, disk_azimuth * 2],
+                "max_absolute_curve_difference_ppm": max_difference,
+                "tolerance_ppm": float(convergence_tolerance_ppm),
+                "passed": bool(max_difference <= convergence_tolerance_ppm),
+            }
+        )
+
+    # Check each injected mixture on a dense sphere. The recovery fits
+    # uniform and hotspot amplitudes separately, with a positivity bound.
+    candidate_longitudes: list[float] = []
+    candidate_widths: list[float] = []
+    candidate_latitudes: list[float] = []
+    candidate_timings: list[float] = []
+    candidate_peak_longitudes: list[float] = []
+    candidate_peak_latitudes: list[float] = []
+    candidate_hotspot_minimums: list[float] = []
+    candidate_hotspot_coefficients: list[FloatArray] = []
+    candidate_maximum_spot_ratios: list[float] = []
+    base_hotspot_metrics: dict[tuple[float, float], tuple[float, float, float]] = {}
+    base_spot_ratios: dict[tuple[float, float], float] = {}
+    base_hotspots: dict[tuple[float, float], FloatArray] = {}
+    fraction = float(analysis["injection_fraction"])
+    uniform_minimum_intensity = _map_metrics(uniform_coefficients, harmonic_degree)[0]
+    for width in analysis["width_grid_degrees"]:
+        for latitude in analysis["latitude_grid_degrees"]:
+            base_hotspot = _hotspot_at_viewing_latitude(
+                0.0, width, latitude, 2, subobserver_latitude
+            )
+            base_hotspots[(float(width), float(latitude))] = base_hotspot
+            base_hotspot_metrics[(float(width), float(latitude))] = _map_metrics(
+                base_hotspot, harmonic_degree
+            )
+            base_spot_ratios[(float(width), float(latitude))] = (
+                _maximum_positive_spot_ratio(
+                    uniform_coefficients, base_hotspot, harmonic_degree
+                )
+            )
+    for timing in timing_values:
+        for width in analysis["width_grid_degrees"]:
+            for latitude in analysis["latitude_grid_degrees"]:
+                _, base_peak_lon, base_peak_lat = base_hotspot_metrics[
+                    (float(width), float(latitude))
+                ]
+                for longitude in analysis["longitude_grid_degrees"]:
+                    coeff = _hotspot_at_viewing_latitude(
+                        float(longitude),
+                        float(width),
+                        float(latitude),
+                        2,
+                        subobserver_latitude,
+                    )
+                    candidate_longitudes.append(float(longitude))
+                    candidate_widths.append(float(width))
+                    candidate_latitudes.append(float(latitude))
+                    candidate_timings.append(float(timing))
+                    candidate_peak_longitudes.append(
+                        float(_wrap_degrees(float(longitude) + base_peak_lon))
+                    )
+                    candidate_peak_latitudes.append(float(base_peak_lat))
+                    candidate_hotspot_coefficients.append(coeff)
+                    ratio_limit = base_spot_ratios[(float(width), float(latitude))]
+                    base_norm = float(
+                        np.linalg.norm(base_hotspots[(float(width), float(latitude))])
+                    )
+                    candidate_norm = float(np.linalg.norm(coeff))
+                    candidate_hotspot_minimums.append(
+                        base_hotspot_metrics[(float(width), float(latitude))][0]
+                        * candidate_norm
+                        / base_norm
+                    )
+                    candidate_maximum_spot_ratios.append(
+                        ratio_limit
+                        if np.isinf(ratio_limit)
+                        else 0.995 * ratio_limit * base_norm / candidate_norm
+                    )
+    if not candidate_hotspot_coefficients:
+        raise ValueError(f"{name}: no positive recovery templates remain")
+
+    candidate_longitude_array = np.asarray(candidate_longitudes, dtype=float)
+    candidate_width_array = np.asarray(candidate_widths, dtype=float)
+    candidate_latitude_array = np.asarray(candidate_latitudes, dtype=float)
+    candidate_timing_array = np.asarray(candidate_timings, dtype=float)
+    candidate_peak_longitude_array = np.asarray(candidate_peak_longitudes, dtype=float)
+    candidate_peak_latitude_array = np.asarray(candidate_peak_latitudes, dtype=float)
+    candidate_hotspot_minimum_array = np.asarray(candidate_hotspot_minimums, dtype=float)
+    maximum_spot_ratio_array = np.asarray(candidate_maximum_spot_ratios, dtype=float)
+    hotspot_coefficients = candidate_hotspot_coefficients
+    hotspot_curves = np.empty((len(hotspot_coefficients), time_days.size), dtype=float)
+    uniform_curves_by_timing = np.empty((timing_values.size, time_days.size), dtype=float)
+    timing_lookup = {float(value): index for index, value in enumerate(timing_values)}
+    for timing_index_value, timing in enumerate(timing_values):
+        operator = operators[float(timing)]
+        uniform_curves_by_timing[timing_index_value] = (
+            float(target["depth_ppm"]) * (operator @ uniform_coefficients)
+        )
+        selection = np.flatnonzero(candidate_timing_array == float(timing))
+        if selection.size:
+            coefficient_block = np.asarray([hotspot_coefficients[index] for index in selection])
+            hotspot_curves[selection] = float(target["depth_ppm"]) * (
+                operator @ coefficient_block.T
+            ).T
+    uniform_candidate_curves = np.asarray(
+        [
+            uniform_curves_by_timing[timing_lookup[float(timing)]]
+            for timing in candidate_timing_array
+        ],
+        dtype=float,
+    )
+
+    injected_timing = float(analysis["injected_timing_seconds"])
+    if not np.any(np.isclose(timing_values, injected_timing, rtol=0.0, atol=1.0e-10)):
+        operators[injected_timing] = _operator_for_visit(
+            time_days,
+            target,
+            injected_timing,
+            quadrature,
+            exposure_subsamples,
+            chunk_size,
+        )
+    full_phase_curve = operators[injected_timing]
+    local_eclipse_mask = (
+        1.0 - (full_phase_curve @ uniform_coefficients)
+        > float(analysis["eclipse_only_loss_threshold"])
+    )
+    if int(np.sum(local_eclipse_mask)) <= nuisance_full.shape[1] + 1:
+        raise ValueError(
+            f"{name}: window has too few in-eclipse samples for the eclipse-only recovery"
+        )
+
+    temperature_offset = _temperature_offset(float(target["teq_k"]))
+    target_summary = {
+        "target": name,
+        "seed_target_index": int(target.get("seed_target_index", target_index)),
+        "instrument": str(target["instrument"]),
+        "teq_k": float(target["teq_k"]),
+        "brightness_temperature_k": target.get("brightness_temperature_k"),
+        "depth_ppm": float(target["depth_ppm"]),
+        "window_hours": float(target["window_hours"]),
+        "cadence_seconds": cadence_seconds,
+        "exposure_seconds": exposure_seconds,
+        "n_observations": int(time_days.size),
+        "n_eclipse_only_observations": int(np.sum(local_eclipse_mask)),
+        "temperature_scaled_offset_degrees": temperature_offset,
+        "valid_candidate_count": len(hotspot_coefficients),
+        "positivity_bounded_candidate_count": int(
+            np.sum(np.isfinite(maximum_spot_ratio_array))
+        ),
+    }
+    target_summaries.append(target_summary)
+    examples_by_target[name] = []
+    noise_levels, are_reference_levels = _target_noise_levels(target, analysis)
+    if quick:
+        noise_levels = noise_levels[:1]
+    noise_reference = float(analysis["noise_reference_seconds"])
+    if not are_reference_levels:
+        noise_reference = exposure_seconds
+
+    truth_by_scenario: dict[str, dict[str, Any]] = {}
+    for scenario in scenario_names:
+        if scenario == "temperature_scaled":
+            injected_longitude = temperature_offset
+        elif scenario == "zero_offset":
+            injected_longitude = 0.0
+        elif scenario == "constant_30_deg":
+            injected_longitude = float(analysis["constant_offset_degrees"])
+        else:
+            injected_longitude = None
+        if injected_longitude is None:
+            truth_coefficients = uniform_coefficients
+            truth_minimum = float(
+                _map_metrics(truth_coefficients, harmonic_degree)[0]
+            )
+            truth_peak_lon = None
+            truth_peak_lat = None
+            truth_peak_shift = None
+        else:
+            truth_coefficients = _mixture_coefficients(
+                injected_longitude,
+                float(analysis["injected_width_degrees"]),
+                float(analysis["injected_latitude_degrees"]),
+                fraction,
+                harmonic_degree,
+                subobserver_latitude,
+            )
+            truth_minimum, truth_peak_lon, truth_peak_lat = _map_metrics(
+                truth_coefficients, harmonic_degree
+            )
+            truth_peak_shift = _circular_difference(truth_peak_lon, injected_longitude)
+            if truth_minimum < -1.0e-10:
+                raise ValueError(
+                    f"{name} {scenario}: injected map is negative on the dense sphere"
+                )
+            if abs(truth_peak_shift) > 0.51:
+                raise ValueError(
+                    f"{name} {scenario}: degree-2 map peak shifts by "
+                    f"{truth_peak_shift:.3f} degrees from the injected longitude"
+                )
+        truth_by_scenario[scenario] = {
+            "longitude": injected_longitude,
+            "coefficients": truth_coefficients,
+            "minimum": truth_minimum,
+            "peak_longitude": truth_peak_lon,
+            "peak_latitude": truth_peak_lat,
+            "peak_shift": truth_peak_shift,
+            "signal": (
+                float(target["depth_ppm"])
+                * (operators[injected_timing] @ truth_coefficients)
+                + injection_baseline
+            ),
+        }
+
+    for noise_index, noise_input in enumerate(noise_levels):
+        sigma_ppm = float(noise_input)
+        if are_reference_levels:
+            sigma_ppm *= math.sqrt(noise_reference / exposure_seconds)
+        if sigma_ppm <= 0.0:
+            raise ValueError(f"{name}: noise level must be positive")
+        for trial in range(effective_trials):
+            # Reuse the same standardized draw at each noise level. This
+            # pairs noise cases and allows a focused run to reuse a
+            # target's seed from a larger run by declaring its index.
+            seed_target_index = int(target.get("seed_target_index", target_index))
+            seed = _stable_seed(master_seed, seed_target_index, 0, trial)
+            rng = np.random.default_rng(seed)
+            noise = rng.normal(0.0, sigma_ppm, size=time_days.size)
+            for scenario in scenario_names:
+                truth = truth_by_scenario[scenario]
+                injected_longitude = truth["longitude"]
+                truth_coefficients = truth["coefficients"]
+                truth_minimum = truth["minimum"]
+                truth_peak_lon = truth["peak_longitude"]
+                truth_peak_lat = truth["peak_latitude"]
+                truth_peak_shift = truth["peak_shift"]
+                injected_timing = float(analysis["injected_timing_seconds"])
+                truth_signal = truth["signal"]
+                observed = truth_signal + noise
+                result_by_scope: dict[str, dict[str, Any]] = {}
+                for fit_scope, mask in (
+                    ("full_window", np.ones(time_days.size, dtype=bool)),
+                    ("eclipse_only", local_eclipse_mask),
+                ):
+                    result = _fit_scope(
+                        target=target,
+                        observed_ppm=observed,
+                        sigma_ppm=sigma_ppm,
+                        mask=mask,
+                        nuisance_full=nuisance_full,
+                        uniform_candidate_curves=uniform_candidate_curves,
+                        hotspot_curves=hotspot_curves,
+                        uniform_curves_by_timing=uniform_curves_by_timing,
+                        candidate_longitudes=candidate_longitude_array,
+                        candidate_peak_longitudes=candidate_peak_longitude_array,
+                        candidate_peak_latitudes=candidate_peak_latitude_array,
+                        candidate_widths=candidate_width_array,
+                        candidate_latitudes=candidate_latitude_array,
+                        candidate_timings=candidate_timing_array,
+                        uniform_coefficients=uniform_coefficients,
+                        hotspot_coefficients=hotspot_coefficients,
+                        uniform_minimum_intensity=uniform_minimum_intensity,
+                        candidate_hotspot_minimums=candidate_hotspot_minimum_array,
+                        maximum_spot_ratios=maximum_spot_ratio_array,
+                        analysis=analysis,
+                    )
+                    result_by_scope[fit_scope] = result
+                    q16, q50, q84 = result["longitude_q"]
+                    longitude_bias = (
+                        None
+                        if truth_peak_lon is None
+                        else _circular_difference(q50, float(truth_peak_lon))
+                    )
+                    contains = (
+                        None
+                        if truth_peak_lon is None
+                        else bool(
+                            _circular_difference(q16, q50)
+                            <= _circular_difference(float(truth_peak_lon), q50)
+                            <= _circular_difference(q84, q50)
+                        )
+                    )
+                    row = {
+                        "run_id": f"{_slug(name)}__{noise_input:g}ppm__{scenario}__trial{trial:03d}__{fit_scope}",
+                        "target": name,
+                        "instrument": str(target["instrument"]),
+                        "teq_k": float(target["teq_k"]),
+                        "brightness_temperature_k": target.get("brightness_temperature_k"),
+                        "noise_ppm": sigma_ppm,
+                        "noise_input_ppm": float(noise_input),
+                        "noise_reference_seconds": noise_reference,
+                        "scenario": scenario,
+                        "trial": int(trial),
+                        "fit_scope": fit_scope,
+                        "time_window_hours": float(target["window_hours"]),
+                        "n_observations": result["n_obs"],
+                        "n_eclipse_only_observations": int(np.sum(local_eclipse_mask)),
+                        "injected_longitude_degrees": injected_longitude,
+                        "injected_latitude_degrees": None
+                        if injected_longitude is None
+                        else float(analysis["injected_latitude_degrees"]),
+                        "injected_width_degrees": None
+                        if injected_longitude is None
+                        else float(analysis["injected_width_degrees"]),
+                        "injection_fraction": None
+                        if injected_longitude is None
+                        else fraction,
+                        "injected_timing_seconds": injected_timing,
+                        "truth_map_minimum_intensity": truth_minimum,
+                        "truth_map_peak_longitude_degrees": truth_peak_lon,
+                        "truth_map_peak_latitude_degrees": truth_peak_lat,
+                        "truth_map_peak_shift_degrees": truth_peak_shift,
+                        "recovered_longitude_q16_degrees": q16,
+                        "recovered_longitude_median_degrees": q50,
+                        "recovered_longitude_q84_degrees": q84,
+                        "longitude_bias_degrees": longitude_bias,
+                        "longitude_interval_contains_truth": contains,
+                        "longitude_interval_resolution_limited": result[
+                            "longitude_resolution_limited"
+                        ],
+                        "recovered_latitude_q16_degrees": result["latitude_q"][0],
+                        "recovered_latitude_median_degrees": result["latitude_q"][1],
+                        "recovered_latitude_q84_degrees": result["latitude_q"][2],
+                        "recovered_width_q16_degrees": result["width_q"][0],
+                        "recovered_width_median_degrees": result["width_q"][1],
+                        "recovered_width_q84_degrees": result["width_q"][2],
+                        "recovered_timing_q16_seconds": result["timing_q"][0],
+                        "recovered_timing_median_seconds": result["timing_q"][1],
+                        "recovered_timing_q84_seconds": result["timing_q"][2],
+                        "best_width_degrees": result["best_width"],
+                        "best_latitude_degrees": result["best_latitude"],
+                        "best_timing_seconds": result["best_timing"],
+                        "best_map_amplitude_scale": result["map_amplitude"],
+                        "best_map_amplitude_ppm": result["map_amplitude"]
+                        * float(target["depth_ppm"]),
+                        "best_uniform_map_amplitude_scale": result[
+                            "uniform_map_amplitude"
+                        ],
+                        "best_spot_amplitude_scale": result["spot_amplitude"],
+                        "best_recovered_spot_fraction": result[
+                            "recovered_spot_fraction"
+                        ],
+                        "uniform_bic": result["uniform_bic"],
+                        "flexible_bic": result["flexible_bic"],
+                        "delta_bic": result["delta_bic"],
+                        "delta_bic_detection_threshold": DETECTION_DELTA_BIC,
+                        "map_detected": bool(result["delta_bic"] < DETECTION_DELTA_BIC),
+                        "best_map_minimum_intensity": result["map_minimum"],
+                        "best_map_peak_longitude_degrees": result["peak_longitude"],
+                        "best_map_peak_latitude_degrees": result["peak_latitude"],
+                        "best_map_peak_shift_degrees": result["peak_shift"],
+                        "best_map_positive": result["map_positive"],
+                        "residual_rms_ppm": result["residual_rms_ppm"],
+                        "random_seed": seed,
+                    }
+                    rows.append(row)
+                    if fit_scope == "full_window":
+                        # Store full-window profile arrays in NPZ only.
+                        # CSV and the trial summaries contain both scopes.
+                        profile_records.append(
+                            {
+                                "run_id": row["run_id"],
+                                "target": name,
+                                "instrument": str(target["instrument"]),
+                                "teq_k": float(target["teq_k"]),
+                                "noise_ppm": sigma_ppm,
+                                "scenario": scenario,
+                                "trial": int(trial),
+                                "fit_scope": fit_scope,
+                                "log_likelihood": result["log_likelihood_values"],
+                                "profile_bic": result["profile_bic"],
+                                "posterior_weights": result["posterior_weights"],
+                            }
+                        )
+                if trial == 0:
+                    for fit_scope, result in result_by_scope.items():
+                        for row_index in range(time_days.size):
+                            examples_by_target[name].append(
+                                {
+                                    "target": name,
+                                    "instrument": str(target["instrument"]),
+                                    "teq_k": float(target["teq_k"]),
+                                    "noise_ppm": sigma_ppm,
+                                    "noise_input_ppm": float(noise_input),
+                                    "scenario": scenario,
+                                    "trial": trial,
+                                    "fit_scope": fit_scope,
+                                    "time_hours_from_eclipse": float(
+                                        (time_days[row_index] - float(target.get("eclipse_time_days", 0.0)))
+                                        * 24.0
+                                    ),
+                                    "orbital_phase_from_transit": float(
+                                        (
+                                            (time_days[row_index] - float(target.get("eclipse_time_days", 0.0)))
+                                            / float(target["period_days"])
+                                            + 0.5
+                                        )
+                                        % 1.0
+                                    ),
+                                    "in_eclipse_only_mask": bool(local_eclipse_mask[row_index]),
+                                    "truth_flux_ppm": float(truth_signal[row_index]),
+                                    "observed_flux_ppm": float(observed[row_index]),
+                                    "sigma_ppm": sigma_ppm,
+                                    "full_window_fit_flux_ppm": float(
+                                        result_by_scope["full_window"]["predicted_full_ppm"][row_index]
+                                    ),
+                                    "eclipse_only_fit_flux_ppm": float(
+                                        result_by_scope["eclipse_only"]["predicted_full_ppm"][row_index]
+                                    ),
+                                }
+                            )
+
+    candidate_profile_arrays = {}
+    if bool(job["keep_profile_grid"]):
+        candidate_profile_arrays = {
+            "candidate_longitude_array": candidate_longitude_array,
+            "candidate_peak_longitude_array": candidate_peak_longitude_array,
+            "candidate_latitude_array": candidate_latitude_array,
+            "candidate_peak_latitude_array": candidate_peak_latitude_array,
+            "candidate_width_array": candidate_width_array,
+            "candidate_timing_array": candidate_timing_array,
+        }
+    return {
+        "rows": rows,
+        "profile_records": profile_records,
+        "examples_by_target": examples_by_target,
+        "target_summaries": target_summaries,
+        "numerical_checks": numerical_checks,
+        "candidate_profile_arrays": candidate_profile_arrays,
+        "process_id": os.getpid(),
+    }
+
+
 def run_study(
     input_path: Path,
     output: Path,
@@ -977,6 +1527,9 @@ def run_study(
     disk_radial: int = 32,
     disk_azimuth: int = 128,
     chunk_size: int = 128,
+    max_cpus: int = 3,
+    workers: int = 1,
+    threads: int = 1,
     check_convergence: bool = False,
     convergence_tolerance_ppm: float = 0.5,
 ) -> dict[str, Any]:
@@ -989,9 +1542,6 @@ def run_study(
     effective_trials = 1 if quick else int(trials)
     master_seed = int(raw.get("seed", 20261009))
     scenario_names = list(analysis["scenarios"])
-    quadrature = disk_quadrature(disk_radial, disk_azimuth)
-    harmonic_degree = 2
-
     analysis_resolved = dict(analysis)
     analysis_resolved.update(
         {
@@ -1008,500 +1558,54 @@ def run_study(
         }
     )
 
-    rows: list[dict[str, Any]] = []
-    profile_records: list[dict[str, Any]] = []
-    examples_by_target: dict[str, list[dict[str, Any]]] = {}
-    target_summaries: list[dict[str, Any]] = []
-    numerical_checks: list[dict[str, Any]] = []
-
-    for target_index, target in enumerate(targets):
-        name = str(target["name"])
-        time_days, exposure_seconds = _make_visit(target)
-        cadence_seconds = float(target["cadence_seconds"])
-        subobserver_latitude = np.deg2rad(90.0 - float(target["inclination_degrees"]))
-        uniform_coefficients = _uniform_coefficients(harmonic_degree)
-        uniform_visible = float(
-            np.asarray(
-                map_design_matrix(0.0, subobserver_latitude, harmonic_degree), dtype=float
-            )
-            @ uniform_coefficients
-        )
-        uniform_coefficients = np.asarray(uniform_coefficients / uniform_visible, dtype=float)
-        # The nuisance basis uses the full visit coordinates for both fit
-        # scopes. This makes eclipse-only baseline fits comparable and lets
-        # their curves be evaluated across the full visit.
-        nuisance_full = _nuisance_design(time_days, int(analysis["baseline_order"]))
-        injection_nuisance = _nuisance_design(time_days, 2)
-        injection_baseline = (
-            float(analysis["baseline_intercept_ppm"])
-            + float(analysis["baseline_slope_ppm"]) * injection_nuisance[:, 1]
-            + float(analysis["baseline_curvature_ppm"]) * injection_nuisance[:, 2]
-        )
-        timing_values = np.asarray(analysis["timing_grid_seconds"], dtype=float)
-        operators: dict[float, FloatArray] = {}
-        for timing in timing_values:
-            operators[float(timing)] = _operator_for_visit(
-                time_days,
-                target,
-                float(timing),
-                quadrature,
-                exposure_subsamples,
-                chunk_size,
-            )
-
-        if check_convergence:
-            offset = _temperature_offset(float(target["teq_k"]))
-            truth_coefficients = _mixture_coefficients(
-                offset,
-                float(analysis["injected_width_degrees"]),
-                float(analysis["injected_latitude_degrees"]),
-                float(analysis["injection_fraction"]),
-                harmonic_degree,
-                subobserver_latitude,
-            )
-            fine_operator = _operator_for_visit(
-                time_days,
-                target,
-                float(analysis["injected_timing_seconds"]),
-                disk_quadrature(disk_radial * 2, disk_azimuth * 2),
-                exposure_subsamples * 2,
-                chunk_size,
-            )
-            coarse_operator = _operator_for_visit(
-                time_days,
-                target,
-                float(analysis["injected_timing_seconds"]),
-                quadrature,
-                exposure_subsamples,
-                chunk_size,
-            )
-            max_difference = float(
-                np.max(
-                    np.abs(
-                        (fine_operator @ truth_coefficients - coarse_operator @ truth_coefficients)
-                        * float(target["depth_ppm"])
-                    )
-                )
-            )
-            numerical_checks.append(
-                {
-                    "target": name,
-                    "base_exposure_subsamples": exposure_subsamples,
-                    "fine_exposure_subsamples": exposure_subsamples * 2,
-                    "base_disk_quadrature": [disk_radial, disk_azimuth],
-                    "fine_disk_quadrature": [disk_radial * 2, disk_azimuth * 2],
-                    "max_absolute_curve_difference_ppm": max_difference,
-                    "tolerance_ppm": float(convergence_tolerance_ppm),
-                    "passed": bool(max_difference <= convergence_tolerance_ppm),
-                }
-            )
-
-        # Check each injected mixture on a dense sphere. The recovery fits
-        # uniform and hotspot amplitudes separately, with a positivity bound.
-        candidate_longitudes: list[float] = []
-        candidate_widths: list[float] = []
-        candidate_latitudes: list[float] = []
-        candidate_timings: list[float] = []
-        candidate_peak_longitudes: list[float] = []
-        candidate_peak_latitudes: list[float] = []
-        candidate_hotspot_minimums: list[float] = []
-        candidate_hotspot_coefficients: list[FloatArray] = []
-        candidate_maximum_spot_ratios: list[float] = []
-        base_hotspot_metrics: dict[tuple[float, float], tuple[float, float, float]] = {}
-        base_spot_ratios: dict[tuple[float, float], float] = {}
-        base_hotspots: dict[tuple[float, float], FloatArray] = {}
-        fraction = float(analysis["injection_fraction"])
-        uniform_minimum_intensity = _map_metrics(uniform_coefficients, harmonic_degree)[0]
-        for width in analysis["width_grid_degrees"]:
-            for latitude in analysis["latitude_grid_degrees"]:
-                base_hotspot = _hotspot_at_viewing_latitude(
-                    0.0, width, latitude, 2, subobserver_latitude
-                )
-                base_hotspots[(float(width), float(latitude))] = base_hotspot
-                base_hotspot_metrics[(float(width), float(latitude))] = _map_metrics(
-                    base_hotspot, harmonic_degree
-                )
-                base_spot_ratios[(float(width), float(latitude))] = (
-                    _maximum_positive_spot_ratio(
-                        uniform_coefficients, base_hotspot, harmonic_degree
-                    )
-                )
-        for timing in timing_values:
-            for width in analysis["width_grid_degrees"]:
-                for latitude in analysis["latitude_grid_degrees"]:
-                    _, base_peak_lon, base_peak_lat = base_hotspot_metrics[
-                        (float(width), float(latitude))
-                    ]
-                    for longitude in analysis["longitude_grid_degrees"]:
-                        coeff = _hotspot_at_viewing_latitude(
-                            float(longitude),
-                            float(width),
-                            float(latitude),
-                            2,
-                            subobserver_latitude,
-                        )
-                        candidate_longitudes.append(float(longitude))
-                        candidate_widths.append(float(width))
-                        candidate_latitudes.append(float(latitude))
-                        candidate_timings.append(float(timing))
-                        candidate_peak_longitudes.append(
-                            float(_wrap_degrees(float(longitude) + base_peak_lon))
-                        )
-                        candidate_peak_latitudes.append(float(base_peak_lat))
-                        candidate_hotspot_coefficients.append(coeff)
-                        ratio_limit = base_spot_ratios[(float(width), float(latitude))]
-                        base_norm = float(
-                            np.linalg.norm(base_hotspots[(float(width), float(latitude))])
-                        )
-                        candidate_norm = float(np.linalg.norm(coeff))
-                        candidate_hotspot_minimums.append(
-                            base_hotspot_metrics[(float(width), float(latitude))][0]
-                            * candidate_norm
-                            / base_norm
-                        )
-                        candidate_maximum_spot_ratios.append(
-                            ratio_limit
-                            if np.isinf(ratio_limit)
-                            else 0.995 * ratio_limit * base_norm / candidate_norm
-                        )
-        if not candidate_hotspot_coefficients:
-            raise ValueError(f"{name}: no positive recovery templates remain")
-
-        candidate_longitude_array = np.asarray(candidate_longitudes, dtype=float)
-        candidate_width_array = np.asarray(candidate_widths, dtype=float)
-        candidate_latitude_array = np.asarray(candidate_latitudes, dtype=float)
-        candidate_timing_array = np.asarray(candidate_timings, dtype=float)
-        candidate_peak_longitude_array = np.asarray(candidate_peak_longitudes, dtype=float)
-        candidate_peak_latitude_array = np.asarray(candidate_peak_latitudes, dtype=float)
-        candidate_hotspot_minimum_array = np.asarray(candidate_hotspot_minimums, dtype=float)
-        maximum_spot_ratio_array = np.asarray(candidate_maximum_spot_ratios, dtype=float)
-        hotspot_coefficients = candidate_hotspot_coefficients
-        hotspot_curves = np.empty((len(hotspot_coefficients), time_days.size), dtype=float)
-        uniform_curves_by_timing = np.empty((timing_values.size, time_days.size), dtype=float)
-        timing_lookup = {float(value): index for index, value in enumerate(timing_values)}
-        for timing_index_value, timing in enumerate(timing_values):
-            operator = operators[float(timing)]
-            uniform_curves_by_timing[timing_index_value] = (
-                float(target["depth_ppm"]) * (operator @ uniform_coefficients)
-            )
-            selection = np.flatnonzero(candidate_timing_array == float(timing))
-            if selection.size:
-                coefficient_block = np.asarray([hotspot_coefficients[index] for index in selection])
-                hotspot_curves[selection] = float(target["depth_ppm"]) * (
-                    operator @ coefficient_block.T
-                ).T
-        uniform_candidate_curves = np.asarray(
-            [
-                uniform_curves_by_timing[timing_lookup[float(timing)]]
-                for timing in candidate_timing_array
-            ],
-            dtype=float,
-        )
-
-        injected_timing = float(analysis["injected_timing_seconds"])
-        if not np.any(np.isclose(timing_values, injected_timing, rtol=0.0, atol=1.0e-10)):
-            operators[injected_timing] = _operator_for_visit(
-                time_days,
-                target,
-                injected_timing,
-                quadrature,
-                exposure_subsamples,
-                chunk_size,
-            )
-        full_phase_curve = operators[injected_timing]
-        local_eclipse_mask = (
-            1.0 - (full_phase_curve @ uniform_coefficients)
-            > float(analysis["eclipse_only_loss_threshold"])
-        )
-        if int(np.sum(local_eclipse_mask)) <= nuisance_full.shape[1] + 1:
-            raise ValueError(
-                f"{name}: window has too few in-eclipse samples for the eclipse-only recovery"
-            )
-
-        temperature_offset = _temperature_offset(float(target["teq_k"]))
-        target_summary = {
-            "target": name,
-            "seed_target_index": int(target.get("seed_target_index", target_index)),
-            "instrument": str(target["instrument"]),
-            "teq_k": float(target["teq_k"]),
-            "brightness_temperature_k": target.get("brightness_temperature_k"),
-            "depth_ppm": float(target["depth_ppm"]),
-            "window_hours": float(target["window_hours"]),
-            "cadence_seconds": cadence_seconds,
-            "exposure_seconds": exposure_seconds,
-            "n_observations": int(time_days.size),
-            "n_eclipse_only_observations": int(np.sum(local_eclipse_mask)),
-            "temperature_scaled_offset_degrees": temperature_offset,
-            "valid_candidate_count": len(hotspot_coefficients),
-            "positivity_bounded_candidate_count": int(
-                np.sum(np.isfinite(maximum_spot_ratio_array))
-            ),
+    plan = resolve_plan(max_cpus=max_cpus, threads=threads, workers=workers)
+    apply_environment(plan)
+    jobs = [
+        {
+            "target_index": target_index,
+            "target": target,
+            "analysis": analysis,
+            "effective_trials": effective_trials,
+            "master_seed": master_seed,
+            "scenario_names": scenario_names,
+            "exposure_subsamples": exposure_subsamples,
+            "disk_radial": disk_radial,
+            "disk_azimuth": disk_azimuth,
+            "chunk_size": chunk_size,
+            "check_convergence": check_convergence,
+            "convergence_tolerance_ppm": convergence_tolerance_ppm,
+            "quick": quick,
+            "keep_profile_grid": target_index == len(targets) - 1,
         }
-        target_summaries.append(target_summary)
-        examples_by_target[name] = []
-        noise_levels, are_reference_levels = _target_noise_levels(target, analysis)
-        if quick:
-            noise_levels = noise_levels[:1]
-        noise_reference = float(analysis["noise_reference_seconds"])
-        if not are_reference_levels:
-            noise_reference = exposure_seconds
-
-        truth_by_scenario: dict[str, dict[str, Any]] = {}
-        for scenario in scenario_names:
-            if scenario == "temperature_scaled":
-                injected_longitude = temperature_offset
-            elif scenario == "zero_offset":
-                injected_longitude = 0.0
-            elif scenario == "constant_30_deg":
-                injected_longitude = float(analysis["constant_offset_degrees"])
-            else:
-                injected_longitude = None
-            if injected_longitude is None:
-                truth_coefficients = uniform_coefficients
-                truth_minimum = float(
-                    _map_metrics(truth_coefficients, harmonic_degree)[0]
-                )
-                truth_peak_lon = None
-                truth_peak_lat = None
-                truth_peak_shift = None
-            else:
-                truth_coefficients = _mixture_coefficients(
-                    injected_longitude,
-                    float(analysis["injected_width_degrees"]),
-                    float(analysis["injected_latitude_degrees"]),
-                    fraction,
-                    harmonic_degree,
-                    subobserver_latitude,
-                )
-                truth_minimum, truth_peak_lon, truth_peak_lat = _map_metrics(
-                    truth_coefficients, harmonic_degree
-                )
-                truth_peak_shift = _circular_difference(truth_peak_lon, injected_longitude)
-                if truth_minimum < -1.0e-10:
-                    raise ValueError(
-                        f"{name} {scenario}: injected map is negative on the dense sphere"
-                    )
-                if abs(truth_peak_shift) > 0.51:
-                    raise ValueError(
-                        f"{name} {scenario}: degree-2 map peak shifts by "
-                        f"{truth_peak_shift:.3f} degrees from the injected longitude"
-                    )
-            truth_by_scenario[scenario] = {
-                "longitude": injected_longitude,
-                "coefficients": truth_coefficients,
-                "minimum": truth_minimum,
-                "peak_longitude": truth_peak_lon,
-                "peak_latitude": truth_peak_lat,
-                "peak_shift": truth_peak_shift,
-                "signal": (
-                    float(target["depth_ppm"])
-                    * (operators[injected_timing] @ truth_coefficients)
-                    + injection_baseline
-                ),
-            }
-
-        for noise_index, noise_input in enumerate(noise_levels):
-            sigma_ppm = float(noise_input)
-            if are_reference_levels:
-                sigma_ppm *= math.sqrt(noise_reference / exposure_seconds)
-            if sigma_ppm <= 0.0:
-                raise ValueError(f"{name}: noise level must be positive")
-            for trial in range(effective_trials):
-                # Reuse the same standardized draw at each noise level. This
-                # pairs noise cases and allows a focused run to reuse a
-                # target's seed from a larger run by declaring its index.
-                seed_target_index = int(target.get("seed_target_index", target_index))
-                seed = _stable_seed(master_seed, seed_target_index, 0, trial)
-                rng = np.random.default_rng(seed)
-                noise = rng.normal(0.0, sigma_ppm, size=time_days.size)
-                for scenario in scenario_names:
-                    truth = truth_by_scenario[scenario]
-                    injected_longitude = truth["longitude"]
-                    truth_coefficients = truth["coefficients"]
-                    truth_minimum = truth["minimum"]
-                    truth_peak_lon = truth["peak_longitude"]
-                    truth_peak_lat = truth["peak_latitude"]
-                    truth_peak_shift = truth["peak_shift"]
-                    injected_timing = float(analysis["injected_timing_seconds"])
-                    truth_signal = truth["signal"]
-                    observed = truth_signal + noise
-                    result_by_scope: dict[str, dict[str, Any]] = {}
-                    for fit_scope, mask in (
-                        ("full_window", np.ones(time_days.size, dtype=bool)),
-                        ("eclipse_only", local_eclipse_mask),
-                    ):
-                        result = _fit_scope(
-                            target=target,
-                            observed_ppm=observed,
-                            sigma_ppm=sigma_ppm,
-                            mask=mask,
-                            nuisance_full=nuisance_full,
-                            uniform_candidate_curves=uniform_candidate_curves,
-                            hotspot_curves=hotspot_curves,
-                            uniform_curves_by_timing=uniform_curves_by_timing,
-                            candidate_longitudes=candidate_longitude_array,
-                            candidate_peak_longitudes=candidate_peak_longitude_array,
-                            candidate_peak_latitudes=candidate_peak_latitude_array,
-                            candidate_widths=candidate_width_array,
-                            candidate_latitudes=candidate_latitude_array,
-                            candidate_timings=candidate_timing_array,
-                            uniform_coefficients=uniform_coefficients,
-                            hotspot_coefficients=hotspot_coefficients,
-                            uniform_minimum_intensity=uniform_minimum_intensity,
-                            candidate_hotspot_minimums=candidate_hotspot_minimum_array,
-                            maximum_spot_ratios=maximum_spot_ratio_array,
-                            analysis=analysis,
-                        )
-                        result_by_scope[fit_scope] = result
-                        q16, q50, q84 = result["longitude_q"]
-                        longitude_bias = (
-                            None
-                            if truth_peak_lon is None
-                            else _circular_difference(q50, float(truth_peak_lon))
-                        )
-                        contains = (
-                            None
-                            if truth_peak_lon is None
-                            else bool(
-                                _circular_difference(q16, q50)
-                                <= _circular_difference(float(truth_peak_lon), q50)
-                                <= _circular_difference(q84, q50)
-                            )
-                        )
-                        row = {
-                            "run_id": f"{_slug(name)}__{noise_input:g}ppm__{scenario}__trial{trial:03d}__{fit_scope}",
-                            "target": name,
-                            "instrument": str(target["instrument"]),
-                            "teq_k": float(target["teq_k"]),
-                            "brightness_temperature_k": target.get("brightness_temperature_k"),
-                            "noise_ppm": sigma_ppm,
-                            "noise_input_ppm": float(noise_input),
-                            "noise_reference_seconds": noise_reference,
-                            "scenario": scenario,
-                            "trial": int(trial),
-                            "fit_scope": fit_scope,
-                            "time_window_hours": float(target["window_hours"]),
-                            "n_observations": result["n_obs"],
-                            "n_eclipse_only_observations": int(np.sum(local_eclipse_mask)),
-                            "injected_longitude_degrees": injected_longitude,
-                            "injected_latitude_degrees": None
-                            if injected_longitude is None
-                            else float(analysis["injected_latitude_degrees"]),
-                            "injected_width_degrees": None
-                            if injected_longitude is None
-                            else float(analysis["injected_width_degrees"]),
-                            "injection_fraction": None
-                            if injected_longitude is None
-                            else fraction,
-                            "injected_timing_seconds": injected_timing,
-                            "truth_map_minimum_intensity": truth_minimum,
-                            "truth_map_peak_longitude_degrees": truth_peak_lon,
-                            "truth_map_peak_latitude_degrees": truth_peak_lat,
-                            "truth_map_peak_shift_degrees": truth_peak_shift,
-                            "recovered_longitude_q16_degrees": q16,
-                            "recovered_longitude_median_degrees": q50,
-                            "recovered_longitude_q84_degrees": q84,
-                            "longitude_bias_degrees": longitude_bias,
-                            "longitude_interval_contains_truth": contains,
-                            "longitude_interval_resolution_limited": result[
-                                "longitude_resolution_limited"
-                            ],
-                            "recovered_latitude_q16_degrees": result["latitude_q"][0],
-                            "recovered_latitude_median_degrees": result["latitude_q"][1],
-                            "recovered_latitude_q84_degrees": result["latitude_q"][2],
-                            "recovered_width_q16_degrees": result["width_q"][0],
-                            "recovered_width_median_degrees": result["width_q"][1],
-                            "recovered_width_q84_degrees": result["width_q"][2],
-                            "recovered_timing_q16_seconds": result["timing_q"][0],
-                            "recovered_timing_median_seconds": result["timing_q"][1],
-                            "recovered_timing_q84_seconds": result["timing_q"][2],
-                            "best_width_degrees": result["best_width"],
-                            "best_latitude_degrees": result["best_latitude"],
-                            "best_timing_seconds": result["best_timing"],
-                            "best_map_amplitude_scale": result["map_amplitude"],
-                            "best_map_amplitude_ppm": result["map_amplitude"]
-                            * float(target["depth_ppm"]),
-                            "best_uniform_map_amplitude_scale": result[
-                                "uniform_map_amplitude"
-                            ],
-                            "best_spot_amplitude_scale": result["spot_amplitude"],
-                            "best_recovered_spot_fraction": result[
-                                "recovered_spot_fraction"
-                            ],
-                            "uniform_bic": result["uniform_bic"],
-                            "flexible_bic": result["flexible_bic"],
-                            "delta_bic": result["delta_bic"],
-                            "delta_bic_detection_threshold": DETECTION_DELTA_BIC,
-                            "map_detected": bool(result["delta_bic"] < DETECTION_DELTA_BIC),
-                            "best_map_minimum_intensity": result["map_minimum"],
-                            "best_map_peak_longitude_degrees": result["peak_longitude"],
-                            "best_map_peak_latitude_degrees": result["peak_latitude"],
-                            "best_map_peak_shift_degrees": result["peak_shift"],
-                            "best_map_positive": result["map_positive"],
-                            "residual_rms_ppm": result["residual_rms_ppm"],
-                            "random_seed": seed,
-                        }
-                        rows.append(row)
-                        if fit_scope == "full_window":
-                            # Store full-window profile arrays in NPZ only.
-                            # CSV and the trial summaries contain both scopes.
-                            profile_records.append(
-                                {
-                                    "run_id": row["run_id"],
-                                    "target": name,
-                                    "instrument": str(target["instrument"]),
-                                    "teq_k": float(target["teq_k"]),
-                                    "noise_ppm": sigma_ppm,
-                                    "scenario": scenario,
-                                    "trial": int(trial),
-                                    "fit_scope": fit_scope,
-                                    "log_likelihood": result["log_likelihood_values"],
-                                    "profile_bic": result["profile_bic"],
-                                    "posterior_weights": result["posterior_weights"],
-                                }
-                            )
-                    if trial == 0:
-                        for fit_scope, result in result_by_scope.items():
-                            for row_index in range(time_days.size):
-                                examples_by_target[name].append(
-                                    {
-                                        "target": name,
-                                        "instrument": str(target["instrument"]),
-                                        "teq_k": float(target["teq_k"]),
-                                        "noise_ppm": sigma_ppm,
-                                        "noise_input_ppm": float(noise_input),
-                                        "scenario": scenario,
-                                        "trial": trial,
-                                        "fit_scope": fit_scope,
-                                        "time_hours_from_eclipse": float(
-                                            (time_days[row_index] - float(target.get("eclipse_time_days", 0.0)))
-                                            * 24.0
-                                        ),
-                                        "orbital_phase_from_transit": float(
-                                            (
-                                                (time_days[row_index] - float(target.get("eclipse_time_days", 0.0)))
-                                                / float(target["period_days"])
-                                                + 0.5
-                                            )
-                                            % 1.0
-                                        ),
-                                        "in_eclipse_only_mask": bool(local_eclipse_mask[row_index]),
-                                        "truth_flux_ppm": float(truth_signal[row_index]),
-                                        "observed_flux_ppm": float(observed[row_index]),
-                                        "sigma_ppm": sigma_ppm,
-                                        "full_window_fit_flux_ppm": float(
-                                            result_by_scope["full_window"]["predicted_full_ppm"][row_index]
-                                        ),
-                                        "eclipse_only_fit_flux_ppm": float(
-                                            result_by_scope["eclipse_only"]["predicted_full_ppm"][row_index]
-                                        ),
-                                    }
-                                )
-
-        print(
-            f"Completed target {target_index + 1}/{len(targets)}: {name}",
-            flush=True,
-        )
+        for target_index, target in enumerate(targets)
+    ]
+    target_results = ordered_map(_run_target_study, jobs, plan)
+    rows = [row for result in target_results for row in result["rows"]]
+    profile_records = [
+        record for result in target_results for record in result["profile_records"]
+    ]
+    examples_by_target = {
+        name: examples
+        for result in target_results
+        for name, examples in result["examples_by_target"].items()
+    }
+    target_summaries = [
+        summary for result in target_results for summary in result["target_summaries"]
+    ]
+    numerical_checks = [
+        check for result in target_results for check in result["numerical_checks"]
+    ]
+    # The serial runner saved the common candidate arrays from its last target.
+    # Keep that output convention while retaining each target's calculation.
+    candidate_profile_arrays = target_results[-1]["candidate_profile_arrays"]
+    execution_plan = {
+        **plan.to_dict(),
+        "parent_process_id": os.getpid(),
+        "worker_process_ids": sorted(
+            {int(result["process_id"]) for result in target_results}
+        ),
+    }
+    execution_plan["actual_workers"] = len(execution_plan["worker_process_ids"])
 
     output.mkdir(parents=True, exist_ok=True)
     input_payload = {
@@ -1526,6 +1630,7 @@ def run_study(
             "seed_provenance": SEED_PROVENANCE,
             "check_convergence": bool(check_convergence),
             "convergence_tolerance_ppm": float(convergence_tolerance_ppm),
+            "execution_plan": execution_plan,
         },
         "source_assumptions": {
             "offset_rule": "delta = atan(tan(40 degrees) * (1500 K / Teq)^3)",
@@ -1600,12 +1705,12 @@ def run_study(
             "scenario": np.asarray([item["scenario"] for item in profile_records], dtype="U32"),
             "trial": np.asarray([item["trial"] for item in profile_records], dtype=np.int32),
             "fit_scope": np.asarray([item["fit_scope"] for item in profile_records], dtype="U24"),
-            "candidate_longitude_degrees": candidate_longitude_array,
-            "candidate_peak_longitude_degrees": candidate_peak_longitude_array,
-            "candidate_latitude_degrees": candidate_latitude_array,
-            "candidate_peak_latitude_degrees": candidate_peak_latitude_array,
-            "candidate_width_degrees": candidate_width_array,
-            "candidate_timing_seconds": candidate_timing_array,
+            "candidate_longitude_degrees": candidate_profile_arrays["candidate_longitude_array"],
+            "candidate_peak_longitude_degrees": candidate_profile_arrays["candidate_peak_longitude_array"],
+            "candidate_latitude_degrees": candidate_profile_arrays["candidate_latitude_array"],
+            "candidate_peak_latitude_degrees": candidate_profile_arrays["candidate_peak_latitude_array"],
+            "candidate_width_degrees": candidate_profile_arrays["candidate_width_array"],
+            "candidate_timing_seconds": candidate_profile_arrays["candidate_timing_array"],
             "profile_log_likelihood": profile_log_likelihood,
             "profile_bic": profile_bic,
             "posterior_weights": posterior_weights,
@@ -1640,6 +1745,7 @@ def run_study(
         "effective_input_assumptions": _effective_input_assumptions(raw, effective_trials),
         "input_sources": raw.get("sources", []),
         "analysis": analysis_resolved,
+        "execution_plan": execution_plan,
         "targets": target_summaries,
         "trial_summaries": _summary_rows(rows),
         "numerical_convergence_checks": numerical_checks,
@@ -1698,6 +1804,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--disk-radial", type=_positive_int, default=32)
     parser.add_argument("--disk-azimuth", type=_positive_int, default=128)
     parser.add_argument("--chunk-size", type=_positive_int, default=128, help="Observations per forward-operator chunk")
+    parser.add_argument("--max-cpus", type=_positive_int, default=3, help="Total CPU budget for the run")
+    parser.add_argument("--workers", type=_positive_int, default=1, help="Target processes to use within --max-cpus")
+    parser.add_argument("--threads", type=_positive_int, default=1, help="Numerical threads per worker")
     parser.add_argument(
         "--check-convergence",
         action="store_true",
@@ -1723,6 +1832,9 @@ def main(argv: list[str] | None = None) -> int:
         disk_radial=args.disk_radial,
         disk_azimuth=args.disk_azimuth,
         chunk_size=args.chunk_size,
+        max_cpus=args.max_cpus,
+        workers=args.workers,
+        threads=args.threads,
         check_convergence=args.check_convergence,
         convergence_tolerance_ppm=args.convergence_tolerance_ppm,
     )
